@@ -40,9 +40,11 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T00.1 Inspect actual repo, docs and environment
 
-- [ ] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
-- [ ] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
+- [x] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
+- [x] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
 - [ ] Confirm configured Supabase project, local CLI/deployment method, target app identifiers, device camera test path, CI/secret management.
+
+**Audit evidence (2026-11-02):** [Integration inventory](PICKWELL_INTEGRATION_INVENTORY.md). Dependency install and static analysis passed. T00.1 remains open: no linked/configured hosted Supabase project; local Docker connection unavailable; camera implementation and device validation absent; CI/signing/remote secret management unverified. No application source or infrastructure changed.
 
 **Acceptance:** Concise integration inventory of existing files, work already completed, missing credentials, and risks; no unnecessary scaffold rewrite.  
 **Targeted validation:** Dependency install / static analyzer on relevant code; verify environment examples contain no real secrets.
