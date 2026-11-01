@@ -64,6 +64,8 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T01.1 Supabase → Meta vision proof of concept
 
+**HARD BLOCKED (2026-11-02):** [Spike preparation and evidence](PICKWELL_META_VISION_SPIKE.md). Current provider documentation checked; disabled isolated adapter, strict schema, operator/auth guards, local tests and live runner prepared. No Meta credentials/model configuration, linked Supabase deployment/test identity or real label fixtures are available. No live inference or deployment occurred; all acceptance boxes remain unchecked.
+
 - [ ] Deploy a narrowly scoped, non-public or separately protected test Edge Function that sends **two real food-package photos** (nutrition and ingredients) to the selected Meta vision model.
 - [ ] Validate authentication/authorization, request format, model availability, response schema, per-image behavior, max input size, duration, provider token/cost reporting, timeout and failure modes.
 - [ ] Test at least two clearly different product pairs and one unreadable label. Demand null/unknown rather than fabricated values; evaluate image basis/units.

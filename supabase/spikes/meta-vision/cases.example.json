@@ -1,0 +1,20 @@
+{
+  "note": "Manifest template only. No real label images are included. Keep populated manifests/photos in an ignored .secrets directory.",
+  "cases": [
+    {
+      "nutrition": "product-a-nutrition.jpg",
+      "ingredients": "product-a-ingredients.jpg",
+      "expected_status": "extracted"
+    },
+    {
+      "nutrition": "product-b-nutrition.jpg",
+      "ingredients": "product-b-ingredients.jpg",
+      "expected_status": "extracted"
+    },
+    {
+      "nutrition": "product-a-nutrition.jpg",
+      "ingredients": "unreadable-ingredients.jpg",
+      "expected_status": "needs_retake"
+    }
+  ]
+}
