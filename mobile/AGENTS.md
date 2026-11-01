@@ -437,3 +437,138 @@ failure/retry behavior, and light/dark themes as applicable.
 Before reporting completion, inspect the diff, preserve unrelated working-tree
 changes, update setup/config examples when behavior changes, and state validation
 and remaining device/service checks. Analysis alone does not prove runtime behavior.
+
+## 1. Read first: mandatory order
+
+1. Inspect the real repository root, directory layout, existing `AGENTS.md`, and current git diff/status. Preserve uncommitted user changes.
+2. Read `PICKWELL_PRD.md` (v1.3), then `PICKWELL_DESIGN.md` (v1.1), `PICKWELL_SPEC.md` (v1.1), `PICKWELL_DATABASE.md` (v1.0), and `PICKWELL_TASKS.md` (v1.0). If filenames differ, locate the role-equivalent file; do not fabricate paths.
+3. Follow the next verified unfinished TASKS task and its prerequisites. A stale unchecked box does not override real working code or user-reported completion.
+4. Inspect existing Flutter templates, Cubit/Bloc patterns, routing, build flavors, package configuration, tests, Supabase migrations/functions, and dependency injection before modifying them.
+5. When documents conflict, stop the *affected step*, report the conflict with file/section references, and preserve the latest user-approved product decisions below. Do not invent a new monetization, auth, or UX policy.
+
+## 2. Locked MVP product decisions
+
+- Project is **Pickwell AI V2**, repository `pickwell-ai`; this is a lasting product revival, not a disposable hackathon demo.
+- Flutter iOS and Android, reusing existing StartAppLab boilerplate. Cubit/Bloc is preferred when already established in the template.
+- **Barcode-first:** scan → secure Supabase lookup. For a `ready` barcode, return saved product data with **zero Meta AI calls**.
+- Missing barcode: guided three-step flow **Barcode ✓ → Nutrition facts image → Ingredients image**. Support preview and retake. Product name and brand are optional.
+- Guests may barcode-scan and view published cached results **without signing in**.
+- A user may capture labels as a guest, but **must sign in using verified Supabase Email OTP before submitting new AI analysis**; retain photos and barcode through the auth interruption.
+- New-product analysis runs **through authenticated Supabase Edge Functions**, calling an approved Meta multimodal model, then validating extracted ingredient/nutrition facts and reasoned findings on the server.
+- Use **evidence-aware green/yellow/red findings with explicit reasons and references/rules**; never treat color as an independently verified health verdict. No arbitrary 0–100 score.
+- Publish a reusable shared product only after automated validation. Incomplete/unreadable or inconsistent label data must request retake; never publish invented facts.
+- No permanent retention of submitted label photos after successful extraction; temporary private storage, if needed, requires failure/orphan cleanup and access limits.
+- **Free quotas:** initial 30 barcode lookups/day for attributable signed-in users, 3 successful new-product AI analyses/day per verified signed-in user, UTC midnight reset. Guests use best-effort lookup throttling, **not guaranteed per-person 30/day**. Quotas are mutable server-side.
+- Both nutrition and ingredients images count as **one** analysis for one product. Failed extraction and bounded retakes do not consume successful-analysis credits. Reserve atomically to bound concurrent spend.
+- Backend is **Supabase PostgreSQL, Edge Functions, Supabase Auth**. Meta API secrets and privileged Supabase credentials remain on server only.
+- **RevenueCat is selected** for eventual paid subscriptions. Prepare server-side Free/Premium entitlements, identity mapping and safe webhook event handling, with **billing/paywall/purchases disabled** during hackathon. Do not assume Premium pricing, limits, or entitlement IDs.
+- Minimal first-party operational analytics and AI cost tracking; no unrelated third-party analytics or billing services without approval.
+- No unnecessary feature work: **AI chat, cosmetics, barcode-free analysis, numeric food score, product comparison, alternative recommendations, history/offline favorites, community, broad localization, elaborate onboarding, subscription paywall** remain deferred.
+
+## 3. Operating boundaries
+
+### Flutter (untrusted client)
+
+- The Flutter app may contain the **Supabase URL and publishable key only**; an existing legacy anon key is acceptable only if the repository already uses it.
+- Do **not** include Meta API keys, Supabase secret/service-role keys, raw database passwords, RevenueCat webhook secrets, or admin bypass tokens in Flutter binaries, `.env` assets or public repo.
+- Backend determines `plan`, `entitlement`, quota remaining, whether a record is published, findings, and trusted user identity. Client-controlled flags must not authorize privileged behavior.
+- Keep UI responsive and states explicit: `scanning`, `checking`, `ready`, `not_found`, `processing`, `needs_retake`, `auth_required`, `rate_limited`, `quota_exceeded`, `network_error`.
+- A network timeout or DB failure is **not** a product-not-found result.
+- Follow DESIGN for scan, capture, OTP, processing, result, and minimal account/settings states; retain readable icons/text independent of colors.
+- Request camera access only when needed. Choose existing project-approved camera/gallery packages before adding dependencies. Do not claim camera functionality is validated without actual device testing.
+
+### Supabase database and Edge Functions
+
+- Enforce RLS on exposed tables, deny **direct client writes** to the shared catalog, analyses, usage, jobs, entitlements and RevenueCat events.
+- `get-product` is a controlled **public lookup** with sanitized published output and protective throttling; **never invokes Meta AI**.
+- `analyze-product` is a **verified-user-only** expensive operation. Verify JWT/identity and verified email **inside backend**, then check barcode cache, plan and quota; validate images, charge/reserve atomically, invoke Meta, validate and publish.
+- Do not interpret a Supabase `authenticated` database role alone as proof of verified non-anonymous identity.
+- Use normalized/validated barcodes, unique constraints, transaction-safe job leases, idempotency keys, bounded retries, and duplicate prevention so two concurrent submitters do not publish conflicting records or issue unnecessary repeated AI calls.
+- Protect all security-definer functions and grants; test with public and authenticated roles, not only privileged service clients.
+- Limit image count, byte size, formats and processing time. Never log raw images, passwords, OTP codes, tokens, private API payloads, or personally identifying information unnecessarily.
+- Avoid permanent photo retention. If private temporary storage is required, clean it on success and through a bounded orphan/failed-job expiry process.
+- Configure quota limits in server data, not app constants; UTC resets, exact signed-in usage, guest best-effort throttling. Separate **user quota** from **global AI spend and concurrency** limits.
+
+### Meta API and evidence requirements
+
+- First critical integration gate: **actual** Supabase Edge Function makes a successful multimodal Meta API call with both nutrition and ingredient photos; model/account access and current request limits remain unverified until tested.
+- Model output must be schema validated. Preserve literal printed label values, units, serving-size basis, raw ingredient text, missing fields, provenance, model and prompt versions.
+- Never invent references, nutritional quantities, dosage implications, ingredient dangers or medical advice. Distinguish label facts, explanatory inferences, and external evidence.
+- AI can draft explanations, but code must own deterministic thresholds, final classifications, and publication acceptance. If evidence insufficient, ask for retake/mark unknown rather than asserting safety.
+- Use product-specific wording; do not label a food as universally “healthy” or “unhealthy” or guarantee allergen absence.
+
+### RevenueCat readiness (no live billing)
+
+- Prepare future `free`/`premium` plan resolution, entitlements, stable verified Supabase user identity linkage, and protected, idempotent webhook/event ledger according to DATABASE/SPEC.
+- Keep `billing_enabled=false` and normal users on Free. Backend test Premium grants must be privileged, labeled and isolated; **never** trust app-supplied Premium.
+- RevenueCat purchase products, offering IDs, subscription prices, trial details and Premium daily allowances are not approved. Do not invent them.
+- If not configured to validate webhook authentication and reconcile out-of-order/duplicate events, **do not deploy a public webhook**.
+- Do not add RevenueCat SDK checkout, paywall screens, purchase buttons or entitlement-granting client paths in the hackathon build. Future integration is a deliberate post-hackathon stage.
+
+## 4. Coding standards and changes
+
+- Respect existing repo conventions and package versions. Avoid wholesale scaffold replacement, unnecessary architecture refactors, broad reformatting, new services, and packages unrelated to the current task.
+- Prefer small, reversible modifications and migrations; no destructive database operations without explicit authorization.
+- Follow existing dependency injection and Cubit/Bloc convention; if a layer/pattern does not exist, document the smallest justified addition.
+- Structured results and statuses must be typed and validated at trust boundaries. Error responses should not leak secrets or stack traces.
+- Do not create artwork, mock product data pretending to be real, or false screenshots. Use labeled fixtures/placeholders when appropriate.
+- Keep environmental values in `.env.example` as placeholders only; never store real credentials.
+- For SQL schema creation, treat DATABASE.md's examples as a **blueprint**, not production-ready scripts. Write migrations against the actual existing schema and run RLS and role tests.
+- For every added network/dependency integration, identify the minimum real verification required to claim it functions.
+
+## 5. Task execution protocol
+
+For each task:
+1. Read its exact TASKS ID, prerequisites, acceptance criteria, related docs and current code.
+2. State the planned minimal edits, known blockers, and whether any existing work already satisfies the task.
+3. Implement only that task and immediately affected dependencies; defer adjacent phases.
+4. Run **targeted tests** for changed code, permissions and server routes. Avoid blanket full-repository regression unless specifically requested or in final QA phase.
+5. Update the relevant TASKS checkbox **only after actual verification**; do not mark speculative work done.
+6. Deliver a completion report containing:
+   - Task ID and what works
+   - Actual changed files
+   - Commands/tests run with observed results
+   - Security, cost and performance considerations
+   - Remaining blockers, credentials or approved UI assets needed
+   - TASKS status changes, if any
+
+**Do not** claim an Edge Function is deployed, a database migration is applied, a live Meta call completed, or an OTP email was sent unless it was actually verified. Never expose secrets in the report.
+
+## 6. Definition of Done / gating checks
+
+A task is done only when independently observable acceptance criteria are satisfied. Key critical-path gates:
+
+1. Meta model can interpret two real product-label images through secured Supabase backend.
+2. Guest cached scan returns a validated result, no sign-in, no AI call.
+3. Unknown product leads to three-step capture, verified OTP, and secure analysis request preserving captured images.
+4. Backend extracts and validates, requests retakes when needed, publishes safe shared analysis, and cleans up temp photos.
+5. A new guest can scan that same barcode and receive cached data without any AI request.
+6. Free quotas (30/3), UTC reset, concurrency and safe failures work; server config changes limits without app update.
+7. Public database role cannot create/edit products or grant entitlements, bypass quotas or read private jobs.
+8. RevenueCat-ready schema/event logic cannot grant Premium through arbitrary client input; no paywall flow is exposed.
+9. Results remain understandable without color alone; no fabricated ingredients, nutrition or evidence.
+
+## 7. Implementation priorities and escalation
+
+- Prioritize Meta two-image API spike and Email OTP delivery early; both are external integration risks.
+- Protect the main barcode → cache → capture → AI → publish → cache path first.
+- If hackathon schedule tightens, postpone cosmetic polish, manual barcode entry, optional product-name editing and unconfigured RevenueCat webhook deployment; **never trade away verified auth, credential secrecy, RLS, quota controls, idempotency and truthful results**.
+- If Meta multimodal API access is unavailable, record it as a blocker rather than silently swapping model providers.
+- Only request user input when truly necessary (e.g., unavailable credentials/irreconcilable project conflict); otherwise make safe defaults consistent with docs and report assumptions.
+
+## 8. Task/dependency index
+
+- **Phase 0** `T00.1–T00.2`: repo audit and secret-safe configuration.
+- **Phase 1** `T01.1`: Meta multimodal integration spike (hard feasibility gate).
+- **Phase 2** `T02.1–T02.4`: migrations, RLS, quotas, minimal telemetry.
+- **Phase 3** `T03.1–T03.2`: public lookup + Flutter scanning.
+- **Phase 4** `T04.1–T04.2`: three-step image capture + Email OTP.
+- **Phase 5** `T05.1–T05.3`: secure AI jobs, validation, publish and cleanup.
+- **Phase 6** `T06.1–T06.4`: results, quota UI, RevenueCat backend readiness, minimal Settings.
+- **Phase 7** `T07.1–T07.2`: integrated QA and hackathon handoff.
+
+All future feature ideas go to a separately approved ROADMAP, not to TASKS checkboxes.
+
+---
+
+**Reminder:** The repository is not attached to this document. The coding agent must inspect the real working tree and existing instructions before applying `AGENTS.md` or beginning development.
