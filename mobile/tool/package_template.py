@@ -37,7 +37,7 @@ def included(relative):
         and relative.as_posix() != 'test/widget_test.dart'
     ):
         return False
-    return relative.as_posix() != 'Makefile'
+    return True
 
 
 def create_archive(root, output, name='pickwell'):
@@ -51,8 +51,6 @@ def create_archive(root, output, name='pickwell'):
                 relative = path.relative_to(root)
                 if path.is_symlink() or path == output or not included(relative):
                     continue
-                if relative.as_posix() == 'Makefile.prod':
-                    relative = Path('Makefile')
                 archive.write(path, f'{name}/{relative.as_posix()}')
     return output
 

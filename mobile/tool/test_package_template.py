@@ -13,7 +13,7 @@ class PackagingTests(unittest.TestCase):
     def test_credentials_and_ephemeral_files_are_excluded(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / 'source'
-            files = ['mason.yaml', 'mason-lock.json', '.mason/bricks/cache.txt', 'lib/main.dart', 'config/features.json', 'tool/check_billing_config.py', 'Makefile.prod', 'Makefile', '.secrets/prod.secrets',
+            files = ['mason.yaml', 'mason-lock.json', '.mason/bricks/cache.txt', 'lib/main.dart', 'config/features.json', 'tool/check_billing_config.py', 'Makefile', '.secrets/prod.secrets',
                      '.env.fastlane', '.env.fastlane.example', 'android/key.properties',
                      'android/release.jks', 'sentry.properties', 'fastlane/downloads/listing.txt',
                      'ios/Flutter/ephemeral/package.swift', '.dart_tool/cache.txt']
@@ -40,21 +40,19 @@ class PackagingTests(unittest.TestCase):
             root = Path(directory) / 'source'
             shutil.copytree(source / 'tool', root / 'tool')
             shutil.copytree(source / 'config', root / 'config')
-            makefile = source / 'Makefile.prod' if (source / 'Makefile.prod').exists() else source / 'Makefile'
-            shutil.copy(makefile, root / 'Makefile.prod')
+            shutil.copy(source / 'Makefile', root / 'Makefile')
             output = create_archive(root, Path(directory) / 'template.zip', name='consumer-app')
             with ZipFile(output) as archive:
                 archive.extractall(Path(directory) / 'generated')
             generated = Path(directory) / 'generated/consumer-app'
             self.assertTrue((generated / 'Makefile').exists())
-            self.assertFalse((generated / 'Makefile.prod').exists())
             (generated / 'release.json').write_text(json.dumps({
                 'APP_ENVIRONMENT': 'prod', 'APP_NAME': 'Consumer App', 'BILLING_MODE': 'disabled'}))
             result = subprocess.run(['make', 'preflight-billing', 'APP_CONFIG=release.json'],
                                     cwd=generated, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             result = subprocess.run(['python3', '-m', 'unittest',
-                'test_check_billing_config.BillingValidationTest.test_make_blocks_invalid_release_before_flutter_for_both_makefiles_and_platforms'],
+                'test_check_billing_config.BillingValidationTest.test_make_blocks_invalid_release_before_flutter_for_both_platforms'],
                 cwd=generated / 'tool', capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
 

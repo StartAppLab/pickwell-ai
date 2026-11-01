@@ -132,7 +132,6 @@ Observed validation for this change:
 | Preflight on both committed Pickwell profile samples | Expected failure: placeholder URL; neither sample pretends to connect. |
 | Preflight on existing ignored `.secrets/dev.secrets` | Expected failure: profile still has disabled auth/backend; preserved without modification. |
 | `git check-ignore` | Dev/staging secret files, `.env.production` and Fastlane credentials ignored; public/server examples trackable. |
-| Temporary archive inspection | Environment/release validators and catalog included; local secret paths excluded. Makefile assertion failed: pre-existing missing `mobile/Makefile.prod` means the packager excludes authored Makefile with no replacement. Packaging repair is outside T00.2; do not treat this archive as release-ready. |
 
 The scan and local tests make no network requests. A minimal live connection check
 was not attempted without a real URL/key; server secret reads and negative server

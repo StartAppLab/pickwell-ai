@@ -54,9 +54,8 @@ make build-ios
 
 Both release build targets run preflight before Flutter and use the exact define
 file checked. Override `APP_CONFIG`, `FEATURE_CATALOG`, or `SUPABASE_DIR` when
-needed. In this source repository, `make -f Makefile.prod ...` uses the committed
-production Makefile; the template packager renames it to `Makefile` for generated
-apps. A direct `fvm flutter build` command bypasses this gate, so run
+needed. The repository and generated projects use `Makefile`. A direct
+`fvm flutter build` command bypasses this gate, so run
 `python3 tool/check_billing_config.py --config .secrets/prod.secrets --platform android`
 first when using a custom build pipeline; select `--platform ios` for iOS. Debug and staging commands are unchanged.
 

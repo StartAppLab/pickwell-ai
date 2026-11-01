@@ -236,7 +236,7 @@ Identify the requested kind of pricing before editing:
   retain empty entitlement/offering mappings; named features require mappings.
 - Production builds run `tool/check_billing_config.py` through Makefile targets.
   Keep the checked `APP_CONFIG` identical to the file passed to Flutter, and update
-  the authored Makefile plus packaged `Makefile.prod` when changing build wiring.
+  the `Makefile` when changing build wiring.
 - Run the preflight separately before a direct Flutter release command. It checks
   local consistency, not live RevenueCat catalogs or deployed server policies.
 - A `server` declaration requires installed optional module artifacts and auth.
@@ -387,8 +387,8 @@ Theme paths below are under `lib/src/config/theme/`:
   `ios/Flutter/ephemeral`; verify new plugins support SPM.
 - Preserve Java 17, Android minimum SDK 26, compile SDK at least 37, and existing
   Flutter-managed SDK settings. Check build-tool/plugin changes on both platforms.
-- Preserve template packaging: authored `Makefile` versus `Makefile.prod` renamed
-  to `Makefile` for generated projects. Use `tool/package_template.py` and extend
+- Preserve template packaging, including the existing `Makefile`. Use
+  `tool/package_template.py` and extend
   credential exclusions when adding files. Retain the existing Fastlane setup.
 - The template currently prescribes local checks. Do not introduce hosted CI or
   replace deployment automation as an incidental feature change.
@@ -428,7 +428,7 @@ failure/retry behavior, and light/dark themes as applicable.
 - Backend changes: from the repository root, run `supabase db reset` and
   `supabase test db` on the local Docker stack. Do not use remote projects for local tests.
 - Packaging changes: `python3 -m unittest discover -s tool -p 'test_*.py'`; inspect
-  an archive for credentials/build caches and the production Makefile rename.
+  an archive for credentials/build caches and the Makefile.
 - OAuth, purchase/restore, account transfers, and reminders require the app's
   device/store-sandbox validation; unit/widget tests do not prove those integrations.
 - Documentation-only edits: verify instructions, paths, and diff whitespace.

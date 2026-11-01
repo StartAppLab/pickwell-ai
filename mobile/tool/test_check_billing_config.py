@@ -169,7 +169,7 @@ class BillingValidationTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertNotIn('sb_secret_do-not-print', result.stdout + result.stderr)
 
-    def test_make_blocks_invalid_release_before_flutter_for_both_makefiles_and_platforms(self):
+    def test_make_blocks_invalid_release_before_flutter_for_both_platforms(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             shutil.copytree(ROOT / 'tool', root / 'tool')
@@ -182,11 +182,8 @@ class BillingValidationTest(unittest.TestCase):
             fvm.write_text('#!/bin/sh\nprintf \"%s\\n\" \"$@\" > flutter-called\n')
             fvm.chmod(0o755)
             env = {**os.environ, 'PATH': str(binary) + os.pathsep + os.environ['PATH']}
-            for makefile in ['Makefile', 'Makefile.prod']:
-                # The packager renames Makefile.prod to Makefile in generated apps.
+            for makefile in ['Makefile']:
                 source = ROOT / makefile
-                if not source.exists():
-                    source = ROOT / 'Makefile.prod' if (ROOT / 'Makefile.prod').exists() else ROOT / 'Makefile'
                 shutil.copy(source, root / makefile)
                 for target in ['build-android', 'build-ios']:
                     result = subprocess.run(['make', '-f', makefile, target, 'APP_CONFIG=production config.json'],
@@ -194,7 +191,7 @@ class BillingValidationTest(unittest.TestCase):
                     self.assertNotEqual(result.returncode, 0)
                     self.assertFalse((root / 'flutter-called').exists())
             config.write_text(json.dumps(free_config()))
-            for makefile in ['Makefile', 'Makefile.prod']:
+            for makefile in ['Makefile']:
                 for target in ['build-android', 'build-ios']:
                     result = subprocess.run(['make', '-f', makefile, target, 'APP_CONFIG=production config.json'],
                                             cwd=root, env=env, capture_output=True, text=True)
