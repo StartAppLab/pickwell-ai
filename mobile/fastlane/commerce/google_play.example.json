@@ -1,0 +1,86 @@
+{
+  "package_name": "com.example.myapp",
+  "regions_version": "2025/03",
+  "one_time_products": [
+    {
+      "product_id": "myapp.lifetime",
+      "listings": [
+        {
+          "language_code": "en-US",
+          "title": "Lifetime Unlock",
+          "description": "Unlock Pickwell forever."
+        }
+      ],
+      "purchase_options": [
+        {
+          "purchase_option_id": "buy",
+          "purchase_type": "buy",
+          "activate": false,
+          "pricing": {
+            "base_currency": "USD",
+            "base_price": "19.99",
+            "manual_prices": {
+              "US": "19.99"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "subscriptions": [
+    {
+      "product_id": "myapp.pro",
+      "listings": [
+        {
+          "language_code": "en-US",
+          "title": "Pickwell Pro",
+          "description": "Premium access to Pickwell.",
+          "benefits": [
+            "Premium features"
+          ]
+        }
+      ],
+      "base_plans": [
+        {
+          "base_plan_id": "weekly",
+          "plan_type": "auto_renewing",
+          "billing_period_duration": "P1W",
+          "activate": false,
+          "pricing": {
+            "base_currency": "USD",
+            "base_price": "1.99",
+            "manual_prices": {
+              "US": "1.99"
+            }
+          }
+        },
+        {
+          "base_plan_id": "monthly",
+          "plan_type": "auto_renewing",
+          "billing_period_duration": "P1M",
+          "activate": false,
+          "pricing": {
+            "base_currency": "USD",
+            "base_price": "4.99",
+            "manual_prices": {
+              "US": "4.99"
+            }
+          }
+        },
+        {
+          "base_plan_id": "yearly",
+          "plan_type": "auto_renewing",
+          "billing_period_duration": "P1Y",
+          "activate": false,
+          "pricing": {
+            "base_currency": "USD",
+            "base_price": "29.99",
+            "manual_prices": {
+              "US": "29.99"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

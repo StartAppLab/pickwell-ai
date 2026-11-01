@@ -1,0 +1,92 @@
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.webp
+*.avif
+
+# Fonts and other assets
+*.pdf
+*.ttf
+*.woff
+*.woff2
+*.eot
+*.otf
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output (Astro + Cloudflare)
+dist/
+.astro/
+.wrangler/
+.vercel/
+.netlify/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# Cache and temporary
+.cache/
+.parcel-cache
+.eslintcache
+.npm
+tmp/
+temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Package manager lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*.generated.*
+*.min.js
+*.min.css
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Public assets
+public/

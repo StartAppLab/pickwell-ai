@@ -1,0 +1,20 @@
+---
+import { BlogAll } from '@/components/sections/blog/blog-all';
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import { ScrollUpButton } from '@/components/shared/scroll-up-button';
+import { BlogParser } from '@/lib/blog-parser';
+import Layout from '@/layouts/Layout.astro';
+
+const blogs = await BlogParser.getAllBlogs();
+---
+
+<Layout>
+  <Header client:load />
+  <BlogAll
+    {blogs}
+    client:load
+  />
+  <Footer client:idle />
+  <ScrollUpButton client:idle />
+</Layout>

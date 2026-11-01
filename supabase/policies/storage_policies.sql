@@ -1,0 +1,2 @@
+-- Storage policies and buckets are managed by migrations/20261013000000_consumer_foundations.sql.
+-- Apply migrations with supabase db reset (local) or supabase db push (remote).

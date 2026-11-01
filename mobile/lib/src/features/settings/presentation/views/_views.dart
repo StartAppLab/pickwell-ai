@@ -1,0 +1,10 @@
+export 'settings_account_view.dart';
+export 'settings_dark_mode_view.dart';
+export 'settings_language_view.dart';
+export 'settings_notifications_view.dart';
+export 'settings_privacy_policy_view.dart';
+export 'settings_subscription_debug_view.dart';
+export 'settings_terms_of_use_view.dart';
+export 'settings_theme_view.dart';
+export 'settings_view.dart';
+export 'settings_changelog_view.dart';

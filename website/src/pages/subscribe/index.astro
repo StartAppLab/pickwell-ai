@@ -1,0 +1,14 @@
+---
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import { Subscribe } from '@/components/sections/subscribe/subscribe';
+import { ScrollUpButton } from '@/components/shared/scroll-up-button';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout>
+  <Header client:load />
+  <Subscribe client:load />
+  <Footer client:idle />
+  <ScrollUpButton client:idle />
+</Layout>

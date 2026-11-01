@@ -1,0 +1,14 @@
+---
+import { InternalServerError } from '@/components/sections/error/internal-server-error';
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout
+  title='Server Error'
+  description='An unexpected error occurred. Please try again later.'>
+  <Header client:load />
+  <InternalServerError client:load />
+  <Footer client:idle />
+</Layout>

@@ -1,0 +1,211 @@
+---
+export interface SeoProps {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: string;
+  canonicalURL?: string;
+}
+
+// App-wide constants
+const appName = 'StartAppNotes';
+const defaultTitle = `${appName} - Capture Ideas Instantly & Organize Effortlessly`;
+const defaultDescription =
+  'The modern note-taking app for creators, developers, and thinkers. Capture thoughts, organize with tags, and sync seamlessly across all your devices.';
+
+// SEO data for each page in the website
+const SEO_DATA: Record<string, { title: string; description: string }> = {
+  // Home Page (/)
+  '/': {
+    title: defaultTitle,
+    description: defaultDescription,
+  },
+  // About Page (/about)
+  '/about': {
+    title: `About Us | ${appName}`,
+    description: `Learn about ${appName} - a private, fast, and powerful note-taking app built for knowledge workers and digital gardeners.`,
+  },
+  // Contact Page (/contact)
+  '/contact': {
+    title: `Contact Us | ${appName}`,
+    description: `Get in touch with the ${appName} team for support, feedback, or partnership inquiries.`,
+  },
+  // Privacy Policy Page (/privacy)
+  '/privacy': {
+    title: `Privacy Policy | ${appName}`,
+    description: `Learn how ${appName} protects your privacy and safeguards your personal knowledge base with secure, local-first data management.`,
+  },
+  // Terms of Use Page (/terms)
+  '/terms': {
+    title: `Terms of Use | ${appName}`,
+    description: `Read the Terms of Use for using the ${appName} platform and services.`,
+  },
+  // Cookie Policy Page (/cookies)
+  '/cookies': {
+    title: `Cookie Policy | ${appName}`,
+    description: `Learn about how ${appName} handles local storage and device identifiers to provide a seamless experience.`,
+  },
+  // Download Page (/download)
+  '/download': {
+    title: `Download ${appName} | ${appName}`,
+    description: `Download ${appName} for iOS and Android. Transform your mobile device into a powerful idea capture engine.`,
+  },
+  // Subscribe Page (/subscribe)
+  '/subscribe': {
+    title: `Subscribe to Updates | ${appName}`,
+    description: `Stay updated on the latest ${appName} features, note-taking methodologies, and productivity insights.`,
+  },
+  // Blog Landing Page (/blog)
+  '/blog': {
+    title: `Blog | ${appName}`,
+    description: `Explore insights, tutorials, and workflows for digital note-taking, Second Brain methodologies, and knowledge management.`,
+  },
+  // All Blog Posts Page (/blog/all)
+  '/blog/all': {
+    title: `All Blogs | ${appName}`,
+    description: `Browse our full archive of articles on productivity, note-taking hacks, and app updates.`,
+  },
+};
+
+// Normalize path (remove trailing slash, .html extension, and index)
+const path =
+  Astro.url.pathname
+    .replace(/\.html$/, '')
+    .replace(/\/index$/, '')
+    .replace(/\/$/, '') || '/';
+
+// eslint-disable-next-line security/detect-object-injection
+const pageSeo = SEO_DATA[path];
+
+// Props override auto-detected values (useful for dynamic pages like individual blog articles)
+const {
+  title = pageSeo?.title || defaultTitle,
+  description = pageSeo?.description || defaultDescription,
+  image = '/og-image.png',
+  type = 'website',
+  canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+} = Astro.props;
+---
+
+<!-- Global Meta Tags -->
+<meta charset='UTF-8' />
+<meta
+  name='viewport'
+  content='width=device-width,initial-scale=1'
+/>
+<title>{title}</title>
+<meta
+  name='description'
+  content={description}
+/>
+<meta
+  name='generator'
+  content={Astro.generator}
+/>
+<link
+  rel='canonical'
+  href={canonicalURL}
+/>
+<link
+  rel='icon'
+  type='image/svg+xml'
+  href='/favicon.svg'
+/>
+
+<!-- Open Graph / Facebook -->
+<meta
+  property='og:type'
+  content={type}
+/>
+<meta
+  property='og:url'
+  content={canonicalURL}
+/>
+<meta
+  property='og:title'
+  content={title}
+/>
+<meta
+  property='og:description'
+  content={description}
+/>
+<meta
+  property='og:image'
+  content={new URL(image, Astro.site)}
+/>
+<meta
+  property='og:image:width'
+  content='1200'
+/>
+<meta
+  property='og:image:height'
+  content='630'
+/>
+<meta
+  property='og:image:type'
+  content='image/png'
+/>
+<meta
+  property='og:image:alt'
+  content={title}
+/>
+<meta
+  property='og:logo'
+  content={new URL('/favicon.svg', Astro.site).href}
+/>
+
+<!-- Twitter -->
+<meta
+  name='twitter:card'
+  content='summary_large_image'
+/>
+<meta
+  name='twitter:url'
+  content={canonicalURL}
+/>
+<meta
+  name='twitter:title'
+  content={title}
+/>
+<meta
+  name='twitter:description'
+  content={description}
+/>
+<meta
+  name='twitter:image'
+  content={new URL(image, Astro.site)}
+/>
+<meta
+  name='twitter:image:width'
+  content='1200'
+/>
+<meta
+  name='twitter:image:height'
+  content='630'
+/>
+<meta
+  name='twitter:image:alt'
+  content={title}
+/>
+
+<!-- Additional Meta Tags -->
+<meta
+  name='format-detection'
+  content='telephone=no'
+/>
+<link
+  rel='sitemap'
+  href='/sitemap-index.xml'
+/>
+
+<!-- Schema.org JSON-LD -->
+<script
+  type='application/ld+json'
+  set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: defaultTitle,
+    description: defaultDescription,
+    url: 'https://startapplab.com',
+  })}
+/>

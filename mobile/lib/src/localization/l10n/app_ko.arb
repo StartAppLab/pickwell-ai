@@ -1,0 +1,222 @@
+{
+    "@@locale": "ko",
+    "appTitle": "Pickwell",
+    "appWebsite": "www.pickwell.com",
+    "skipButton": "Skip",
+    "continueButton": "Continue",
+    "welcomeTitle": "Welcome to {appTitle}",
+    "@welcomeTitle": {
+        "description": "A welcome message for users",
+        "placeholders": {
+            "appTitle": {
+                "type": "String",
+                "example": "App"
+            }
+        }
+    },
+    "welcomeDesc": "We''re thrilled to have you on board. Get ready to turn your startup ideas into reaility.",
+    "getStarted": "Get Started",
+    "dontHaveAnAccount": "Don''t have an account?",
+    "alreadyHaveAnAccount": "Already have an account?",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "signInTitle": "Welcome Back",
+    "signInDesc": "Sign in to continue your startup journey",
+    "email": "Email",
+    "password": "Password",
+    "or": "or",
+    "createAccount": "Create Account",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "optional": "(Optional)",
+    "termsAndPrivacyDesc": "By signing up, you agree to our",
+    "and": "and",
+    "loading": "Loading...",
+    "signingInWith": "Signing in with {provider}...",
+    "@signingInWith": {
+        "placeholders": {
+            "provider": {
+                "type": "String",
+                "example": "Google"
+            }
+        }
+    },
+    "signingUpWith": "Signing up with {provider}...",
+    "@signingUpWith": {
+        "placeholders": {
+            "provider": {
+                "type": "String",
+                "example": "Google"
+            }
+        }
+    },
+    "google": "Google",
+    "apple": "Apple",
+    "forgotPassword": "Forgot Password",
+    "forgotPasswordDesc": "Please enter your account''s email address and we will send a link to reset your password",
+    "resetPasswordSuccessTitle": "Success!",
+    "resetPasswordSuccessMessage": "Reset password link successfully sent to your email",
+    "changePassword": "Change Password",
+    "changePasswordDesc": "Please enter your new password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "otpVerification": "OTP Verification",
+    "enterCode": "Enter Code",
+    "resendCode": "Resend Code",
+    "enterCodeDesc": "Enter the code sent to your email address",
+    "didntReceiveCode": "Didn''t receive code?",
+    "resendOtpIn": "Resend OTP in ",
+    "verify": "Verify",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "home": "Home",
+    "message": "Message",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "greetings": "Good {timeOfDay} {name}!",
+    "@greetings": {
+        "description": "A greeting message for users",
+        "placeholders": {
+            "timeOfDay": {
+                "type": "String",
+                "example": "Morning"
+            },
+            "name": {
+                "type": "String",
+                "example": "Amir"
+            }
+        }
+    },
+    "subscription": "Subscription",
+    "profile": "Profile",
+    "account": "Account",
+    "notifications": "Notifications",
+    "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "rateApp": "Rate App",
+    "shareApp": "Share App",
+    "contactUs": "Contact Us",
+    "help": "Help",
+    "about": "About",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "dataDeletion": "Data Deletion",
+    "editAccount": "Edit Account",
+    "deleteAccount": "Delete Account",
+    "changeEmail": "Change Email",
+    "appVersion": "v{version}({buildNumber})",
+    "@appVersion": {
+        "description": "The app version text info",
+        "placeholders": {
+            "version": {
+                "type": "String",
+                "example": "1.0.0"
+            },
+            "buildNumber": {
+                "type": "String",
+                "example": "1"
+            }
+        }
+    },
+    "errorTitleOops": "Oops!",
+    "errorServerAccess": "An error occured during server access. Please try again or come back later.",
+    "errorCannotBeEmpty": "{value} cannot be empty",
+    "@errorCannotBeEmpty": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "Email"
+            }
+        }
+    },
+    "errorEnterValidValue": "Please enter a valid {value}",
+    "@errorEnterValidValue": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "Email"
+            }
+        }
+    },
+    "errorLettersOnly": "{value} should be letters only",
+    "@errorLettersOnly": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "First Name"
+            }
+        }
+    },
+    "errorTooShort": "{value} is too short",
+    "@errorTooShort": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "First Name"
+            }
+        }
+    },
+    "errorTooLong": "{value} is too long",
+    "@errorTooLong": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "First Name"
+            }
+        }
+    },
+    "errorDoNotMatch": "{value} do not match",
+    "@errorDoNotMatch": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "Password"
+            }
+        }
+    },
+    "errorWeakPassword": "Password should contain {value}",
+    "@errorWeakPassword": {
+        "placeholders": {
+            "value": {
+                "type": "String",
+                "example": "password"
+            }
+        }
+    },
+    "errorPasswordRequirement": "uppercase letters, lowercase letters, numbers, and symbols",
+    "welcomeToPickwell": "Welcome to Pickwell",
+    "authOptionsDescription": "계속하려면 {appName}에 로그인하세요.",
+    "saveProgressTitle": "진행 상황 저장",
+    "saveProgressDescription": "계정을 만들거나 로그인하여 설정을 완료하세요.",
+    "signInWithProvider": "{provider}로 로그인",
+    "signInLaterPrompt": "나중에 로그인하시겠어요?",
+    "authContinueError": "계속할 수 없습니다. 다시 시도해 주세요.",
+    "continueWithEmail": "이메일로 계속",
+    "reviewPromptTitle": "짧은 리뷰를 남겨주실 수 있나요?",
+    "reviewPromptBody1": "리뷰를 남겨 주시면 더 많은 사람들이 {appName}을 발견하는 데 도움이 됩니다.",
+    "reviewPromptMaybeLater": "나중에",
+    "reviewPromptAction": "리뷰 남기기",
+    "reviewPromptError": "리뷰를 열 수 없습니다. 다시 시도해 주세요.",
+    "welcomeGuideSubtitle": "일상의 메모를 위한 작은 영감.",
+    "welcomeGroceriesTitle": "장보기 목록",
+    "welcomeGroceriesDescription": "필요한 물품, 할 일, 식사 아이디어.",
+    "welcomeJournalTitle": "일기 쓰기",
+    "welcomeJournalDescription": "하루의 생각, 소중한 순간, 나의 성장.",
+    "welcomeStudyTitle": "공부",
+    "welcomeStudyDescription": "수업 노트, 핵심 개념, 복습 아이디어.",
+    "welcomeIdeasTitle": "아이디어 저장",
+    "welcomeIdeasDescription": "창의적인 영감과 다시 살펴볼 생각.",
+    "welcomeWorkTitle": "업무 메모",
+    "welcomeWorkDescription": "회의 요점, 프로젝트 아이디어, 다음 단계.",
+    "welcomePlanningTitle": "개인 계획",
+    "welcomePlanningDescription": "앞으로의 우선순위, 목표, 계획.",
+    "subscriptionSuccessTitle": "축하합니다!",
+    "subscriptionSuccessBody": "모든 준비가 끝났습니다. {appName}을 응원해 주셔서 감사합니다.",
+    "restoreSuccessTitle": "이용 권한 복원 완료",
+    "restoreSuccessBody": "프리미엄 이용 권한이 복원되었습니다.",
+    "retryButton": "다시 시도"
+}

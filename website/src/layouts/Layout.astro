@@ -1,0 +1,118 @@
+---
+import '@/styles/global.css';
+import '@/styles/shape.css';
+import '@/styles/theme.css';
+
+import Seo from '@/components/common/seo.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Load font configuration from global.css
+const globalCssPath = path.resolve('./src/styles/global.css');
+const globalCss = fs.readFileSync(globalCssPath, 'utf-8');
+const fontMatch = globalCss.match(/--font-sans:\s*["']?([^"',]+)["']?/);
+const fontName = fontMatch ? fontMatch[1].replace(/['"]/g, '').trim() : 'Inter';
+
+// System fonts that don't need to be fetched from Google Fonts
+const systemFonts = [
+  'ui-sans-serif',
+  'system-ui',
+  '-apple-system',
+  'BlinkMacSystemFont',
+  'Segoe UI',
+  'Helvetica Neue',
+  'Arial',
+  'sans-serif',
+  'Apple Color Emoji',
+  'Segoe UI Emoji',
+  'Segoe UI Symbol',
+  'Noto Color Emoji',
+];
+
+const shouldFetchFont = !systemFonts.includes(fontName);
+const googleFontUrl = shouldFetchFont
+  ? `https://fonts.googleapis.com/css2?family=${fontName.replace(/\s+/g, '+')}:wght@400;500;600;700&display=swap`
+  : null;
+---
+
+<!doctype html>
+<html lang='en'>
+  <head>
+    <Seo
+      title={Astro.props.title}
+      description={Astro.props.description}
+      image={Astro.props.image}
+      type={Astro.props.type}
+    />
+    <!-- Google Fonts -->
+    {
+      googleFontUrl && (
+        <link
+          href={googleFontUrl}
+          rel='stylesheet'
+        />
+      )
+    }
+    <!-- DNS prefetch for external resources -->
+    <link
+      rel='dns-prefetch'
+      href='//fonts.googleapis.com'
+    />
+    <link
+      rel='dns-prefetch'
+      href='//fonts.gstatic.com'
+    />
+    <!-- Critical CSS optimization -->
+    <style define:vars={{ fontName }}>
+      body {
+        font-family: var(--fontName), sans-serif;
+        background-color: var(--background);
+        color: var(--foreground);
+        letter-spacing: var(--tracking-normal);
+        margin: 0;
+        padding: 0;
+      }
+      * {
+        font-display: swap;
+      }
+    </style>
+    <!-- Prevent flash of wrong theme -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem('pickwell-theme');
+        const theme = stored || 'light';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class='bg-background'>
+    <main aria-label='Main'>
+      <slot />
+    </main>
+    <script>
+      // Global error handling for hydration failures
+      window.addEventListener('error', (event) => {
+        if (
+          event.message.includes('astro-island') ||
+          event.message.includes('Failed to fetch dynamically imported module')
+        ) {
+          console.warn('Hydration error handled gracefully:', event.message);
+          event.preventDefault();
+        }
+      });
+    </script>
+    <style is:global define:vars={{ fontName }}>
+      :root {
+        --font-sans: var(--fontName), sans-serif;
+      }
+      html {
+        font-family: var(--font-sans);
+        background-color: var(--background);
+        overflow-x: hidden;
+        scroll-behavior: smooth !important;
+      }
+    </style>
+  </body>
+</html>

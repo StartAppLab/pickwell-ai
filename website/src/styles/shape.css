@@ -1,0 +1,45 @@
+@reference "./global.css";
+
+/* Hero */
+.shape-divider-bottom {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.shape-divider-bottom svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 200px;
+}
+
+/* Features Top */
+.shape-divider-top {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  transform: rotate(180deg);
+}
+
+.shape-divider-top svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 127px;
+  transform: rotateY(180deg);
+}
+
+/* Features Bottom */
+.shape-divider-bottom {
+  overflow: hidden;
+  line-height: 0;
+}
+
+.shape-divider-bottom svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 127px;
+  transform: rotateY(180deg);
+}

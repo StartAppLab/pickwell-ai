@@ -1,0 +1,14 @@
+---
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import { Privacy } from '@/components/sections/privacy/privacy';
+import { ScrollUpButton } from '@/components/shared/scroll-up-button';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout>
+  <Header client:load />
+  <Privacy client:load />
+  <Footer client:idle />
+  <ScrollUpButton client:idle />
+</Layout>

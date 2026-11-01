@@ -1,0 +1,40 @@
+{
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
+  "printWidth": 80,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "semi": true,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "astroAllowShorthand": true,
+  "htmlWhitespaceSensitivity": "css",
+  "tailwindFunctions": ["cn", "cva", "clsx"],
+  "tailwindAttributes": ["class", "className", "ngClass"],
+  "useTabs": false,
+  "quoteProps": "as-needed",
+  "proseWrap": "preserve",
+  "singleAttributePerLine": true,
+  "overrides": [
+    {
+      "files": "*.astro",
+      "options": {
+        "parser": "astro",
+        "singleAttributePerLine": true
+      }
+    },
+    {
+      "files": ["*.tsx", "*.ts", "*.jsx", "*.js"],
+      "options": {
+        "parser": "typescript",
+        "semi": true,
+        "jsxSingleQuote": true,
+        "singleQuote": true,
+        "singleAttributePerLine": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# This file sets the HTTP security headers for your Cloudflare Pages deployment.
+
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: accelerometer=(), camera=(), microphone=(), geolocation=(), payment=()
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google-analytics.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://*.googleapis.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'

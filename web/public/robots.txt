@@ -1,0 +1,6 @@
+# robots.txt for StartAppLab Dashboard
+
+User-agent: *
+Disallow: /
+
+# Block all crawlers from accessing any path

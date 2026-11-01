@@ -1,0 +1,14 @@
+---
+import { PageNotFound } from '@/components/sections/error/page-not-found';
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout
+  title='Page Not Found'
+  description='The page you are looking for could not be found.'>
+  <Header client:load />
+  <PageNotFound client:load />
+  <Footer client:idle />
+</Layout>

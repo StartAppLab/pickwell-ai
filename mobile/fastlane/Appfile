@@ -1,0 +1,11 @@
+# Appfile is evaluated by Fastlane after changing into this directory, without
+# a source filename, so require_relative cannot resolve its base path.
+require File.expand_path("lib/fastlane_env", Dir.pwd)
+
+FastlaneEnv.load!
+
+app_store_bundle_id = ENV["APP_STORE_BUNDLE_ID"].to_s.strip
+app_store_team_id = ENV["APP_STORE_TEAM_ID"].to_s.strip
+
+app_identifier(app_store_bundle_id) unless app_store_bundle_id.empty?
+team_id(app_store_team_id) unless app_store_team_id.empty?

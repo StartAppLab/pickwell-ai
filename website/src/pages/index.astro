@@ -1,0 +1,34 @@
+---
+import { CookieBanner } from '@/components/sections/cookies/cookie-banner';
+import { Cta } from '@/components/sections/cta/cta';
+import { Faq } from '@/components/sections/faq/faq';
+import { Feature1 } from '@/components/sections/feature/feature-1';
+import { Feature2 } from '@/components/sections/feature/feature-2';
+import { Feature3 } from '@/components/sections/feature/feature-3';
+import { Feature4 } from '@/components/sections/feature/feature-4';
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import { Hero } from '@/components/sections/hero/hero';
+import { HowItWorks } from '@/components/sections/how-it-works/how-it-works';
+import { Pricing } from '@/components/sections/pricing/pricing';
+import { Testimonial } from '@/components/sections/testimonial/testimonial';
+import { ScrollUpButton } from '@/components/shared/scroll-up-button';
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout>
+  <Header client:load />
+  <Hero client:load />
+  <Feature1 client:idle />
+  <Feature2 client:idle />
+  <Feature3 client:idle />
+  <Feature4 client:idle />
+  <HowItWorks client:idle />
+  <Pricing client:idle />
+  <Testimonial client:idle />
+  <Faq client:idle />
+  <Cta client:idle />
+  <Footer client:idle />
+  <ScrollUpButton client:idle />
+  <CookieBanner client:load />
+</Layout>

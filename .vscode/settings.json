@@ -1,0 +1,103 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/.idea": true,
+        "**/node_modules": true,
+        "**/.dart_tool": true,
+        "**/build": true,
+        "**/.next": true,
+        "**/.astro": true,
+        "**/ios/Pods": true,
+        "**/ios/.symlinks": true,
+        "**/android/.gradle": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/.dart_tool": true,
+        "**/build": true,
+        "**/.next": true,
+        "**/.astro": true,
+        "**/dist": true,
+        "**/coverage": true,
+        "**/.fvm": true
+    },
+    "files.watcherExclude": {
+        "**/.fvm": true
+    },
+    "files.associations": {
+        "wrangler.json": "jsonc",
+        "*.css": "tailwindcss",
+        "*.scss": "tailwindcss",
+        "*.secrets": "json"
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll": "always"
+    },
+    "prettier.requireConfig": true,
+    "[dart]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "Dart-Code.dart-code",
+        "editor.rulers": [
+            100
+        ],
+        "editor.selectionHighlight": false,
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.tabCompletion": "onlySnippets",
+        "editor.wordBasedSuggestions": "off",
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.detectIndentation": false,
+        "editor.suggest.insertMode": "insert"
+    },
+    "[astro]": {
+        "editor.defaultFormatter": "astro-build.astro-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "tailwindCSS.includeLanguages": {
+        "astro": "html",
+        "javascript": "javascript",
+        "javascriptreact": "javascriptreact",
+        "typescript": "typescript",
+        "typescriptreact": "typescriptreact"
+    },
+    "tailwindCSS.experimental.classRegex": [
+        [
+            "cva\\(([^)]*)\\)",
+            "[\"'`]([^\"'`]*).*?[\"'`]"
+        ],
+        [
+            "cn\\(([^)]*)\\)",
+            "[\"'`]([^\"'`]*).*?[\"'`]"
+        ]
+    ],
+    "dart.flutterSdkPath": "mobile/.fvm/versions/stable",
+    "dart.flutterSdkPaths": [
+        "mobile/.fvm/versions/stable"
+    ],
+    "dart.debugExternalPackageLibraries": false,
+    "dart.debugSdkLibraries": false,
+    "dart.lineLength": 100,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.dart": "${capture}.g.dart, ${capture}.freezed.dart, ${capture}.config.dart, ${capture}.auto_mappr.dart",
+        "pubspec.yaml": ".packages, .dart_tool, .flutter-plugins, .flutter-plugins-dependencies, .metadata, pubspec.lock, pubspec_overrides.yaml, build.yaml, analysis_options.yaml, devtools_options.yaml, all_lint_rules.yaml",
+        "mason.yaml": "mason-lock.json, .mason",
+        ".gitignore": ".gitattributes, .gitmodules, .gitmessage, .mailmap, .git-blame"
+    }
+}

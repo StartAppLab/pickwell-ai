@@ -1,0 +1,36 @@
+{
+  "APP_ENVIRONMENT": "dev",
+  "APP_NAME": "Pickwell",
+  
+  "NOTIFICATIONS_ENABLED": true,
+  "ONBOARDING_ENABLED": false,
+  "ONBOARDING_PAYWALL_ENABLED": false,
+  "BILLING_MODE": "disabled",
+  "REVENUECAT_ANDROID_API_KEY": "",
+  "REVENUECAT_IOS_API_KEY": "",
+  "REVENUECAT_ENTITLEMENT_ID": "premium",
+  "FEATURE_ENTITLEMENTS": "{}",
+  "FEATURE_OFFERINGS": "{}",
+
+  "CRASH_REPORTING_ENABLED": false,
+  "SENTRY_DSN": "",
+
+  "ANALYTICS_ENABLED": false,
+  "POSTHOG_API_KEY": "",
+  "POSTHOG_HOST": "",
+
+  "AUTH_MODE": "disabled",
+  "GOOGLE_SIGN_IN_ENABLED": false,
+  "APPLE_SIGN_IN_ENABLED": false,
+  "AUTH_REDIRECT_URL": "com.startapplab.pickwell://auth-callback",
+
+  "BACKEND_ENABLED": false,
+  "SERVER_BASE_URL": "",
+  "SERVER_API_KEY": "",
+
+  "TERMS_URL": "",
+  "PRIVACY_URL": "",
+  "SUPPORT_URL": "",
+  "STORE_URL_ANDROID": "",
+  "STORE_URL_IOS": ""
+}

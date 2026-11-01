@@ -1,0 +1,49 @@
+{
+  "bundle_id": "com.example.myapp",
+  "in_app_purchases": [
+    {
+      "product_id": "myapp.lifetime",
+      "name": "Lifetime Unlock",
+      "in_app_purchase_type": "NON_CONSUMABLE",
+      "pricing": {
+        "base_territory": "USA",
+        "base_customer_price": "19.99",
+        "manual_prices": {
+          "PHL": "999"
+        }
+      }
+    }
+  ],
+  "subscriptions": [
+    {
+      "product_id": "myapp.pro.weekly",
+      "name": "Pickwell Pro weekly",
+      "subscription_group_id": "REPLACE_WITH_SUBSCRIPTION_GROUP_ID",
+      "subscription_period": "ONE_WEEK",
+      "pricing": {
+        "base_territory": "USA",
+        "base_customer_price": "1.99"
+      }
+    },
+    {
+      "product_id": "myapp.pro.monthly",
+      "name": "Pickwell Pro monthly",
+      "subscription_group_id": "REPLACE_WITH_SUBSCRIPTION_GROUP_ID",
+      "subscription_period": "ONE_MONTH",
+      "pricing": {
+        "base_territory": "USA",
+        "base_customer_price": "4.99"
+      }
+    },
+    {
+      "product_id": "myapp.pro.yearly",
+      "name": "Pickwell Pro yearly",
+      "subscription_group_id": "REPLACE_WITH_SUBSCRIPTION_GROUP_ID",
+      "subscription_period": "ONE_YEAR",
+      "pricing": {
+        "base_territory": "USA",
+        "base_customer_price": "29.99"
+      }
+    }
+  ]
+}

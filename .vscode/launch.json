@@ -1,0 +1,75 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Website: Astro",
+            "command": "pnpm run dev",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/website"
+        },
+        {
+            "name": "Web: Next.js",
+            "command": "pnpm run dev",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/web"
+        },
+        {
+            "name": "Mobile Dev",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "${workspaceFolder}/mobile/lib/main.dart",
+            "cwd": "${workspaceFolder}/mobile",
+            "args": [
+                "--dart-define-from-file=.secrets/dev.secrets",
+            ]
+        },
+        {
+            "name": "Mobile Dev (No debugger)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "noDebug": true,
+            "program": "${workspaceFolder}/mobile/lib/main.dart",
+            "cwd": "${workspaceFolder}/mobile",
+            "args": [
+                "--dart-define-from-file=.secrets/dev.secrets",
+            ]
+        },
+        {
+            "name": "Mobile Stg (Profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "${workspaceFolder}/mobile/lib/main.dart",
+            "cwd": "${workspaceFolder}/mobile",
+            "args": [
+                "--dart-define-from-file=.secrets/stg.secrets",
+            ]
+        },
+        {
+            "name": "Mobile Stg (Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "${workspaceFolder}/mobile/lib/main.dart",
+            "cwd": "${workspaceFolder}/mobile",
+            "args": [
+                "--dart-define-from-file=.secrets/stg.secrets",
+            ]
+        },
+        {
+            "name": "Mobile Prod",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "${workspaceFolder}/mobile/lib/main.dart",
+            "cwd": "${workspaceFolder}/mobile",
+            "args": [
+                "--dart-define-from-file=.secrets/prod.secrets",
+            ]
+        },
+    ]
+}

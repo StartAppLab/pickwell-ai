@@ -1,0 +1,451 @@
+default_platform(:ios)
+skip_docs
+
+require "base64"
+require "json"
+require "shellwords"
+require_relative "lib/fastlane_env"
+
+FastlaneEnv.load!
+
+FASTLANE_ROOT = FastlaneEnv.fastlane_root
+METADATA_PATH = File.join(FASTLANE_ROOT, "metadata")
+SCREENSHOTS_PATH = File.join(FASTLANE_ROOT, "screenshots")
+PRICING_SCRIPT_PATH = File.join(FASTLANE_ROOT, "scripts", "app_store_pricing.rb")
+APP_STORE_COMMERCE_SCRIPT_PATH = File.join(FASTLANE_ROOT, "scripts", "app_store_commerce.rb")
+ANDROID_METADATA_PATH = File.join(FASTLANE_ROOT, "metadata", "android")
+ANDROID_DOWNLOADS_PATH = File.join(FASTLANE_ROOT, "downloads")
+ANDROID_LISTING_SCRIPT_PATH = File.join(FASTLANE_ROOT, "scripts", "google_play_listing.rb")
+GOOGLE_PLAY_COMMERCE_SCRIPT_PATH = File.join(FASTLANE_ROOT, "scripts", "google_play_commerce.rb")
+
+def parse_play_store_json_key(raw_value, env_name)
+  value = raw_value.to_s.strip
+  UI.user_error!("#{env_name} is empty") if value.empty?
+
+  json = if value.start_with?("{")
+    value
+  else
+    begin
+      Base64.strict_decode64(value)
+    rescue ArgumentError
+      UI.user_error!("#{env_name} must contain raw JSON or base64-encoded JSON")
+    end
+  end
+
+  parsed = JSON.parse(json)
+  required_keys = %w[type client_email private_key]
+  missing = required_keys.select { |key| parsed[key].to_s.strip.empty? }
+  UI.user_error!("#{env_name} is missing required JSON keys: #{missing.join(', ')}") unless missing.empty?
+
+  json
+rescue JSON::ParserError => e
+  UI.user_error!("#{env_name} does not contain valid Google credentials JSON: #{e.message}")
+end
+
+platform :ios do
+  private_lane :verify_configuration do |options|
+    required = %w[
+      APP_STORE_BUNDLE_ID
+      APP_STORE_TEAM_ID
+      APP_STORE_CONNECT_ISSUER_ID
+      APP_STORE_CONNECT_KEY_ID
+      APP_STORE_CONNECT_KEY_CONTENT
+    ]
+    missing = required.select { |key| ENV[key].to_s.strip.empty? }
+    UI.user_error!("Missing required values in .env.fastlane: #{missing.join(', ')}") unless missing.empty?
+
+    begin
+      key_content = Base64.strict_decode64(ENV.fetch("APP_STORE_CONNECT_KEY_CONTENT"))
+      UI.user_error!("APP_STORE_CONNECT_KEY_CONTENT must contain a base64-encoded .p8 key") unless key_content.include?("BEGIN PRIVATE KEY")
+    rescue ArgumentError
+      UI.user_error!("APP_STORE_CONNECT_KEY_CONTENT is not valid base64")
+    end
+
+    if options[:metadata]
+      UI.user_error!("Metadata directory not found: #{METADATA_PATH}") unless Dir.exist?(METADATA_PATH)
+      metadata_files = Dir.glob(File.join(METADATA_PATH, "**", "*.txt"))
+      UI.user_error!("No metadata text files found in #{METADATA_PATH}") if metadata_files.empty?
+    end
+
+    if options[:screenshots]
+      screenshot_files = Dir.glob(File.join(SCREENSHOTS_PATH, "**", "*"), File::FNM_CASEFOLD).select do |path|
+        File.file?(path) && %w[.png .jpg .jpeg].include?(File.extname(path).downcase)
+      end
+      UI.user_error!("No screenshots found in #{SCREENSHOTS_PATH}") if screenshot_files.empty?
+    end
+
+    config = options[:pricing_config]
+    UI.user_error!("Pricing config not found: #{config}") if config && !File.file?(config)
+
+    UI.success("Fastlane configuration is ready for #{ENV.fetch('APP_STORE_BUNDLE_ID')}")
+  end
+
+  private_lane :app_store_api_key do
+    app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_KEY_CONTENT"),
+      is_key_content_base64: true
+    )
+  end
+
+  desc "Check credentials, project identity, metadata, and optional upload inputs"
+  lane :preflight do |options|
+    pricing_config = options[:config] && File.expand_path(options[:config], FastlaneEnv.project_root)
+    verify_configuration(
+      metadata: options[:metadata].to_s != "false",
+      screenshots: options[:screenshots].to_s == "true",
+      pricing_config: pricing_config
+    )
+  end
+
+  desc "Download the current App Store metadata into fastlane/metadata"
+  lane :download_metadata do
+    verify_configuration
+    deliver(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      metadata_path: METADATA_PATH,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      force: true,
+      download_metadata: true
+    )
+  end
+
+  desc "Validate current App Store metadata against precheck rules"
+  lane :validate_metadata do
+    verify_configuration(metadata: true)
+    precheck(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      default_rule_level: :warn,
+      include_in_app_purchases: false
+    )
+  end
+
+  desc "Upload App Store listing metadata only"
+  lane :upload_metadata do |options|
+    verify_configuration(metadata: true)
+    deliver(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      metadata_path: METADATA_PATH,
+      skip_binary_upload: true,
+      skip_screenshots: true,
+      submit_for_review: false,
+      force: true,
+      edit_live: options[:edit_live] || false,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Upload localized iPhone and iPad screenshots"
+  lane :upload_screenshots do |options|
+    verify_configuration(screenshots: true)
+    deliver(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      screenshots_path: SCREENSHOTS_PATH,
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      force: true,
+      edit_live: options[:edit_live] || false,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Upload metadata and screenshots together"
+  lane :upload_listing do |options|
+    verify_configuration(metadata: true, screenshots: true)
+    deliver(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      metadata_path: METADATA_PATH,
+      screenshots_path: SCREENSHOTS_PATH,
+      skip_binary_upload: true,
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      force: true,
+      edit_live: options[:edit_live] || false,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Update the App Store price tier"
+  lane :update_price do |options|
+    verify_configuration
+    price_tier = options[:price_tier] || ENV["APP_STORE_PRICE_TIER"]
+    UI.user_error!("Provide price_tier:<tier> or set APP_STORE_PRICE_TIER") unless price_tier
+
+    deliver(
+      api_key: app_store_api_key,
+      app_identifier: CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+      skip_binary_upload: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      price_tier: price_tier.to_s,
+      submit_for_review: false,
+      force: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Apply App Store pricing from a JSON or CSV config"
+  lane :apply_pricing do |options|
+    UI.user_error!("Provide config:fastlane/pricing/prices.json or config:fastlane/pricing/prices.csv") unless options[:config]
+
+    config = File.expand_path(options[:config], FastlaneEnv.project_root)
+    dry_run = options[:dry_run].to_s == "true"
+    verify_configuration(pricing_config: config)
+
+    command = [
+      "ruby",
+      Shellwords.escape(PRICING_SCRIPT_PATH),
+      Shellwords.escape(config)
+    ]
+    command << "--dry-run" if dry_run
+
+    sh(command.join(" "))
+  end
+
+  desc "Create or update App Store subscriptions and in-app purchases from config"
+  lane :sync_commerce do |options|
+    UI.user_error!("Provide config:fastlane/commerce/app_store.json") unless options[:config]
+
+    config = File.expand_path(options[:config], FastlaneEnv.project_root)
+    dry_run = options[:dry_run].to_s == "true"
+    verify_configuration(pricing_config: config)
+
+    command = [
+      "ruby",
+      Shellwords.escape(APP_STORE_COMMERCE_SCRIPT_PATH),
+      Shellwords.escape(config)
+    ]
+    command << "--dry-run" if dry_run
+
+    sh(command.join(" "))
+  end
+end
+
+platform :android do
+  private_lane :generate_listing do |options|
+    command = ["ruby", Shellwords.escape(ANDROID_LISTING_SCRIPT_PATH)]
+    command << "--skip-screenshots" unless options[:screenshots]
+    sh(command.join(" "))
+  end
+
+  private_lane :should_sync_listing do |options|
+    options[:skip_sync].to_s != "true"
+  end
+
+  private_lane :play_store_package_name do
+    package_name = ENV["PLAY_STORE_PACKAGE_NAME"].to_s.strip
+    UI.user_error!("Missing PLAY_STORE_PACKAGE_NAME in .env.fastlane") if package_name.empty?
+    package_name
+  end
+
+  private_lane :play_store_track do |options|
+    track = (options[:track] || ENV["PLAY_STORE_TRACK"]).to_s.strip
+    track.empty? ? "production" : track
+  end
+
+  private_lane :play_store_version_code do |options|
+    explicit = (options[:version_code] || ENV["PLAY_STORE_VERSION_CODE"]).to_s.strip
+    unless explicit.empty?
+      UI.user_error!("Google Play version code must be a positive integer: #{explicit.inspect}") unless explicit.match?(/\A[1-9]\d*\z/)
+      return explicit.to_i
+    end
+
+    track = play_store_track(options)
+    version_codes = google_play_track_version_codes(
+      package_name: play_store_package_name,
+      track: track,
+      **play_store_auth_options
+    )
+    UI.user_error!("No releases found on Google Play track '#{track}'. Provide version_code:<code> or set PLAY_STORE_VERSION_CODE") if version_codes.empty?
+
+    version_codes.max
+  end
+
+  private_lane :play_store_auth_options do
+    json_key_path = ENV["PLAY_STORE_JSON_KEY_PATH"].to_s.strip
+    json_key_data = ENV["PLAY_STORE_JSON_KEY_DATA"].to_s.strip
+
+    if json_key_path.empty? && json_key_data.empty?
+      UI.user_error!("Set PLAY_STORE_JSON_KEY_PATH or PLAY_STORE_JSON_KEY_DATA in .env.fastlane")
+    end
+
+    if !json_key_path.empty? && !json_key_data.empty?
+      UI.user_error!("Set only one of PLAY_STORE_JSON_KEY_PATH or PLAY_STORE_JSON_KEY_DATA")
+    end
+
+    if !json_key_path.empty?
+      path = File.expand_path(json_key_path, FastlaneEnv.project_root)
+      UI.user_error!("Play Store JSON key not found: #{path}") unless File.file?(path)
+      parse_play_store_json_key(File.read(path), "PLAY_STORE_JSON_KEY_PATH")
+      { json_key: path }
+    else
+      { json_key_data: parse_play_store_json_key(json_key_data, "PLAY_STORE_JSON_KEY_DATA") }
+    end
+  end
+
+  private_lane :verify_configuration do |options|
+    package_name = play_store_package_name
+    auth = play_store_auth_options
+
+    validate_play_store_json_key(**auth)
+
+    if options[:metadata]
+      UI.user_error!("Android metadata directory not found: #{ANDROID_METADATA_PATH}") unless Dir.exist?(ANDROID_METADATA_PATH)
+      metadata_files = Dir.glob(File.join(ANDROID_METADATA_PATH, "**", "*.txt"))
+      UI.user_error!("No Android metadata text files found in #{ANDROID_METADATA_PATH}") if metadata_files.empty?
+    end
+
+    UI.success("Fastlane configuration is ready for #{package_name}")
+  end
+
+  desc "Check Play Store credentials and optional local Android metadata inputs"
+  lane :preflight do |options|
+    generate_listing(screenshots: options[:screenshots].to_s == "true") if options[:metadata].to_s == "true" && should_sync_listing(options)
+    verify_configuration(
+      metadata: options[:metadata].to_s == "true"
+    )
+  end
+
+  desc "Generate Google Play listing files from the canonical iOS metadata and screenshots"
+  lane :sync_listing do |options|
+    generate_listing(screenshots: options[:screenshots].to_s != "false")
+  end
+
+  desc "Download current Google Play metadata into a timestamped snapshot"
+  lane :download_metadata do |options|
+    verify_configuration
+    download_path = if options[:output]
+      File.expand_path(options[:output], FastlaneEnv.project_root)
+    else
+      File.join(ANDROID_DOWNLOADS_PATH, "googleplay-#{Time.now.utc.strftime('%Y%m%d-%H%M%S')}")
+    end
+    UI.user_error!("Download destination already exists: #{download_path}") if File.exist?(download_path)
+
+    download_from_play_store(
+      package_name: play_store_package_name,
+      metadata_path: download_path,
+      track: play_store_track(options),
+      **play_store_auth_options
+    )
+    UI.success("Downloaded Google Play snapshot to #{download_path}")
+  end
+
+  desc "Validate Google Play listing changes without publishing them"
+  lane :validate_listing do |options|
+    generate_listing(screenshots: true) if should_sync_listing(options)
+    verify_configuration(metadata: true)
+    track = play_store_track(options)
+    upload_to_play_store(
+      package_name: play_store_package_name,
+      metadata_path: ANDROID_METADATA_PATH,
+      track: track,
+      version_code: play_store_version_code(track: track, version_code: options[:version_code]),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      validate_only: true,
+      **play_store_auth_options
+    )
+  end
+
+  desc "Upload Google Play metadata and changelogs generated from iOS fields"
+  lane :upload_metadata do |options|
+    generate_listing(screenshots: false) if should_sync_listing(options)
+    verify_configuration(metadata: true)
+    track = play_store_track(options)
+    upload_to_play_store(
+      package_name: play_store_package_name,
+      metadata_path: ANDROID_METADATA_PATH,
+      track: track,
+      version_code: play_store_version_code(track: track, version_code: options[:version_code]),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      changes_not_sent_for_review: options[:changes_not_sent_for_review].to_s == "true",
+      **play_store_auth_options
+    )
+  end
+
+  desc "Upload Google Play metadata without changelogs"
+  lane :upload_metadata_only do |options|
+    generate_listing(screenshots: false) if should_sync_listing(options)
+    verify_configuration(metadata: true)
+    track = play_store_track(options)
+    upload_to_play_store(
+      package_name: play_store_package_name,
+      metadata_path: ANDROID_METADATA_PATH,
+      track: track,
+      version_code: play_store_version_code(track: track, version_code: options[:version_code]),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      changes_not_sent_for_review: options[:changes_not_sent_for_review].to_s == "true",
+      **play_store_auth_options
+    )
+  end
+
+  desc "Upload Google Play phone and authored tablet screenshots"
+  lane :upload_screenshots do |options|
+    generate_listing(screenshots: true) if should_sync_listing(options)
+    verify_configuration(metadata: true)
+    track = play_store_track(options)
+    upload_to_play_store(
+      package_name: play_store_package_name,
+      metadata_path: ANDROID_METADATA_PATH,
+      track: track,
+      version_code: play_store_version_code(track: track, version_code: options[:version_code]),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      changes_not_sent_for_review: options[:changes_not_sent_for_review].to_s == "true",
+      **play_store_auth_options
+    )
+  end
+
+  desc "Upload the complete Google Play listing generated from iOS fields"
+  lane :upload_listing do |options|
+    generate_listing(screenshots: true) if should_sync_listing(options)
+    verify_configuration(metadata: true)
+    track = play_store_track(options)
+    upload_to_play_store(
+      package_name: play_store_package_name,
+      metadata_path: ANDROID_METADATA_PATH,
+      track: track,
+      version_code: play_store_version_code(track: track, version_code: options[:version_code]),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      changes_not_sent_for_review: options[:changes_not_sent_for_review].to_s == "true",
+      **play_store_auth_options
+    )
+  end
+
+  desc "Create or update Google Play subscriptions and one-time products from config"
+  lane :sync_commerce do |options|
+    UI.user_error!("Provide config:fastlane/commerce/google_play.json") unless options[:config]
+
+    config = File.expand_path(options[:config], FastlaneEnv.project_root)
+    verify_configuration
+
+    command = [
+      "ruby",
+      Shellwords.escape(GOOGLE_PLAY_COMMERCE_SCRIPT_PATH),
+      Shellwords.escape(config)
+    ]
+    command << "--dry-run" if options[:dry_run].to_s == "true"
+
+    sh(command.join(" "))
+  end
+end

@@ -1,0 +1,41 @@
+{
+  "pins" : [
+    {
+      "identity" : "posthog-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PostHog/posthog-ios",
+      "state" : {
+        "revision" : "835f624c2618d72d73650d0ed0029325232f5b0a",
+        "version" : "3.92.0"
+      }
+    },
+    {
+      "identity" : "purchases-hybrid-common",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-hybrid-common.git",
+      "state" : {
+        "revision" : "7514157cbe345ca753aafbaf74fbe1f8433bf07f",
+        "version" : "19.10.0"
+      }
+    },
+    {
+      "identity" : "purchases-ios-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/RevenueCat/purchases-ios-spm",
+      "state" : {
+        "revision" : "1152c719f7b35f86d16a2d0053aba9d26972a962",
+        "version" : "5.94.0"
+      }
+    },
+    {
+      "identity" : "sentry-cocoa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/getsentry/sentry-cocoa",
+      "state" : {
+        "revision" : "aaf96c4a417d30208b3c25d90910d6156ddc973d",
+        "version" : "9.27.0"
+      }
+    }
+  ],
+  "version" : 2
+}

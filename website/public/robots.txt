@@ -1,0 +1,75 @@
+# robots.txt for StartAppNotes
+
+Sitemap: https://startapplab.com/sitemap-index.xml
+
+# Default rules for all crawlers
+User-agent: *
+Allow: /
+
+# Block unwanted paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /login/
+Disallow: /signup/
+Disallow: /checkout/
+Disallow: /cart/
+Disallow: /account/
+Disallow: /user/
+Disallow: /payment/
+Disallow: /order/
+Disallow: /dev/
+Disallow: /staging/
+Disallow: /test/
+Disallow: /beta/
+Disallow: /demo/
+
+# Block sensitive file types
+Disallow: /*.sql$
+Disallow: /*.env$
+Disallow: /*.log$
+Disallow: /*.config$
+Disallow: /*.bak$
+Disallow: /*.backup$
+
+# Allow social media bots explicitly
+User-agent: FacebookBot
+Allow: /
+Allow: /og-image.png
+
+User-agent: Twitterbot
+Allow: /
+Allow: /og-image.png
+
+User-agent: LinkedInBot
+Allow: /
+Allow: /og-image.png
+
+User-agent: WhatsApp
+Allow: /
+Allow: /og-image.png
+
+User-agent: TelegramBot
+Allow: /
+Allow: /og-image.png
+
+# Allow AI training crawlers (for AEO - AI Engine Optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /

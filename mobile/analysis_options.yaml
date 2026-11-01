@@ -1,0 +1,22 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_single_quotes: true
+    # This template keeps project-internal imports relative by convention.
+    avoid_relative_lib_imports: false
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "bricks"
+    - build/**
+    - android/**
+    - ios/**
+    - .widget_preview/**
+  errors:
+    invalid_annotation_target: ignore
+
+formatter:
+  page_width: 100

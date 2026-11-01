@@ -1,0 +1,4 @@
+territory,customer_price,is_base,start_date,bundle_id
+USA,0.99,true,2026-08-27,com.example.myapp
+DEU,0.99,false,2026-08-27,com.example.myapp
+PHL,0.49,false,2026-08-27,com.example.myapp

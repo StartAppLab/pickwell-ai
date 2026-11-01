@@ -1,0 +1,39 @@
+---
+import { BlogDetails } from '@/components/sections/blog/blog-details';
+import { Footer } from '@/components/sections/footer';
+import { Header } from '@/components/sections/header';
+import { ScrollUpButton } from '@/components/shared/scroll-up-button';
+import { BlogParser } from '@/lib/blog-parser';
+import Layout from '@/layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const modules = await BlogParser.getAllBlogModules();
+  const slugs = Array.from(modules.keys());
+
+  return slugs.map((slug) => ({
+    params: { slug },
+  }));
+}
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/blog');
+}
+
+const blogData = await BlogParser.getBlogBySlug(slug);
+if (!blogData) {
+  return Astro.redirect('/blog');
+}
+---
+
+<Layout
+  title={blogData.title}
+  description={blogData.subtitle}>
+  <Header client:load />
+  <BlogDetails
+    blog={blogData}
+    client:load
+  />
+  <Footer client:idle />
+  <ScrollUpButton client:idle />
+</Layout>

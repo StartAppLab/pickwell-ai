@@ -1,0 +1,132 @@
+@reference "./global.css";
+
+/* Typography */
+.label {
+  @apply text-secondary text-sm font-bold sm:text-base;
+}
+
+.headline {
+  @apply text-foreground text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl;
+}
+
+.subheadline {
+  @apply text-muted-foreground text-sm md:text-base xl:text-lg;
+}
+
+.block-title {
+  @apply text-foreground text-3xl font-bold tracking-normal;
+}
+
+.block-big-title {
+  @apply text-foreground text-4xl font-bold tracking-normal xl:text-5xl;
+}
+
+.block-subtitle {
+  @apply border-border bg-accent text-accent-foreground inline-flex w-fit items-center rounded-(--radius) border px-4 py-2 text-xs font-medium tracking-wider uppercase shadow-sm;
+}
+
+.content-title {
+  @apply text-foreground text-lg font-bold tracking-normal;
+}
+
+.content-text {
+  @apply text-foreground text-base leading-relaxed;
+}
+
+.content-text-muted {
+  @apply text-muted-foreground text-base;
+}
+
+.banner-title {
+  @apply text-foreground text-4xl font-bold tracking-normal sm:text-5xl 2xl:text-6xl;
+}
+
+.blog-card-title {
+  @apply text-card-foreground text-2xl font-bold;
+}
+
+.blog-card-subtitle {
+  @apply text-card-foreground leading-loose;
+}
+
+.blog-label {
+  @apply text-muted-foreground text-xs sm:text-sm;
+}
+
+.blog-headline {
+  @apply text-foreground text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl;
+}
+
+.blog-subheadline {
+  @apply text-muted-foreground text-sm md:text-base xl:text-lg;
+}
+
+/* Borders */
+@utility main-border {
+  @apply border-border border border-solid;
+}
+
+@utility main-border-darker {
+  @apply border-input border border-solid;
+}
+
+/* Buttons */
+.button {
+  @apply rounded-(--radius) text-base font-bold;
+}
+
+.contained-button {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-(--radius) text-base font-bold transition-all duration-300;
+}
+
+.outlined-button {
+  @apply main-border bg-accent text-accent-foreground hover:bg-accent/80 cursor-pointer rounded-(--radius) text-base font-bold transition-all duration-300;
+}
+
+/* Inputs */
+.input-field {
+  @apply main-border-darker bg-muted text-foreground placeholder:text-muted-foreground rounded-(--radius) p-4 text-center text-base outline-none;
+}
+
+/* Cards */
+@utility card {
+  @apply main-border bg-card text-card-foreground rounded-(--radius);
+}
+
+.clickable-card {
+  @apply card hover:bg-muted cursor-pointer transition;
+}
+
+/* Popovers */
+.popover {
+  @apply main-border bg-popover text-popover-foreground fixed z-50 mx-auto h-screen w-full px-8 py-12 backdrop-blur-xl sm:mb-8 sm:h-auto sm:w-3/4 sm:rounded-(--radius) sm:px-16 md:w-3/5 lg:w-[1000px] xl:w-[1100px];
+}
+
+.popover-background {
+  @apply bg-background/80 fixed top-0 left-0 z-50 flex size-full items-center justify-center backdrop-blur-sm;
+}
+
+/* Sections */
+.header-style {
+  @apply fixed z-40 flex w-full flex-col items-center justify-center;
+}
+
+.header-size {
+  @apply w-11/12 xl:w-10/12 2xl:w-[1280px];
+}
+
+.footer-style {
+  @apply bg-background pt-10 pb-8 lg:pt-20 lg:pb-16;
+}
+
+.footer-size {
+  @apply mx-auto w-11/12 px-4 xl:w-10/12 2xl:w-[1280px];
+}
+
+.section-style {
+  @apply relative flex w-full justify-center px-4 pt-16 pb-20;
+}
+
+.section-size {
+  @apply mx-auto md:w-4/5 lg:w-[1000px] xl:w-[1100px] 2xl:w-[1200px];
+}
