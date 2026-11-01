@@ -17,3 +17,4 @@ export 'pressable.dart';
 export 'social_media_icon.dart';
 export 'webview_page.dart';
 export 'edge_blur.dart';
+export 'sheet_drag_handle.dart';

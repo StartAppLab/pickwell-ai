@@ -13,7 +13,7 @@ class PackagingTests(unittest.TestCase):
     def test_credentials_and_ephemeral_files_are_excluded(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / 'source'
-            files = ['lib/main.dart', 'config/features.json', 'tool/check_billing_config.py', 'Makefile.prod', 'Makefile', '.secrets/prod.secrets',
+            files = ['mason.yaml', 'mason-lock.json', '.mason/bricks/cache.txt', 'lib/main.dart', 'config/features.json', 'tool/check_billing_config.py', 'Makefile.prod', 'Makefile', '.secrets/prod.secrets',
                      '.env.fastlane', '.env.fastlane.example', 'android/key.properties',
                      'android/release.jks', 'sentry.properties', 'fastlane/downloads/listing.txt',
                      'ios/Flutter/ephemeral/package.swift', '.dart_tool/cache.txt']
@@ -24,6 +24,8 @@ class PackagingTests(unittest.TestCase):
             output = create_archive(root, Path(directory) / 'template.zip')
             with ZipFile(output) as archive:
                 self.assertEqual(set(archive.namelist()), {
+                    'pickwell/mason.yaml',
+                    'pickwell/mason-lock.json',
                     'pickwell/lib/main.dart',
                     'pickwell/config/features.json',
                     'pickwell/tool/check_billing_config.py',

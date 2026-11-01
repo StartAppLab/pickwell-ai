@@ -11,7 +11,7 @@ EXCLUDED_PARTS = {
     'temp_source_zip', '.widget_preview',
 }
 EXCLUDED_NAMES = {
-    '.DS_Store', 'mason.yaml', 'mason-lock.json', '.flutter-plugins',
+    '.DS_Store', '.flutter-plugins',
     '.flutter-plugins-dependencies', 'local.properties', 'key.properties',
     'sentry.properties', 'report.xml', 'Generated.xcconfig', 'flutter_export_environment.sh',
 }

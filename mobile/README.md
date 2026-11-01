@@ -391,6 +391,33 @@ The catalog is public build metadata, not server authorization. Local validation
 does not verify live RevenueCat products, backend deployment, or every guarded
 operation. The default free catalog requires no external service credentials.
 
+## Generate features with Mason
+
+From `mobile/`:
+
+```sh
+make init-mason
+# Alias: make mason-init
+mason make feature-cubit --name feature_name
+fvm dart run build_runner build
+```
+
+The target activates `mason_cli` through FVM and runs `mason get`. Keep Dart's
+global executable directory on PATH. The manifest and lockfile pin the bricks to
+`81fc50c84603366a840a43ee829a333a1a31f16f`; the CLI itself is not version-pinned.
+Use the Cubit brick and preserve its scaffold. Adapt remote-service, ID, logging,
+and cache examples to the feature's actual behavior before wiring them. Generate
+into a scratch directory to compare an existing feature; never overwrite it blindly.
+Do not copy `.mason/` caches or invoke base/secrets bricks during feature creation.
+The manifest, lockfile, and production Makefile are included in template archives.
+
+Shared UI conventions are in [AGENTS.md](AGENTS.md): one widget per file, `Gap`
+for spacing, `AppIcon` with HugeIcons, and reuse of `features/app/` components.
+`DimensionsData` supplies `spacingXxs` through `spacingXxl`, separate padding,
+shape, icon, touch-target, and sheet tokens, plus `copyWith` for overrides.
+`SheetDragHandle` provides the shared floating-sheet handle. Existing legacy
+spacing and inset values remain unchanged.
+
 ## Development and validation
 
 ```sh

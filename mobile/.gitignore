@@ -48,15 +48,10 @@ app.*.map.json
 .fvm/
 
 # Mason
-mason.yaml
-mason-lock.json
 .mason
 
 # Secrets
 .secrets
-
-# Makefile
-Makefile
 
 # Cursor related
 .cursorrules

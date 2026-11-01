@@ -52,8 +52,23 @@ when adding or changing defines.
 
 ## Add or extend a feature
 
-Use `lib/src/features/<feature_name>/` with snake_case filenames. Follow these
-layers when needed; do not create empty layers simply to match a directory tree:
+Generate new feature skeletons from `mobile/` with
+`mason make feature-cubit --name <feature_name>` after `make init-mason`
+(alias: `make mason-init`). Use the checked-in `mason.yaml` and `mason-lock.json`.
+Use the Cubit brick rather than event-based Bloc bricks. Preserve the full
+generated scaffold and adapt it as functionality lands; unused example operations
+must remain disconnected from live UI. Do not overwrite existing features by
+regenerating them. Generate into a scratch directory first when reconciling an
+existing feature, and inspect file conflicts explicitly.
+
+The brick's remote/network examples, integer IDs, logging, and cache patterns are
+scaffolds. Adapt them to Pickwell's actual repositories, identifiers, privacy,
+and enabled integrations before wiring them. Generation does not authorize a
+backend, SDK initialization, or additional product features. Do not copy `.mason/`
+caches, generate a new base app, or invoke secrets/base bricks for feature creation.
+
+Use `lib/src/features/<feature_name>/` with snake_case filenames. The generated
+layers are:
 
 ```text
 <feature_name>/
@@ -255,6 +270,33 @@ authentication, or purchases mandatory for every generated app.
   permission. Do not simulate profile analysis or promise unsupported features,
   trials, or reminders.
 
+## Template UI conventions
+
+- Before changing UI, read `../docs/APP_DESIGN_GUIDELINES.md` and any applicable
+  app design specification. Review supplied references and check changed screens
+  for spacing, typography, accessibility, and light/dark consistency.
+- Search existing code before creating widgets, helpers, services, or tokens.
+  Inspect `lib/src/features/app/`, especially `presentation/widgets/_widgets.dart`,
+  and `lib/src/config/theme/`. Reuse or extend existing implementations rather
+  than creating duplicates or a parallel design system.
+- Define each widget in its own snake_case Dart file, including private widgets.
+  Keep route screens in `presentation/views/`, feature widgets in that feature's
+  `presentation/widgets/`, and reusable widgets under `features/app/`.
+  Extract widget classes instead of widget-returning helper methods; update barrels.
+- Use `Gap` from `package:gap/gap.dart` for sibling spacing, for example
+  `Gap(context.themeData.dimensionsData.spacingMd)`. Use `SliverGap` in slivers.
+  Reserve `SizedBox` for actual sizing/constraints or empty placeholders rather
+  than spacing. Use padding presets for content insets.
+- Use the existing `AppIcon` with `HugeIcons` icon data, for example
+  `AppIcon(icon: HugeIcons.strokeRoundedHome01)`. `AppIcon` delegates HugeIcons
+  rendering to `HugeIcon`; reuse that wrapper rather than creating another one.
+  Use Material/Cupertino icon data through `AppIcon` when a platform-specific icon
+  is needed. Use the named icon dimensions and theme colors.
+- Edit `lib/src/config/theme/app_color_scheme.dart` for the default light/dark
+  palette, and the existing theme modules below for shared styling. Use theme
+  values in widgets rather than hardcoded colors or competing palette classes.
+- Use `SheetDragHandle` and the sheet dimensions for shared floating sheets.
+
 ## Themes, shared UI, and settings
 
 Theme paths below are under `lib/src/config/theme/`:
@@ -271,6 +313,21 @@ Theme paths below are under `lib/src/config/theme/`:
 - Derive styles from the supplied `ColorScheme`. Use `context.colorScheme`,
   `context.textTheme`, and existing custom theme data in widgets. Keep product
   colors and one-off shapes out of global tokens.
+- Read dimensions through `context.themeData.dimensionsData` and inset presets
+  through `context.themeData.edgeInsetsData`. New UI uses the explicit tokens:
+  - Sibling gaps: `spacingXxs` 4, `spacingXs` 8, `spacingSm` 12, `spacingMd` 16,
+    `spacingLg` 24, `spacingXl` 32, `spacingXxl` 40.
+  - Insets: `paddingMicro` 2, `paddingXxs` 4, `paddingXs` 8, `paddingSm` 12,
+    `paddingMd` 16, `paddingComfortable` 20, `paddingLg` 24, `paddingXl` 32,
+    `paddingXxl` 40. Prefer existing `EdgeInsetsData` presets where applicable.
+  - Shapes: `cornerRadius`, `cardCornerRadius`, `heroCornerRadius`,
+    `nestedCornerRadius`, and `sheetCornerRadius`. Icons: `iconSmall`,
+    `iconMedium`, `iconSize`, `iconLarge`; touch targets: `minimumTouchTarget`.
+  Keep gaps, insets, shapes, and icon measurements separate. Do not invent
+  variants through token arithmetic (such as `cornerRadius - 4`); use an existing
+  token or add a justified shared dimension. Name one-off local measurements.
+  Legacy spacing fields and inset presets retain their existing values for
+  compatibility; do not silently change existing layouts when adopting new tokens.
 - Add tokens only for real shared needs; update constructors, `copyWith`, and
   transition behavior together. Prefer standard `TextTheme` styles to unused
   duplicate body/caption fields. `AppThemeData.lerp` currently does not interpolate
