@@ -55,6 +55,8 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 - [ ] Configure Meta API key and privileged Supabase credentials only in protected Edge Function/server environments; never expose them to Flutter or logs.
 - [ ] Prepare `.env.example`, `.gitignore`, safe test accounts, development/staging environment values, and zero-secrets check.
 
+**Preparation (2026-11-02):** [Environment setup and blockers](PICKWELL_ENVIRONMENT_SETUP.md). Added placeholder public dev/staging profiles, server-only env sample, ignore rules, credential scanning/preflight and client-key rejection tests. All T00.2 boxes remain unchecked: real public connectivity, server secret reads, safe accounts and backend rejection of fake credentials require a configured project/credentials and a running backend. No live credentials or infrastructure were changed.
+
 **Acceptance:** App can connect using public configuration and backend can read private secrets; no secret is committed.  
 **Targeted validation:** Search tracked files and build config for known secret patterns; verify fake secret in client cannot authorize privileged work.
 

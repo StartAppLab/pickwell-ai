@@ -105,7 +105,9 @@ def validate(config, catalog, platform, supabase_dir):
                 'ANALYTICS_ENABLED', 'CRASH_REPORTING_ENABLED']:
         if key in config and not isinstance(config[key], bool):
             raise InvalidConfig(f'{key} must be a JSON boolean')
-    for key in ['REVENUECAT_SECRET_API_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'REVENUECAT_WEBHOOK_AUTHORIZATION']:
+    for key in ['REVENUECAT_SECRET_API_KEY', 'SUPABASE_SERVICE_ROLE_KEY',
+                'SUPABASE_SECRET_KEY', 'SUPABASE_DB_PASSWORD', 'DATABASE_URL',
+                'META_API_KEY', 'META_ACCESS_TOKEN', 'REVENUECAT_WEBHOOK_AUTHORIZATION']:
         if config.get(key):
             raise InvalidConfig(f'{key} belongs only in server secrets')
     # Check supplied credentials even for integrations disabled in this build.

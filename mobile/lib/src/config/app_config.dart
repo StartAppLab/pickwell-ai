@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
@@ -63,6 +65,30 @@ class AppConfig {
     }
 
     requireValue('APP_NAME', appName);
+    // Reject privileged credentials before bootstrap, including disabled profiles.
+    // This is configuration hygiene, not a substitute for server authorization.
+    if (apiKey.isNotEmpty) {
+      var publicKey =
+          apiKey.startsWith('sb_publishable_') &&
+          apiKey.length > 'sb_publishable_'.length &&
+          apiKey == apiKey.trim();
+      if (!publicKey) {
+        try {
+          final parts = apiKey.split('.');
+          if (parts.length == 3) {
+            final payload = jsonDecode(
+              utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+            );
+            publicKey = payload is Map<String, dynamic> && payload['role'] == 'anon';
+          }
+        } on FormatException {
+          // Never include the key or decoder error in startup logs.
+        }
+      }
+      if (!publicKey) {
+        throw ArgumentError('SERVER_API_KEY requires a public Supabase key.');
+      }
+    }
     if (features.authEnabled && !features.backendEnabled) {
       throw ArgumentError('Authentication requires BACKEND_ENABLED.');
     }

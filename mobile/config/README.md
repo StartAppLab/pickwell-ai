@@ -1,5 +1,15 @@
 # Mobile app configuration
 
+For this project's barcode-first, billing-disabled configuration, follow
+[Pickwell environment setup](../../docs/PICKWELL_ENVIRONMENT_SETUP.md). Use
+`pickwell.dev.example.json` / `pickwell.stg.example.json` as incomplete public
+profiles; `app.example.json` remains the reusable offline starter. Run
+`python3 tool/check_environment.py --config .secrets/dev.secrets` before launching
+a configured Pickwell profile. The check rejects server-only fields and known
+private credentials without printing values. App startup also rejects private
+Supabase keys, including in disabled profiles; these checks do not authenticate
+keys or replace backend authorization.
+
 `app.example.json` contains Flutter defines. Copy it to an ignored environment
 file such as `.secrets/prod.secrets` and set `APP_ENVIRONMENT` to `prod` before a
 production build. `features.json` is an app-owned release catalog, not a Dart
