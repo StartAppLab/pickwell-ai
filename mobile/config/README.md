@@ -6,6 +6,33 @@ production build. `features.json` is an app-owned release catalog, not a Dart
 define file or a server authorization policy. Keep it in Git and update it when
 adding, removing, or changing guards.
 
+## Environment variants
+
+Use this file as the instructions for maintaining the app's environment configs.
+Local define files live under `mobile/.secrets/` and are ignored by Git:
+
+| File | `APP_ENVIRONMENT` | Existing IDE launch profiles |
+| --- | --- | --- |
+| `.secrets/dev.secrets` | `dev` | Mobile Dev, Mobile Dev (No debugger) |
+| `.secrets/stg.secrets` | `stg` | Mobile Stg (Profile), Mobile Stg (Release) |
+| `.secrets/prod.secrets` | `prod` | Mobile Prod |
+
+Create each file from `app.example.json`, set its matching `APP_ENVIRONMENT`,
+and keep `APP_NAME` set to `Pickwell`. Preserve the example's integration settings
+until configuring a service for that environment. Supply only public mobile SDK
+keys; server credentials must never go in these files. The variants share the
+native package ID `com.startapplab.pickwell`.
+
+From `mobile/`, run a variant directly with:
+
+```sh
+fvm flutter run --debug --dart-define-from-file=.secrets/dev.secrets
+fvm flutter run --profile --dart-define-from-file=.secrets/stg.secrets
+```
+
+Use the production Makefile targets below for release builds so the exact
+production config passes preflight before compilation.
+
 From `mobile/` in this repository, or from the generated Flutter project's root:
 
 ```sh
