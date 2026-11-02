@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
 **File:** `PICKWELL_SPEC.md`  
-**Version:** 1.1 — Entitlements, quotas, RevenueCat-ready backend  
+**Version:** 1.2 — Approved Home/navigation, entitlement foundations  
 **Date:** 2026-11-02  
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (PRD → DESIGN → SPEC → DATABASE → TASKS → AGENTS)  
@@ -9,7 +9,7 @@
 
 ## 1. Source of truth, principles and scope
 
-Read `PICKWELL_PRD.md` (canonical v1.3), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
+Read `PICKWELL_PRD.md` (canonical v1.4), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
 
 **App promise:** Barcode-first packaged food scanning. Guests can scan and view previously published nutrition/ingredient analysis immediately without AI. Unknown products enter a **Barcode ✓ → Nutrition photo → Ingredients photo** capture. Verified Email OTP user can submit. Meta AI analyzes labels in Supabase Edge Functions; validated structured results and documented red/yellow/green findings are published and reused by all subsequent scanners.
 
@@ -59,6 +59,7 @@ Unknown barcode
 
 Suggested feature areas (adapt paths to existing project, do **not** impose a new architecture):
 
+- `home`: bounded device-local recent barcode index, UI fetch/resolve, search/filter/newest, empty state and navigation.
 - `scanner`: permission, camera stream, barcode formats, debounce, lookup trigger and retry.
 - `capture`: three-step wizard, draft state, previews, legibility guidance, optional name/brand, retakes.
 - `auth`: send Email OTP, verify code, resend cooldown, session observer, resumed submission.
@@ -67,11 +68,11 @@ Suggested feature areas (adapt paths to existing project, do **not** impose a ne
 - `settings`: email/account state, sign out, privacy and analysis limits info.
 - `core`: Supabase client, repositories, typed DTOs, structured network error handling and analytics facade.
 
-**State:** Cubit/Bloc for independent feature machines. Keep a capture `Draft` containing normalized barcode, nutrition and ingredients file references, optional product identity, captured timestamps and progress state. Preserve that draft in memory while OTP is in progress, and clear it after successful submission or explicit discard. Do **not** claim crash/restart resilience or persistent scan history. Temporary files must be removed when not needed. Avoid retaining raw image bytes in Cubit state or logs; use references/paths and controlled disposal.
+**State:** Cubit/Bloc for independent feature machines. Keep a capture `Draft` containing normalized barcode, nutrition and ingredients file references, optional product identity, captured timestamps and progress state. Preserve that draft in memory while OTP is in progress, and clear it after successful submission or explicit discard. Persist **only the small approved device-local index of recent barcode references + timestamps** across restart, separately from in-progress photo drafts. Do **not** claim server-synced history or offline nutrition results. Temporary files must be removed when not needed. Avoid retaining raw image bytes in Cubit state or logs; use references/paths and controlled disposal.
 
 **Scanner controls:** Scan one code at a time; debounce repeating camera frames. Pause scan stream while lookup/result/capture is active. Do not auto-trigger capture after a network timeout. Provide manually entered barcode fallback if available at low cost.
 
-**Navigation:** Scanner → transient lookup → cached Result **OR** Capture → OTP (only if unauthenticated) → Processing → Result. Settings is secondary. Returning from OTP preserves step 3 and input files. The lookup is *not* a dedicated full-page destination. Follow approved DESIGN for tokens and accessibility; its palette remains provisional pending original assets.
+**Navigation:** Home (recent-product list) → separate rightmost Scan action → Scanner → transient lookup → cached Result **OR** Not Found → Capture → OTP (only if unauthenticated) → Processing → Result. Settings is primary secondary navigation. Home search opens from top-right icon. Returning from OTP preserves capture draft. Product Details is a nested route without root bottom navigation. Chat and cosmetics concepts are excluded from live navigation. Follow approved lemon DESIGN v1.2 for tokens, 60/30/10 and accessibility.
 
 ## 5. API contracts (logical v1)
 
@@ -310,3 +311,31 @@ Verified Supabase documentation (accessed 2026-11-02):
 8. With `billing_enabled=false`, no paywall/purchase action appears, no user is charged, and test Premium grants work only through privileged admin operations.
 
 **Exact schema, SQL constraints, policies, jobs and cleanup are specified by `PICKWELL_DATABASE.md`.**
+
+## 17. Final approved Flutter UI implementation contract — v1.2
+
+### 17.1 Root/navigation state
+
+- Root is **Home/RecentProducts**, not scanner. Root nav uses native-looking translucent/blurred pill (Home + Settings) with separate rightmost round scan icon; hide root bar on nested scanner/capture/OTP/process/details flows. Chat is a visual-only future concept and not tappable in MVP. On Android, implement legible translucent fallback rather than promising Apple-only glass rendering.
+- Home header consists of approved lemon emblem + Pickwell wordmark and **magnifier at right only**. Search expands on tap, not always visible. Avoid a second user/profile icon or a recently-scanned heading.
+- Home filter chips All / Food and right-aligned Newest sort; no list/grid toggle and no active Cosmetics chip while cosmetics analysis is deferred.
+- Cards are individually rounded white surfaces, truthful image thumbnail or placeholder, title/one subtitle, trailing chevron. Never use a green check to certify health unless a documented claim specifically supports it.
+
+### 17.2 Local recents implementation
+
+- Maintain a **bounded local index** of `{normalized_barcode, last_opened_at_utc}` for most recently viewed/scanned ready products. Suggested max length 30, deduplicated and sorted by last-opened. Use preexisting project-safe local persistence (SharedPreferences or equivalent if already installed); don't add Drift/server table merely for this.
+- Do not persist product label photos, AI raw payloads, personal account identifiers, or full cached nutrition details. Refresh product summaries from backend where accessible. If offline/unavailable, render graceful missing-state; do not advertise offline access to full results.
+- Reopening a *locally cached currently displayed card* does not consume another camera-scan quota. If the system must fetch from backend, follow server's actual lookup/quota rules; do not invent free or quota-exempt backend endpoints.
+- Home search filters loaded local records by name/brand/barcode; category Food filters known food type; Newest sort uses timestamp. This is not a global product discovery search.
+
+### 17.3 Nested details and actions
+
+- Nested Product Details uses back + overflow (no logo/title or bottom tabs), product identification, a non-numeric evidence-aware summary, ingredients/allergens, nutrition with units/basis, caveats and analysis date.
+- Do not render the earlier prototype's 92/100 score, dial, generic 'Good Choice' certificate or Add to List unless later approved and methodologically implemented. Share can be optional P1 via native share sheet of valid public record link or carefully composed non-sensitive text, avoiding fabricated URL.
+- Use semantic green, amber and red independently from brand lemon decorations; icons and text labels required.
+
+### 17.4 Platform and design tests
+
+- Test portrait safe insets/dynamic text, keyboard and expanded search, genuine camera rendering and photo capture, compact device height, real scroll/nav bottom insets, and Android fallback blur/translucency. Do not use static generated screenshots as functioning UIs.
+- Unit/widget tests: home record index dedupe/newest persistence; filter/search empty; root bar visibility vs nested routes; scan action; product card factual placeholder; details omission of score/Add to List; Chat hidden; auth capture-draft survival.
+

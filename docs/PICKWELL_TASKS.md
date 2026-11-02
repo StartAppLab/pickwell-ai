@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — IMPLEMENTATION TASKS
 
 **Document:** `PICKWELL_TASKS.md`  
-**Version:** 1.0 — Meta AI Hackathon implementation plan  
+**Version:** 1.1 — Final lemon UI and local recents  
 **Date:** 2026-11-02  
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
@@ -11,13 +11,13 @@
 
 Read `PICKWELL_PRD.md`, `PICKWELL_DESIGN.md`, `PICKWELL_SPEC.md`, and `PICKWELL_DATABASE.md` before implementing. Respect existing repository structure and Flutter boilerplate; do not invent file paths, replace existing code wholesale, or assume work is unfinished if the repository proves otherwise.
 
-**Locked MVP:** Flutter barcode scan → Supabase cache lookup → immediately display published ready record OR three-step capture (Barcode ✓ → Nutrition → Ingredients) → require verified Supabase Email OTP to submit uncached analysis → Meta multimodal AI via Supabase Edge Function → validate nutrition, ingredients and findings with documented rules → publish reusable result → future cache hits skip AI. Optional name/brand. Green/yellow/red findings, with explanations and evidence.
+**Locked MVP:** Flutter local recent-product Home → separate Scan action → Supabase cache lookup → immediately display published ready record OR three-step capture (Barcode ✓ → Nutrition → Ingredients) → require verified Supabase Email OTP to submit uncached analysis → Meta multimodal AI via Supabase Edge Function → validate nutrition, ingredients and findings with documented rules → publish reusable result → future cache hits skip AI. Optional name/brand. Green/yellow/red findings, with explanations and evidence.
 
 **Initial limits:** 30 barcode lookups/day (signed-in accurate, guests best-effort fair-use) and 3 successful new-product analyses/day for verified Free accounts; configurable server-side, reset 00:00 UTC. Two photos constitute one analysis; bounded retries and unsuccessful extraction must not burn a successful-analysis credit. AI spend limits are separate.
 
 **RevenueCat:** Prepare backend identity mapping, entitlements, webhook authentication/idempotency and `billing_enabled=false`. **No purchases, paywall, pricing UI, or premium offering during the hackathon.** Future Premium quotas and billing products remain unspecified.
 
-**Not MVP:** product comparison, cosmetics, AI Q&A/chat, food score, offline history, subscriptions, community, favorites, advanced onboarding, broad localization. No new backend service beyond approved Supabase + Meta API.
+**Not MVP:** product comparison, cosmetics, AI Q&A/chat (visual-only future concept), numeric food score, cloud/offline analysis history, Add to List/collections, subscriptions, community, favorites, advanced onboarding, broad localization. Device-local barcode recents are included without a backend history table. No new backend service beyond approved Supabase + Meta API.
 
 **Definition of done for each task:** implementation completed; acceptance criteria met; targeted tests run and outcomes recorded; no keys committed or client privilege escalation; mark checkbox only with evidence. Avoid blanket full regression until final release gate.
 
@@ -40,11 +40,9 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T00.1 Inspect actual repo, docs and environment
 
-- [x] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
-- [x] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
+- [ ] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
+- [ ] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
 - [ ] Confirm configured Supabase project, local CLI/deployment method, target app identifiers, device camera test path, CI/secret management.
-
-**Audit evidence (2026-11-02):** [Integration inventory](PICKWELL_INTEGRATION_INVENTORY.md). Dependency install and static analysis passed. T00.1 remains open: no linked/configured hosted Supabase project; local Docker connection unavailable; camera implementation and device validation absent; CI/signing/remote secret management unverified. No application source or infrastructure changed.
 
 **Acceptance:** Concise integration inventory of existing files, work already completed, missing credentials, and risks; no unnecessary scaffold rewrite.  
 **Targeted validation:** Dependency install / static analyzer on relevant code; verify environment examples contain no real secrets.
@@ -55,16 +53,12 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 - [ ] Configure Meta API key and privileged Supabase credentials only in protected Edge Function/server environments; never expose them to Flutter or logs.
 - [ ] Prepare `.env.example`, `.gitignore`, safe test accounts, development/staging environment values, and zero-secrets check.
 
-**Preparation (2026-11-02):** [Environment setup and blockers](PICKWELL_ENVIRONMENT_SETUP.md). Added placeholder public dev/staging profiles, server-only env sample, ignore rules, credential scanning/preflight and client-key rejection tests. All T00.2 boxes remain unchecked: real public connectivity, server secret reads, safe accounts and backend rejection of fake credentials require a configured project/credentials and a running backend. No live credentials or infrastructure were changed.
-
 **Acceptance:** App can connect using public configuration and backend can read private secrets; no secret is committed.  
 **Targeted validation:** Search tracked files and build config for known secret patterns; verify fake secret in client cannot authorize privileged work.
 
 ## 3. Phase 1 — Stop-the-line multimodal AI feasibility spike (P0)
 
 ### T01.1 Supabase → Meta vision proof of concept
-
-**HARD BLOCKED (2026-11-02):** [Spike preparation and evidence](PICKWELL_META_VISION_SPIKE.md). Current provider documentation checked; disabled isolated adapter, strict schema, operator/auth guards, local tests and live runner prepared. No Meta credentials/model configuration, linked Supabase deployment/test identity or real label fixtures are available. No live inference or deployment occurred; all acceptance boxes remain unchecked.
 
 - [ ] Deploy a narrowly scoped, non-public or separately protected test Edge Function that sends **two real food-package photos** (nutrition and ingredients) to the selected Meta vision model.
 - [ ] Validate authentication/authorization, request format, model availability, response schema, per-image behavior, max input size, duration, provider token/cost reporting, timeout and failure modes.
@@ -130,14 +124,26 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T03.2 Flutter scanner/home and lookup UX
 
-- [ ] Reuse existing template/navigation; implement minimal Home/Scanner and permissions following DESIGN.
+- [ ] Reuse existing template/navigation; implement **lemon-branded recent-products Home**, not scanner-first. Header logo + only search icon, All/Food chips, Newest sort, separate rounded cards, no section heading or list/grid toggle.
+- [ ] Create liquid-glass-inspired translucent Home/Settings pill, **separate far-right scan circle with icon only**; hide it on nested routes, with Android visual fallback. Chat is future visual reference and must not ship as dead tab.
+- [ ] Implement minimal scanner camera and permissions following DESIGN.
 - [ ] Integrate suitable scanner dependency only if none exists; enable camera and gallery where needed; test common EAN/UPC.
 - [ ] Use Cubit/Bloc states for idle, scanning, checking, found, miss, processing, denied, error.
 - [ ] Navigate directly to results for `ready`; to 3-step wizard for `not_found`; expose retry for network failure.
 - [ ] Optionally add manual barcode input as a P1 fallback, without displacing P0.
 
-**Acceptance:** Guest can scan existing and unknown demo barcodes; no sign-in gate before lookup.  
+**Acceptance:** Guest lands on correct empty/local recents Home, opens scanner with prominent rightmost Scan icon, scans existing and unknown demo barcodes; no sign-in gate before lookup.  
 **Targeted validation:** Scanner/lookup Cubit tests, camera permission-denied flow, one real-device barcode scan.
+
+### T03.3 Local recent-products Home index and search (P0 recent index / P1 filtering polish)
+
+- [ ] Record only unique published ready barcode references and last-opened timestamps in a bounded device-local index; no personal account/cloud history, persistent user label photos or full offline analysis payloads.
+- [ ] On app relaunch, display available last-viewed product cards with truthful thumbnails (actual authorized media or placeholder). Refresh summary online when needed and follow server lookup/quota rules; never invent package photos or pretend results are locally available offline.
+- [ ] Search icon expands into search field; filter the local list, allow All/Food and newest order; Cosmetics and Chat must remain nonfunctional concepts outside shipped MVP.
+- [ ] Empty state encourages scan without fake product fixtures.
+
+**Acceptance:** A real ready barcode opened once appears in Home after app restart, newest-first and deduplicated. Empty state correct. Scanning remains guest-accessible. Local reopening does not trigger Meta.  
+**Targeted validation:** Local persistence/dedup/search/filter unit tests, widget check for screen density and scan button, missing-photo fallback and offline handling.
 
 ## 6. Phase 4 — Guided capture and Email OTP (P0)
 
@@ -198,7 +204,8 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T06.1 Product results and accountable findings (P0)
 
-- [ ] Implement DESIGN result view with product identity (if known), ingredient explanations, nutrition, summary, green/yellow/red findings, declared allergens, missing information and analysis timestamp.
+- [ ] Implement approved nested Product Details: back + overflow, **no logo app-bar title or bottom tabs**, product identity/photo or fallback, ingredient explanations, nutrition, summary, green/yellow/red findings, declared allergens, missing information and analysis timestamp.
+- [ ] **No numeric 92/100 score, unsupported healthy certification, or Add to List.** Share native action is optional P1 with valid non-sensitive data.
 - [ ] Show color-independent warning icons/labels and readable explanations; format servings/units consistently.
 - [ ] Display explicit status while analyzing and relevant-label retake state; safe retry, not infinite progress.
 
@@ -229,7 +236,7 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T06.4 Settings/account & minimal operational UI (P1)
 
-- [ ] Implement minimal account email, sign-out, privacy links, and usage section per DESIGN; no fake purchases.
+- [ ] Implement minimal account email, sign-out, privacy links, and usage section per DESIGN; no fake purchases. Use newest lemon/cream tokens and consistent simple surfaces.
 - [ ] Respect template styling and avoid new onboarding carousel or additional premium screens.
 
 **Acceptance:** Account state and usage can be viewed; sign-out prevents another analysis without re-authentication.  
@@ -239,6 +246,7 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T07.1 End-to-end acceptance and security pass
 
+- [ ] **Home:** New install has honest empty state; previously viewed barcode is present after restart in bounded local recents; header search and actual Food/Newest filters work. No Chat/cosmetics fake routes.
 - [ ] **Cached path:** Scan existing barcode as guest → show analysis without Meta call, no OTP wall.
 - [ ] **New path:** Scan missing barcode → nutrition photo → ingredients photo → Email OTP → server-only AI → validation → publish → results.
 - [ ] **Reuse:** Another guest/session rescans new barcode → cached result, no repeat Meta inference.
@@ -279,4 +287,4 @@ If timeline threatens completion, narrow in this order **without changing approv
 - `AGENTS.md` is the next StartAppLab artifact; preserve any existing agent instructions and extend rather than overwrite.
 - If any requirement contradicts approved PRD/SPEC/DATABASE, stop only that conflicting implementation step and document the conflict; do not silently change the product.
 
-**Prepared documents:** `PICKWELL_PRD.md` v1.3; `PICKWELL_DESIGN.md` v1.1; `PICKWELL_SPEC.md` v1.1; `PICKWELL_DATABASE.md` v1.0; this `PICKWELL_TASKS.md` v1.0.
+**Prepared documents:** `PICKWELL_PRD.md` v1.4; `PICKWELL_DESIGN.md` v1.2; `PICKWELL_SPEC.md` v1.2; `PICKWELL_DATABASE.md` v1.0; this `PICKWELL_TASKS.md` v1.1.

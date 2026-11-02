@@ -1,310 +1,153 @@
 # PICKWELL AI V2 — DESIGN SPECIFICATION
 
 **File:** `PICKWELL_DESIGN.md`  
-**Version:** 1.1 — Usage quotas and premium-ready UI  
+**Version:** 1.2 — Approved lemon-inspired UX and complete hackathon screen set  
 **Date:** November 2, 2026  
-**Project:** `pickwell-ai`  
-**Framework:** StartAppLab App Framework — Stage 2 / DESIGN  
-**Status:** Proposed implementation-ready UI design; product scope approved, visual tokens require review against original design assets  
-**Source of truth:** `PICKWELL_PRD.md` (PRD v1.3, November 2, 2026)
+**Repository:** `pickwell-ai`  
+**Framework:** StartAppLab App Framework / DESIGN  
+**Status:** Final visual direction approved through iterative reference mockups; platform fidelity and real product-photo sources remain implementation checks.  
+**Source of truth:** `PICKWELL_PRD.md` v1.4. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
 
-## 1. Design intent
+## 1. Design goals and scope boundaries
 
-**Promise:** Scan a packaged-food barcode. If Pickwell already knows the product, get its saved analysis immediately. If not, follow a seamless capture flow, sign in only when submitting a new analysis, and receive interpretable ingredient and nutrition findings.
+Pickwell is a premium-feeling yet approachable product label intelligence app. Avoid dashboard clutter and visual health claims unsupported by source labels. Use the approved **whole lemon** with green leaves as the app brand mark: no scanner brackets, text, glow, drop shadow or rounded-corner container baked into the source icon. Mobile OS can mask the app icon; asset canvas stays full square.
 
-Design for someone standing in a grocery aisle holding a product with one hand. Minimize steps, typing, sign-in interruptions, visual clutter, and unsupported promises about product health.
+**Approved mockup patterns:** home with product cards and real photos; no permanently expanded search, no recently scanned section heading, no list/grid switch; product details without bottom tab bar or center-logo title; camera-first barcode/label capture; compact OTP, failure/retake, quota, search, settings and empty states.
 
-**Guiding principles**
-1. **Scan first:** first-launch experience is scanner-ready, with no mandatory sign-in or long onboarding.
-2. **Database first:** cached results open immediately after lookup; do not display AI-processing UI on cache hits.
-3. **Three recognizable steps:** Barcode → Nutrition → Ingredients. Barcode remains visually complete throughout new-product capture.
-4. **Trust through clarity:** distinguish facts from labels, interpreted findings, rules/reference thresholds, and missing information.
-5. **Color supports meaning; it does not replace text:** favorable observations are green, concerns red, caution/uncertainty yellow; labels and icons are always provided.
-6. **Recovery over failure:** camera retry, network retry, OTP retry, relevant-label retake and quota explanations.
-7. **Strict hackathon scope:** no numerical food score, chatbot, cosmetics, comparisons, history, subscriptions, notifications, social/community, or full onboarding.
+**Important:** Images are design references, not reliable product data. Several concepts showed Chat, cosmetics, a 92/100 score or Add to List—these are **not** approved hackathon functions. Do not ship dead-end or misleading controls. No user-scanned front/package product photo is currently required in the approved 3-step flow; image thumbnail must be legitimately available, or use an attractive neutral placeholder. Food-only active category in hackathon; cosmetics is visually explored for V2 later.
 
-### Original website alignment
+## 2. Visual system — 60/30/10
 
-Official product messaging at https://pickwell.app emphasizes scanning products, ingredient/nutrition interpretation and making informed decisions. Preserve the **Pickwell** name and approachable, health-conscious identity; do not carry over currently advertised scores, cosmetic features, history or pricing into the hackathon UI. Website graphics have not been approved as exact screen assets. **Existing logo, icon, fonts and brand hex codes must be checked against the real project's assets before implementation.**
+This is a *visual-area guideline*, not a literal requirement to fill 30% of the canvas with saturated green.
 
-## 2. Navigation model and information architecture
+| Token | Hex (proposed locked visual direction) | Usage |
+|---|---|---|
+| `canvas.white` | `#FFFFFF` | Primary surfaces, cards, native navigation backdrop |
+| `canvas.cream` | `#FFF7D6` | Warm supporting canvas, gentle accents, empty states |
+| `brand.lemon` | `#FFD428` | Lemon mark, rare active-chip/decorative highlights; ~10% visual weight |
+| `brand.green` | `#168A3B` | Actions, valid navigation emphasis, completion |
+| `brand.forest` | `#173A25` | Brand wordmark, strong UI text, scanner button |
+| `ink.primary` | `#17251D` | General copy |
+| `ink.muted` | `#647068` | Secondary descriptions |
+| `surface.softGreen` | `#EAF5E9` | Chips, subtle selected nav background |
+| `surface.border` | `#E5E9E2` | Dividers and outline when needed |
+| `semantic.warning` | `#B66A00` | Cautions; text/icon accompany amber |
+| `semantic.concern` | `#B3261E` | Evidence-backed concerns |
 
-A single primary scan-oriented flow with no bottom navigation needed for MVP:
+**Balance:** roughly 60% white/cream neutral, 30% forest/green text/controls/organic surfaces, 10% yellow brand accent. Positive/negative/warning signals are **semantic**, not brand decoration. Avoid more than one dominant yellow control per viewport. No huge gradient panels, heavy neobrutalist borders, thick outlines, floating decorative stickers, oversized illustrations or fake extra data. The later hand-drawn and neo-brutalist studies are explorations, not the approved core UI style.
+
+**Type:** Use existing Flutter project sans-serif unless approved project assets provide a specific family; prominent labels and headings strong but compact. No unsupported custom fonts. Platform-scaled typography with 16sp body baseline and >= 44pt/48dp tap targets. **Cards:** 16–22dp radii, restrained elevation/hairline. **Spacing:** 8dp base, 16–20dp horizontal safe margins, ~12dp gaps between rows. Preserve safe areas/keyboard insets.
+
+## 3. Navigation and hierarchy
 
 ```text
-App start
-  └─ Home / scanner (guest permitted)
-       ├─ Scan existing barcode → Checking → Product result
-       ├─ Scan unknown barcode → Capture wizard
-       │    Step 1 Barcode ✓
-       │    Step 2 Nutrition photo
-       │    Step 3 Ingredients photo
-       │        └─ Analyze product
-       │             ├─ Verified session → processing → result
-       │             └─ Guest → Email OTP → resume processing → result
-       ├─ Checking network error → retry lookup
-       ├─ Another user analyzing same barcode → processing/poll → result
-       └─ Account / Settings (minimal)
+App launch
+  └─ Home — device-local recently viewed/scanned product list (or empty state)
+       ├─ Search icon → expandable search field + recent-product matches
+       ├─ Category filter (All / Food); sort (Newest)
+       ├─ Product card → Product Details (nested full-screen, no bottom nav)
+       ├─ Settings → account, usage, privacy, sign-out
+       └─ Separate rightmost Scan action → camera barcode scanner
+             ├─ ready → Product Details; append local recent reference
+             ├─ not_found → Product Not Found → Nutrition capture → Ingredients capture
+             │    → Review Photos → OTP if guest → AI Processing
+             │    → Product Details OR needs_retake / failure
+             ├─ processing → bounded status / retry
+             └─ error → barcode retry / permission advice / quota guidance
 ```
 
-Use a conventional back arrow on nested routes. On return from result, reopen barcode scanner ready for another product. **Do not show a post-capture gallery of scan history**: that is deferred.
-
-## 3. Visual system — provisional tokens
-
-Tokens below are **design recommendations, not claimed official pickwell.app values**. Replace only after comparing supplied brand assets / current design files. Keep one consistent token source in Flutter.
-
-| Token | Light-mode proposed value | Usage |
-|---|---|---|
-| `brand.primary` | `#15805D` | Scan CTAs, active navigation / step completion |
-| `brand.primaryPressed` | `#106749` | Pressed states |
-| `canvas` | `#F8FAF9` | App surface |
-| `surface` | `#FFFFFF` | Cards and sheets |
-| `text.primary` | `#172420` | Titles / core values |
-| `text.secondary` | `#64726C` | Descriptions / supporting metadata |
-| `border` | `#DFE7E2` | Dividers / camera frames |
-| `finding.positive` | `#16784F` | Favorable findings; not overall certification |
-| `finding.concern` | `#BA3436` | Rule-supported nutritional concerns |
-| `finding.caution` | `#9B6A08` | Cautions / uncertainty / allergens |
-| `finding.neutral` | `#52645B` | Informational/unknown states |
-
-Use light mode as primary demo target. If the Flutter boilerplate already offers functional dark mode, keep it coherent; **do not build a new dark theme solely for the hackathon**.
-
-**Type:** Material-compatible text system using existing boilerplate font. Proposed scale: display 28/34 semibold, screen heading 24/30 semibold, section heading 18/24 semibold, body 16/24 regular, secondary 14/20, metadata 12/16. Prefer accessible system font fallback. Do not invent an official branded font.
-
-**Spacing:** 4px base unit; screen padding 20px; typical gaps 8/12/16/24; cards with 16px padding and 14–18px radius; primary buttons at least 48px tall (prefer 52px). Respect safe-area insets and system text scaling. Avoid horizontal overflow on compact devices.
-
-**Iconography:** Consistent outlined icons from existing Flutter UI kit; barcode, camera, check-circle, alert-triangle, info, refresh, arrow-back, lock and mail. No need for new illustration assets.
-
-**Motion:** Short, subtle (150–250ms) transitions; never rely on motion for critical instructions. Reduced-motion preferences respected where supported.
-
-## 4. Screen inventory
-
-| ID | Screen / state group | Entry | Primary action | Required variants |
-|---|---|---|---|---|
-| S01 | Home + barcode scanner | App launch, return | Scan | camera permission, scanning, unsupported code, manual entry fallback (P1) |
-| S02 | Barcode lookup | Accepted code | Wait or retry | checking, ready, not found, already processing, offline, timeout |
-| S03 | Guided product capture | Confirmed miss | Nutrition → ingredients → Analyze | empty, image preview, retake, camera/gallery failure |
-| S04 | Email OTP auth gate | Guest taps Analyze | Verify email OTP | email entry, code entry, resend, invalid, expired, loading, cancel |
-| S05 | AI processing | Authorized request | Wait, retry where safe | queued, processing, retake needed, quota reached, failure |
-| S06 | Product result | Cache hit or successful analysis | Scan another product | complete, partial explained info, unknown fields, provenance, accessible findings |
-| S07 | Minimal account/settings | Home overflow / icon | Sign in/out and privacy | guest, authenticated, sign-out confirmation |
-
-These are **seven screen/state groups**, but only **six principal UI destinations**: Scanner, Capture, OTP, Processing, Result, Settings. Barcode lookup is a transient state within Scanner, not a separate navigation destination.
-
-## 5. Screen-by-screen UX specification
-
-### S01 — Home / Scanner
-
-**Layout (top to bottom)**
-- Compact Pickwell wordmark and right-aligned account/profile action; account status should not dominate.
-- Headline **“Scan a food product”** and subtext **“Understand its nutrition and ingredients.”**
-- Camera barcode viewfinder taking the main available area; visible rectangular scan guide, adequate contrast, flashlight control only if supported by camera package.
-- Helper line: **“Place the barcode inside the frame.”**
-- Contextual camera-permission fallback and **Open Settings** action when denied. Optional **Enter barcode manually** action (P1; useful for demo resilience).
-- No chat, search history feed, score badge, cosmetics switcher, or paywall.
-
-**Behavior:** Camera detects supported retail barcodes, debounces repeated detections, suspends scanner while lookup is pending, resumes after dismissing error or exiting result. Invalid or unsupported barcodes trigger an explanatory error, not the upload wizard.
-
-**Accessibility:** Semantics for viewfinder, accessible flashlight and manual-entry buttons, haptic feedback optional, and text instructions always visible.
-
-### S02 — Barcode lookup (inline / transitional)
-
-- A small overlay or sheet on top of paused camera: **“Checking Pickwell…”** with activity indicator and scanned barcode (truncated only for display).
-- `ready`: navigate directly to S06 with no AI animation.
-- `not_found`: show **“Product not found — let’s add it.”** plus **“Continue”** to S03.
-- `processing`: show **“This product is being analyzed.”** and a bounded **Check again** option; do not launch another analysis.
-- network error/timeout: **“Couldn’t check this product. Try again.”** + **Retry** / **Scan another**. Never conflate network errors with cache misses.
-- rate limit: explain lookup delay and provide retry guidance; do not loop automatically.
-
-### S03 — Three-step capture wizard
-
-**Persistent progress header:**
-
-`✓ Barcode  →  2 Nutrition  →  3 Ingredients`
-
-On nutrition step, barcode is complete, nutrition active, ingredients upcoming. On ingredients step, barcode and nutrition are complete. The user must never have to scan barcode again because the database missed.
-
-**Step 2 — Nutrition facts**
-- Screen title **“Photograph nutrition facts”**.
-- Guidance **“Fit the whole nutrition panel in the photo. Make the numbers readable.”**
-- Large capture area / placeholder with camera and **Choose photo** option.
-- After capture: image preview, **Retake**, **Use photo / Continue**.
-- Optional short helper: avoid blur and glare; include serving units and serving size if present.
-
-**Step 3 — Ingredients**
-- Screen title **“Photograph ingredients”**.
-- Guidance **“Include the full ingredient list and declared allergens, if printed.”**
-- Same camera/gallery picker and preview pattern for consistency.
-- After valid local capture, primary action **“Analyze product”**.
-- Optional expandable row **“Product name / brand (optional)”** to enter/correct identity, but never block submission.
-
-**Data behavior:** Retain the original barcode and currently accepted photos in in-memory draft state across wizard and OTP; on cancellation, offer discard confirmation. Do not promise persistence across process termination. Camera/gallery selections should be compressed suitably without making text unreadable; exact limits set in SPEC.
-
-**Multi-image clarification:** The approved *simple multi-image* behavior is one readable photo of nutrition and one of ingredients. No complex unlimited gallery management is required. If a panel cannot fit, allowing a small bounded extra photo per label is an implementation-time fallback only if backed by the AI payload contract.
-
-### S04 — Email OTP authentication gate
-
-Shown **only when a guest taps Analyze product** (not on app launch or barcode lookup).
-
-- Use a modal full-screen sheet or separate page preserving capture draft behind it.
-- Title **“Sign in to analyze this product”**.
-- Supporting copy **“Scanned products are free to view. Sign in to add a new analysis to Pickwell.”**
-- Email field, keyboard-aware action **“Send code”**.
-- OTP code field (platform autofill when available), **Verify**, resend countdown or disabled state, **Change email**, **Cancel**.
-- After success, return directly to processing (do not restart the wizard or add profile setup).
-- After fail/expire: inline message with manual retry and safe resend controls.
-- Session refresh and email verification should be handled by backend; client must not infer authorization merely from locally stored email.
-
-**Security UX:** Explain that structured product information will become available to other users; show privacy terms link before analysis, not an expansive onboarding consent wall.
-
-### S05 — AI analysis / processing
-
-- Heading **“Analyzing product labels”**.
-- A simple indeterminate progress indicator with status copy such as **“Reading nutrition facts and ingredients…”**; avoid fabricated percentages or guaranteed times.
-- Copy **“We'll check the extracted information before publishing the result.”**
-- Prevent duplicate submission while pending. If user backgrounds app, gracefully restore job state if supported by backend rather than silently creating a second job.
-- If processing completed, transition to S06.
-- If `needs_retake`, identify exact photo (**nutrition** or **ingredients**); navigate to relevant wizard step with the other accepted image preserved.
-- If `quota_exceeded`, show **“You've reached your analysis limit for now. You can still view products already in Pickwell.”** + **Scan another product**.
-- If server error, show action appropriate to safe idempotent retry. Never offer endless automatic retries.
-- If no connection, show recoverable state and avoid pretending a publish succeeded.
-
-### S06 — Product result (single scannable screen)
-
-**Information hierarchy**
-1. **Identity header:** product name if verified, optional brand, barcode. Fallback **“Food product”** when identity unavailable. Avoid invented packaging imagery.
-2. **Summary:** short plain-language explanation of the product's nutritional characteristics and ingredient observations. Use **“What we found”**, never a 0–100 score or a universal 'healthy/unhealthy' verdict.
-3. **Finding cards:** grouped favorable (green), concern (red) and caution (yellow), each with icon, explicit label, short plain-language explanation and what label data or rule supports it. Hide empty groups rather than invent filler.
-4. **Nutrition facts:** compact readable rows with value, unit, serving basis; display **“Not available”** for unknowns. Do not mix per-serving and per-100g metrics without labeling.
-5. **Ingredients:** ordered readable list, expandable details only where explanations exist and are substantiated.
-6. **Declared allergens / label cautions:** clearly identify *declared on packaging* versus unknown / not checked; absent mention is not absence guarantee.
-7. **Source & limitations:** **“Based on packaging submitted to Pickwell”**, date analyzed, notes on AI interpretation and missing data; never fabricate external sources.
-8. Sticky/visible exit action **“Scan another product”** (one tap back to camera).
-
-**Color usage example (illustrative, not final nutrition thresholds):**
-- **Green • Favorable:** “Contains a meaningful amount of protein” **only if** a documented backend threshold exists and evidence supports it.
-- **Red • Concern:** “High in sodium” **only if** validated label data and an adopted published threshold support it.
-- **Yellow • Caution:** “Milk is declared as an allergen” or “Serving-size information is incomplete.”
-
-Do **not** imply yellow or red ingredients are inherently dangerous. Show user-visible explanations and data basis. Color swatches alone must not carry meaning.
-
-### S07 — Settings / account
-
-Minimal list: signed-in/guest status, **Sign in** (for guest), **Sign out** (for account), **Privacy**, **About Pickwell**. No account profiles, syncing, personalized nutrition preferences, premium pages, or history.
-
-## 6. Shared components
-
-| Component | Implementation role | States |
-|---|---|---|
-| `PickwellPrimaryButton` | Main CTA | enabled, disabled, loading |
-| `ScanViewfinder` | Barcode scanner overlay | ready, scanning, paused, denied |
-| `StepProgress` | 3-step capture tracker | completed, active, upcoming |
-| `LabelPhotoTile` | Guided photo input | empty, preview, error, retake |
-| `StatusPanel` | Lookup/AI feedback | progress, error, retry, processing |
-| `FindingCard` | Traffic-light findings | positive, concern, caution, neutral |
-| `NutritionRow` | Single nutrient value | known, unknown, basis shown |
-| `IngredientRow` | Ingredient explanation | name only, details, uncertain |
-| `OtpInput` | Verification code entry | empty, invalid, expired, verifying |
-| `EvidenceFooter` | Attribution/limitations | data source, analyzed date, caveat |
-
-Use components already provided by the user's Flutter template when they satisfy the spec; do not rebuild the design system just for this app.
-
-## 7. Copy, accessibility and localization readiness
-
-- MVP language: English interface. Write plain, globally comprehensible copy; long-term multilingual support is deferred.
-- Centralize all visible strings in localization-compatible resources, even if only English ships.
-- Do not use red/green alone; pair with icon and labels **Favorable**, **Concern**, **Caution**.
-- Target WCAG AA-like text contrast where possible; verify final token pairs on actual devices.
-- Interactive target minimum approximately 44×44pt iOS / 48×48dp Android.
-- Support dynamic text scaling, VoiceOver/TalkBack, keyboard focus for OTP, screen reader descriptions for barcode scanner and status changes.
-- Loading states announce status without excessive repetition. Avoid infinite retry spinners.
-- For camera use, include permission rationale and clear alternative action if denied.
-- When reading label content, avoid medical claims, definitive absence-of-allergens statements, and disease-specific advice.
-
-## 8. Error/state matrix
-
-| Situation | UI outcome | Next user action |
-|---|---|---|
-| Camera denied | Explanation + system-settings link | Enable camera or use supported manual entry |
-| Invalid barcode | Unsupported/invalid code message | Rescan |
-| Known product | Immediate result | Review or scan another |
-| Unknown product | Friendly contribution prompt | Begin guided photos |
-| Barcode currently processing | Nonterminal status | Check again; no duplicate AI job |
-| Lookup offline or timeout | Explicit connection failure | Retry lookup |
-| Nutrition photo unclear | Retake nutrition prompt | Retake only nutrition |
-| Ingredient photo unclear | Retake ingredients prompt | Retake only ingredients |
-| Email OTP invalid/expired | Inline auth error | Re-enter or resend |
-| Auth canceled | Return to captured draft | Resume later while draft remains in session |
-| Session expired | Reauthentication required | Verify email before submit |
-| User quota exhausted | Clear quota notice | Scan cached products instead |
-| AI timeout/error | Recoverable error / job status | Bounded retry without duplicate submission |
-| Missing nutrition field in valid record | “Not available” and uncertainty | Understand limitations; no invented values |
-| Conflicting product label/barcode | Refuse publication with explanation | Check product and recapture |
-
-## 9. Backend/UI contract and privacy boundary
-
-The UI consumes **server-provided statuses** rather than deriving truth from timeouts:
-
-- `ready` → S06 cached or newly saved result
-- `not_found` → S03 capture
-- `processing` / `queued` → S05 or S02 processing status
-- `needs_retake` with `field: nutrition | ingredients` → S03 corresponding step
-- `unauthorized` / `email_unverified` → S04
-- `rate_limited` / `quota_exceeded` → S05 explanation
-- `failed` / `network_error` → S02 or S05 with safe retry
-
-Never show a privileged token, full API request detail, backend stack trace, or raw personal-data analytics identifier. Label images are sent for processing and not retained as a permanent product gallery; any temporary private uploads must be cleaned up per SPEC. Product records and AI interpretations will be shared after automated validation; communicate that before submission.
-
-## 10. Asset inventory and handoff
-
-**Required:** Existing Pickwell logo/icon (if repository supplies it), barcode/scanner UI icon, generic illustration-free empty scanner fallback. Prefer bundled vector/material icons.
-
-**Not required:** Stock food photography, fake product catalog images, subscription/paywall artwork, mascots, AI-generated decorative banners, store screenshots.
-
-**Verification tasks before visual lock:**
-1. Inspect original Pickwell branding assets and screenshot references from `pickwell`/`pickwell-ai` repo.
-2. Confirm or replace provisional palette, font and logo use without altering approved UX flow.
-3. Check that Flutter template already provides reusable theme, buttons, route framework and icon set.
-4. Capture **real implemented screens** for any hackathon demo or eventual store listing; do not mislabel design concepts as app screenshots.
-
-## 11. Acceptance and targeted design QA
-
-- Guest launch can reach barcode scanner without sign-in.
-- Cached barcode opens readable result, bypassing all capture/AI/OTP screens.
-- Unknown barcode follows Barcode ✓ → Nutrition photo → Ingredients photo → Analyze.
-- User can preview and retake each photo independently.
-- Guest submits → OTP gate → returns to exact preserved draft → authenticated analysis.
-- Incomplete AI interpretation requests retake of correct label, without publishing result.
-- Result contains labeled green/yellow/red findings with provenance and no numerical score.
-- Error states distinguish cache miss from network failure and concurrent analysis.
-- Compact phone, large text, camera-denied and screen-reader states are usable.
-- All visual assets conform to original brand once verified; no unapproved visual claims.
-
-## 12. Cross-document consistency and next steps
-
-**PRD locked:** Barcode-first flow, shared cache, Supabase, Meta AI, Email OTP at analysis gate, rules-based findings, automated publication, ephemeral label images, initial 30/day barcode and 3/day AI allowances (server-configurable), minimal analytics and RevenueCat-ready backend without active monetization.
-
-**To specify in `PICKWELL_SPEC.md`:** Actual Flutter packages and architecture, scan lifecycle, draft state through OTP, typed API/error models, image compression/payload caps, auth redirect handling, job polling/timeouts, backend model integration, security/RLS surface, analytics event definitions, accessible widget implementation and targeted tests.
-
-**To specify in `PICKWELL_DATABASE.md`:** Product uniqueness/normalization, published revisions, analysis/jobs and quotas, atomic claims, server-only writes, RLS, retention/cleanup and admin remediation.
-
-**Do not silently expand scope while translating this design into tasks.** Store launch ASO, full payment funnel and public-release interface features remain future work.
-
----
-**Change log:** v1.0 — Initial hackathon design specification derived from approved PRD v1.2. Tokens explicitly provisional pending real brand asset inspection.
-
-
-## 13. Usage allowance UI and future-premium readiness (v1.1)
-
-**No new paywall destination, purchase CTA, subscription offer, Premium price, or active checkout in hackathon.** Preserve six essential screens and inline lookup state.
-
-- On **Home/Scanner** show compact “Free usage today” rows only if the backend supplies credible values: **Barcode lookups: 30/day**, **AI analyses: 3/day**. Never hardcode those numbers in labels; pull `limit`, `remaining`, and `resets_at` from entitlement/usage API. For a guest, display “Guest scans available — fair-use limits apply” rather than fake personalized count.
-- On **Product Capture**, after an unknown barcode, show the user's available analysis count if authenticated; if guest, prompt for Email OTP at submission as already locked. The two label images count as **one** analysis.
-- On **AI Processing**, don't decrement the displayed remaining count until successful finalization. While pending, use “1 analysis reserved” messaging if needed; on failure/retake, return to capture preserving draft and showing unchanged final usage (bounded retries).
-- For **lookup limit reached**, keep the scanner accessible but block further server lookup requests with clear wording, server `resets_at` and no fake ability to buy more. Example: “You've reached today's barcode lookups. Try again after 00:00 UTC.” Prefer the viewer's local reset timestamp if formatted correctly from server-provided UTC; don't always show literal UTC to end users.
-- For **AI limit reached**, let the user view cached products while new analysis is disabled; explain next reset. No purchase CTA.
-- On **Settings/Account** show active plan “Free” and read-only quota usage. Premium status can render if set by server test override, but don't show billing management or a broken Upgrade button.
-- **Accessibility:** quotas and traffic lights use text+icons in addition to color; loading/error states must be announced to screen readers. Avoid unexpected changes while someone is completing an OTP form.
-- **Dynamic allowances:** a backend change from 30 to 20 must reflect at the next quota response without a Flutter release; remaining is clamped to zero if user has already spent more than the new limit.
-
-**Design QA:** guest scanning has no account wall; OTP preserves draft; cache-hit never uses an AI credit; quota exhausted states give accurate reset; no unactionable “Upgrade” control; the six MVP destinations remain intact.
+**Primary bar:** iOS 26-inspired translucent floating **liquid glass** pill with Home + Settings controls for hackathon, a distinct green circular Scan action aligned on the **far right** separated from that pill. Scan uses *icon only* (no label). Chat may appear in design exploration, but is excluded from active hackathon navigation. Do not imitate unlicensed Apple UI assets or assume fully equivalent native blur on Android; use native glass where reliably supported, else a restrained translucent/blurred fallback with contrast. Hidden on full-screen scanner, capture, OTP, processing, and nested Product Details.
+
+**Back/overflow:** Nested pages have a back button upper left; Product Details has a small overflow control upper right; *no Pickwell logo or wordmark as an app-bar title on Product Details*. Do not put a main tabs bar on details.
+
+## 4. Screen inventory (IDs fixed for handoff)
+
+| ID | Screen/state | Hackathon | Notes |
+|---|---|---|---|
+| H01 | Home / Local Recent Products | P0 | Rounded list cards; empty state; not a public catalog feed |
+| H02 | Search overlay/expanded field | P1 | Search local recent titles/barcodes; not global full-text database search |
+| B01 | Barcode camera | P0 | Real camera, scanning corners, torch and cancel |
+| B02 | Lookup loading / found | P0 | No invented fake progress; cached ready goes to details |
+| B03 | Product Not Found | P0 | Show barcode and Add This Product |
+| C01 | Nutrition photo capture | P0 | Actual camera, capture/preview/retake |
+| C02 | Ingredients photo capture | P0 | Actual camera, capture/preview/retake |
+| C03 | Review captured labels | P0 | Check photo clarity, can retake one, submit |
+| A01 | Email OTP request | P0 | Contextual gate *after* photos, no loss of draft |
+| A02 | Verify 6-digit code | P0 | Resend timer, error/expired states |
+| P01 | AI Processing | P0 | Honest statuses, cancellable/recoverable handling |
+| P02 | Retake/failure | P0 | Identify affected label; bounded retry |
+| R01 | Product Details | P0 | Evidence-aware findings, ingredients, nutrition; no numeric score |
+| Q01 | Daily quota reached | P0 | Accurate server limits/reset time; no paywall |
+| S01 | Settings / Account | P1 | Email/guest status, usage/limits, privacy, sign-out |
+| F01 | Chat and cosmetics concept | Future | Never a usable hackathon destination |
+
+## 5. H01 Home — precise approved layout
+
+1. iOS status bar/safe top area. Small full yellow lemon emblem + dark forest **Pickwell** wordmark on left; **only magnifier button** upper right (no user/profile icon).
+2. Do **not** show a persistent full-width search bar. Tapping magnifier reveals focused search input and keyboard with cancel/close, and filters currently loaded local recent items.
+3. A single compact row of category chips (`All` selected, `Food` available) and **right-aligned `Newest` sort**. Use compact capsule pills; no list/grid toggle. Cosmetics only if it becomes a real approved category in future.
+4. Immediately below chips: scrollable stacked **individual rounded product cards**. **No 'Recently scanned' heading**, long marketing copy or statistics block above list. Card consists of left 64–84dp photographic thumbnail / neutral placeholder, center product name + one supporting line (brand or descriptor), right chevron. Show a positive/warning icon *only when meaning and evidence are clear*, and it must never imply a holistic food safety certification.
+5. Cards use white with subtle borders/soft lift over mainly warm white/cream canvas. Real-world photos originate only from authorized stored/returned product media; no fabricated real packaging. If none exists, elegant placeholder with product initials/category, not invented product photo.
+6. At bottom, separate softly translucent glass pill for primary available navigation (`Home`,`Settings`) and standalone circle **scan icon** on the right. Chat can be represented in future comps but must be absent from working build. Avoid inconsistent text label under scan icon.
+7. Empty Home: same header/chips/nav and a short pleasant empty message with scanner action, no fabricated recently scanned records. Do not require login to use Home.
+
+**Data contract:** Store a bounded device-local list of barcode and last-opened timestamp only; no photos, ingredient payloads, or PII. Refresh published products by barcode when online; show unavailable placeholders gracefully; never claim it is multi-device synced or robust offline product-data storage. Use existing local preference/store mechanism (no new DB package if unnecessary). Local recent index is independent of backend usage quota: simply opening a local row doesn't count a new barcode scan, but fetching an uncached remote record must obey backend-defined lookup rules.
+
+## 6. B01–B03 Barcode scanner / lookup
+
+- Open camera full-screen from far-right Scan control, without an extra Scan-a-Product choice screen.
+- Dark live camera with large rounded rectangular corner guides and short 'Align barcode within frame' hint, torch upper right and X/back upper left. Camera permission/retry/manual fallback as appropriate. Do **not** show a shutter button for continuous barcode recognition unless an approved alternative entry requires it.
+- On recognized code, pause frames and display short honest lookup state, then either show Product Details (`ready`), product-in-progress state (`processing`), or 'Product not found — let's add it' (`not_found`). Network error remains distinct.
+- Not Found screen has compact barcode identifier and `Add This Product` primary button, `Scan Another` secondary; no misleading generic label-photo analysis shortcut that skips barcode.
+
+## 7. C01–C03 Guided capture and review
+
+- Fixed three-step **Barcode ✓ → Nutrition → Ingredients**. Photo review is confirmation after step 3, **not a new numbered fourth step**.
+- Nutrition: capture full readable nutrition panel with units, servings and serving size. Ingredients: capture entire ordered ingredient text and allergen statements. Distinct brief guidance and same camera components.
+- Large genuine camera preview, legibility corner brackets, optional gallery import, retake and Use Photo. Avoid giant decorative illustrations in the camera stage.
+- Review: two thumbnail cards labeled Nutrition Facts and Ingredients, clear edit/retake per photo, optional Name and Brand fields if accurate/desired, primary `Analyze Product` at bottom. This primary action triggers OTP for a guest, preserving all captures.
+
+## 8. A01–A02 OTP
+
+- Clean cream/white screens with small envelope mark; title `Continue with Email`, email input, `Send Code`. Verification: six digits, email shown, resend cooldown, `Verify` action. Back/cancel preserves draft unless user explicitly discards.
+- No Google/Apple auth button. Failures have human-readable recovery and no exposed code/token logs. Keep compact, not busy illustration.
+
+## 9. P01–P02 Processing, errors and quotas
+
+- Honest server-backed stages: processing photos → extracting → analyzing → preparing results. **Do not simulate determinate percent if server has no real progress metric**; use indeterminate animation/check states.
+- `needs_retake`: identify nutrition OR ingredient photo, display existing blurry preview, primary `Retake Photo`, secondary `Use Different Photo`; preserve other approved capture.
+- `quota_exceeded`: show exact 30/3 effective limits **from server**, remaining when known, and next reset with user-local time. Guests must not see a false exact per-person counter. No paywall/upgrade link.
+- Distinguish invalid barcode, not-found, permission denial, network error, OTP expiry, processing duplicate, provider failure and spending cap.
+
+## 10. R01 Product Details — approved reference with MVP corrections
+
+- Full-screen nested page; top back (left), optional ellipsis overflow (right), no logo/title bar; no bottom navigation. Generous breathing room.
+- Hero: available *real* product photo or neutral fallback on left, name/brand on right. Small findings tags may be shown if supported; avoid unsupported 'Good Choice' absolute claim.
+- Separate rounded section cards: **Product Overview** (summary + favorable/needs-context/concern findings, labeled), **Ingredients & declared allergens** (ordered raw list and understandable context), **Nutrition Facts** (per-serving or per-100g basis with explicit units). The original reference layout is an inspiration, not a mandate to display fabricated `92/100` score or blanket 'None Detected' allergen claims.
+- Explanatory rows may be green/amber/red **only** when sourced by printed label and validated rules. An unverified value is `Unknown`, never implied zero. Include analysis date/method and caveats.
+- Sticky bottom actions: **Share** (P1, only if appropriate real link/text is available); **Add to List** remains visually approved as a *future* concept but **do not display an inert button in MVP**. Do not sneak in a saved-items database or numeric scoring to match mockup.
+- If result too long, scroll content while maintaining safe bottom action space. Content density should be airy, with moderate number of white cards.
+
+## 11. H02 Search and S01 Settings
+
+- Search is an expansion of the Home top-right magnifier; only searches actual device-local recent records in this MVP. Show explicit no matches and close; never pretend worldwide catalog search is implemented.
+- Settings: guest/verified status, Email OTP sign-in or sign-out, correct server-provided usage limits/reset, privacy/disclosure, About. No live paywall, fake chat, notifications or cosmetic options.
+
+## 12. Assets and handoff
+
+- Whole-lemon brand icon with two green leaves on full-square white canvas (reference generated during conversation); source logo vector/PNG and exact font assets must be confirmed in actual repository. No file path is assumed from conversation mockups.
+- Real product thumbnails are optional and unavailable unless an authorized product media source exists. Label photos are deleted after analysis; **do not reuse them as long-term product imagery**.
+- Reproduce the visual system with Flutter components; do not insert AI-generated screenshot images as the screen itself. Contrast, dynamic text, screen-reader semantics and tappable targets must be tested.
+- Reuse existing Flutter template layouts, fonts, asset build setup, platform camera packages and Cubit state; avoid unnecessary package swaps.
+
+## 13. Design QA / approval criteria
+
+1. iPhone portrait proportions in actual device screenshots, not stretched imagery; Android safe areas verified where available.
+2. Home header has lemon + Pickwell and **only** search icon. No recently-scanned heading, permanent search bar, list/grid control or distracting header card.
+3. Active categories limited to implemented data. Home contains rounded cards with truthful thumbnails and distinct empty state.
+4. Glass-inspired bar resembles current iOS translucent pill with an **independent rightmost Scan circle**; gracefully degrades on Android; scan has no text label.
+5. Product Details no tab bar or logo title, no false score, optional native Share only, no fake Add to List action.
+6. Capture, Email OTP, retake and quota states preserve underlying workflow and trust rules.
+7. Color is never the only signal; warnings are clearly differentiated from decorative lemon yellow.
+
+**Version history:** v1.1 quotas/preparatory UI; v1.2 November 2 2026 aligned with final visual iterations and clarified temporary local recents vs deferred cloud history.

@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — PRODUCT REQUIREMENTS DOCUMENT
 
 **File:** `PICKWELL_PRD.md`  
-**Version:** 1.3 — Quotas and RevenueCat-ready entitlements  
+**Version:** 1.4 — Approved lemon UI and product-list Home  
 **Date:** November 2, 2026  
 **Project / repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2, PRD  
@@ -61,11 +61,13 @@ Primary audience: everyday shoppers in the Philippines and other markets with pa
 | F07 | Shared database save and barcode-based deduplication | P0 | Reusable product records |
 | F08 | Green/yellow/red findings and contextual summary | P0 | Explanations, sources, uncertainties |
 | F09 | Backend secrets, RLS, rate limits, usage quotas | P0 | Guard expensive and privileged operations |
-| F10 | Minimal screens, camera/error/permission states | P0 | Complete usable demo |
+| F10 | Lemon-branded Home/product-list, scanner, camera/error/permission states | P0 | Complete usable demo |
+| F13 | Local recent-products index (lightweight, on this device) | P0 | Home shows previously opened/scanned product references without cloud history |
+| F14 | Home search/filter/sort and product cards | P1 | Search locally indexed recent items, food category, newest sort |
 | F12 | Free quotas and premium-ready entitlement resolver | P0 | Server-side 30/day barcode + 3/day AI, with future RevenueCat integration |
 | F11 | Optional name/brand correction, manual barcode entry | P1 | Improve legibility and demo resilience |
 
-No chat assistant, numeric food score, cosmetics, comparisons, favorites, personal scan history, offline history, **active purchases or paywall**, notifications, or elaborate onboarding in this hackathon iteration. Server-side monetization readiness is included.
+No chat assistant, numeric food score, cosmetic analysis, comparisons, favorites/collections, **cloud/personal account-wide scan history**, full offline product results, **active purchases or paywall**, notifications, or elaborate onboarding in this hackathon iteration. A small **device-local list of recent product references** is included for Home; this does not create a server history table. Server-side monetization readiness is included.
 
 ## 4. Primary user flows
 
@@ -205,12 +207,31 @@ Same three-step capture, but skip sign-in gate. User quota and abuse checks stil
 
 ### F10 — Minimal user experience
 
-- Home/scanner, lookup state, guided capture, contextual OTP screen, analysis status, and results. Settings/account sign-out can be minimal.
+- Home opens to a minimal **recently scanned product list** (or empty state), not a camera-first scanner. An independent prominent Scan action opens the barcode camera. Other destinations: lookup, guided capture, contextual OTP, analysis, results, and minimal Settings/account.
+- Home uses approved lemon + forest green + green + cream + white 60/30/10 *visual balance* (dominant neutral/cream, supportive greens, restrained lemon accents); no heavy shadows or large marketing panels.
+- Home header: lemon mark + Pickwell wordmark left; **only search icon** at upper right, expanding into search when tapped (no permanent search bar).
+- Under header: category filter chips (Food and All in MVP), compact newest sort, then **separate rounded photo product cards**. Each card displays actual product identity when known and a genuine available photo or neutral fallback, without invented package imagery. Avoid arbitrary checkmarks that imply a nutritional safety certification.
+- iOS 26-style translucent **liquid-glass-inspired** floating navigation pill for **Home and Settings**, with distinct far-right circular Scan action. The proposed Chat tab may appear in **design concepts only**, but must be hidden or disabled without false affordance in hackathon production. No cosmetics tab/filter while cosmetics analysis is deferred.
+- Product details is a nested page **without a bottom navigation bar or Pickwell header title**. Back + overflow, product photo/details, ingredient observations and nutrition cards, explanatory color-coded findings; Share is optional. Numeric Pickwell Score and Add to List belong to future roadmap.
 - Camera permission requested only when needed; gallery access uses appropriate platform mechanism.
 - Clear empty/loading/error/permission-denied/quota-exceeded/OTP-failed states.
 - Tiny contextual introduction suffices; no lengthy onboarding.
 
 **Pass:** New user can reach value quickly and complete both cached and uncached journeys.
+
+## 5A. Approved Home, navigation and product-details experience — v1.4
+
+**Scope:** The newest approved UI supersedes all prior scanner-first Home layouts and older green-only mockups. The product list is the opening screen; the primary Scan action remains a single tap away.
+
+- **First launch / empty Home:** lemon wordmark and search icon at top, gentle explanation, clear separate Scan action; no fake seeded products presented as actual user history.
+- **Local recents:** once a valid product record has been opened, add `{barcode, opened_at}` to a small device-local bounded index (e.g. max 30 unique recent barcodes). On next launch, resolve those barcodes through the published lookup endpoint when network permits. Never store private image captures or account identifiers in this index. Treat missing/offline records as unavailable, not as trusted complete offline analyses. Device-local recents do not synchronize across users/devices.
+- **Search/filter/sort:** Search icon opens search mode; search filters the local recent index by product name/brand/barcode already available. All and Food are active chips. Cosmetics, My Products, Chat, advanced search of the shared global catalog, and collections are **future UX**, not working MVP features. Newest sort should be true to `opened_at`. No list/grid toggle.
+- **Cards:** Individual softly rounded white product cards on warm white/cream surfaces, photo on left (real user/product photo only when legitimately available; otherwise neutral placeholder), product name and brief supporting text, trailing chevron and *only* substantiated status. No unsourced green checks as healthy certifications.
+- **Navigation:** Home and Settings in a translucent floating navigation pill; separate Scan circle at far right (scan icon **only**, no “Scan” text). No bottom navigation on nested Product Details, Scanner, OTP, or capture views. Chat is a future design reference and must not become a dead production tab.
+- **Product Details:** Product thumbnail/identity, evidence-aware findings by severity, ingredients/allergen and nutrition information. No 0–100 food score until a method is validated. The visually mocked score dial and Add to List are deferred; sharing via native share sheet is P1 only if the actual product URL/privacy contract permits it.
+- **Color semantics:** The general 60/30/10 brand balance means 60% warm white/cream foundation, 30% forest and supportive green typography/actions/soft shapes, 10% lemon yellow brand accents. Warning yellow must be distinguished from decorative lemon yellow with text and icon.
+
+**Acceptance:** Guest opens into local recent-product Home without a login gate; tapping the search icon expands search; filtering and newest ordering affect local recents; tapping a product opens nested details without bottom navigation; prominent scan action opens live barcode camera; zero unsupported Chat/cosmetic/score/collections controls appear interactive.
 
 ## 6. Backend and data contract (refine in SPEC.md / DATABASE.md)
 
@@ -254,7 +275,7 @@ Never imply absence of a listed allergen is proof of safety. Never invent nutrit
 - Cosmetics and personal care scanning.
 - Arbitrary image analysis with no barcode, product-to-product comparisons and alternatives.
 - Overall food score (0–100), pending validated methodology.
-- Per-user scan history, favorites, cloud sync of personal collections, offline history.
+- Cloud/account-wide scan history, favorites, saved collections, server-side user-product sync, and fully offline analysis history. **Lightweight device-local recent product references for the Home list are in MVP.**
 - Google/Apple sign-in (Email OTP is the approved MVP method).
 - **Active** subscriptions, paywalls, purchase buttons, RevenueCat checkout and monetization, referrals. RevenueCat-ready database entitlements and webhook design are included now; charging users is deferred.
 - Community ratings/reviews, extensive moderation workflows, broad localization, push notifications.
@@ -348,3 +369,5 @@ Maintain a separate future `ROADMAP.md` when needed; roadmap items are **not** P
 - **v1.2 (Nov 2, 2026):** Added approved Supabase backend, optional Email OTP guest/auth split, eight locked operational decisions and server-side security requirements while retaining the narrow hackathon scope.
 
 - **v1.3 (Nov 2, 2026):** Added server-controlled initial 30 barcode/3 AI daily limits, future RevenueCat entitlement/webhook schema, quota semantics and explicit paywall-disabled hackathon policy.
+
+- **v1.4 (Nov 2, 2026):** Locked lemon 60/30/10 visual identity, recent-products Home, expandable search, rounded photo cards, separate Scan action and minimalist nested Product Details. Local recents explicitly distinct from deferred cloud history; Chat/cosmetics/score/Add to List remain deferred.

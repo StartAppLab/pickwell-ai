@@ -443,7 +443,7 @@ and remaining device/service checks. Analysis alone does not prove runtime behav
 1. Inspect the real repository root, directory layout, existing `AGENTS.md`, and current git diff/status. Preserve uncommitted user changes.
 2. Read `PICKWELL_PRD.md` (v1.3), then `PICKWELL_DESIGN.md` (v1.1), `PICKWELL_SPEC.md` (v1.1), `PICKWELL_DATABASE.md` (v1.0), and `PICKWELL_TASKS.md` (v1.0). If filenames differ, locate the role-equivalent file; do not fabricate paths.
 3. Follow the next verified unfinished TASKS task and its prerequisites. A stale unchecked box does not override real working code or user-reported completion.
-4. Inspect existing Flutter templates, Cubit/Bloc patterns, routing, build flavors, package configuration, tests, Supabase migrations/functions, and dependency injection before modifying them.
+4. Inspect existing Flutter templates, Cubit/Bloc patterns, routing, build flavors, package configuration, tests, Supabase migrations/functions, and dependency injection before modifying them. Use the **latest PRD v1.4 and DESIGN v1.2** for lemon-brand Home/navigation (including local recents and separate rightmost Scan circle); do not follow obsolete scanner-first mockups.
 5. When documents conflict, stop the *affected step*, report the conflict with file/section references, and preserve the latest user-approved product decisions below. Do not invent a new monetization, auth, or UX policy.
 
 ## 2. Locked MVP product decisions
@@ -463,7 +463,7 @@ and remaining device/service checks. Analysis alone does not prove runtime behav
 - Backend is **Supabase PostgreSQL, Edge Functions, Supabase Auth**. Meta API secrets and privileged Supabase credentials remain on server only.
 - **RevenueCat is selected** for eventual paid subscriptions. Prepare server-side Free/Premium entitlements, identity mapping and safe webhook event handling, with **billing/paywall/purchases disabled** during hackathon. Do not assume Premium pricing, limits, or entitlement IDs.
 - Minimal first-party operational analytics and AI cost tracking; no unrelated third-party analytics or billing services without approval.
-- No unnecessary feature work: **AI chat, cosmetics, barcode-free analysis, numeric food score, product comparison, alternative recommendations, history/offline favorites, community, broad localization, elaborate onboarding, subscription paywall** remain deferred.
+- No unnecessary feature work: **AI chat, cosmetics, barcode-free analysis, numeric food score, product comparison, alternative recommendations, cloud history/offline full analyses/favorites, community, broad localization, elaborate onboarding, subscription paywall** remain deferred. **A bounded device-local recent barcode reference index for the approved Home product cards is in scope**; it is not a cloud scan-history feature.
 
 ## 3. Operating boundaries
 

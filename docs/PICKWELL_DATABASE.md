@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — SUPABASE DATABASE & BACKEND DATA DESIGN
 
 **Version:** 1.0 · **Date:** 2026-11-02 · **Repository:** `pickwell-ai`  
-**Source of truth:** `PICKWELL_PRD.md` v1.3, `PICKWELL_DESIGN.md` v1.1, `PICKWELL_SPEC.md` v1.1.  
+**Source of truth:** `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2.  
 **Status:** Implementation blueprint, **not deployed SQL**. Migration and deployment require verification against the actual project, schema linting and transactional tests.  
 **Goal:** Shared barcode product catalog, authenticated Meta AI contributions, server-enforced adjustable daily quotas, RevenueCat-ready Premium entitlements, no active purchase flow.
 
