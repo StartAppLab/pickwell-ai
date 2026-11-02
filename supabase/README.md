@@ -22,6 +22,15 @@ The consumer migration creates images, documents, and avatars buckets and their
 RLS policies. It also allows self notifications. Storage policy files outside the
 migration directory are no longer an installation step.
 
+## Pickwell catalog foundation
+
+The additive T02.1 migration, server-only published projection, private jobs and
+explicit synthetic demo seed are documented in
+[PICKWELL_CATALOG_FOUNDATION.md](../docs/PICKWELL_CATALOG_FOUNDATION.md).
+The new seed runs alongside existing sample content on local reset. Its demo
+barcode is `2900000000018` (canonical `02900000000018`); never present its fictional
+facts as a real food analysis. Full local Supabase validation still needs Docker.
+
 ## Optional premium backend access
 
 [modules/subscriptions/README.md](modules/subscriptions/README.md) provides an

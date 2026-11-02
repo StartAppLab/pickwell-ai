@@ -75,10 +75,12 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T02.1 Migrations for shared catalog and analysis jobs
 
-- [ ] Translate `PICKWELL_DATABASE.md` illustrative SQL into real versioned migrations; review existing schema before applying.
-- [ ] Create products, analyses, ingredient/nutrition structured fields, findings/evidence, analysis jobs, unique normalized barcode constraint, status lifecycle, timestamps, model/rule versions and contributor references as specified.
-- [ ] Plan product correction/invalidation without giving contributors overwrite rights; make error/retry state explicit.
-- [ ] Seed a **clearly identified demo record** with complete safe nutrition and analysis for cache-hit testing.
+- [x] Translate `PICKWELL_DATABASE.md` illustrative SQL into real versioned migrations; review existing schema before applying.
+- [x] Create products, analyses, ingredient/nutrition structured fields, findings/evidence, analysis jobs, unique normalized barcode constraint, status lifecycle, timestamps, model/rule versions and contributor references as specified.
+- [x] Plan product correction/invalidation without giving contributors overwrite rights; make error/retry state explicit.
+- [x] Seed a **clearly identified demo record** with complete safe nutrition and analysis for cache-hit testing.
+
+**2026-11-02 — implementation verified locally; integration acceptance PARTIAL:** [Catalog foundation evidence](PICKWELL_CATALOG_FOUNDATION.md). Nine PostgreSQL-engine tests pass, with 46 expected rejection checks, existing-data preservation and version-ledger replay. Full Supabase CLI/PostgreSQL 15 migration/seed application remains unverified: local reset/test commands fail because Docker/Postgres is unavailable. No remote database changed. Do not treat the checked implementation items as a passing full-stack gate.
 
 **Acceptance:** Migrations apply cleanly to clean test DB and preserve existing data when rerun via migration runner; duplicate barcode prevented; only `ready` considered published.  
 **Targeted validation:** SQL schema/assertion tests for unique barcode, FK integrity, job state and version metadata.

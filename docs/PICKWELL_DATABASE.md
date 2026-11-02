@@ -307,3 +307,14 @@ Webhook route should not be deployed unprotected merely because it omits JWT ver
 - Whether to use direct short-lived image upload or private temporary Storage and queued processing after runtime measurement.
 
 **Next document:** `PICKWELL_TASKS.md`, followed by `AGENTS.md` after inspecting the real `pickwell-ai` repository's existing instructions/template.
+
+## 11. T02.1 implementation reference (2026-11-02)
+
+The catalog/analysis/findings/jobs subset now has an additive implementation in
+`supabase/migrations/20261102000100_pickwell_catalog.sql`, a clearly synthetic
+`supabase/seed/04_pickwell_demo.sql`, and targeted PostgreSQL-engine tests.
+See [catalog foundation evidence](PICKWELL_CATALOG_FOUNDATION.md) for normalization,
+composite revision ownership, publication sealing, correction/retry behavior and
+validation limits. No remote migration was applied. Full Supabase/PostgreSQL 15
+checks remain blocked by the unavailable local Docker stack. Quota, analytics,
+entitlement and webhook portions of this blueprint remain later tasks.
