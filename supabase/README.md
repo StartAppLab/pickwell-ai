@@ -290,3 +290,22 @@ performs no DB writes, uploads, usage reservation, billing or inference.
 submission handler. That handler must recheck identity; a prior preflight response
 or a client flag grants no submission capability. See
 [Email OTP evidence](../docs/PICKWELL_EMAIL_OTP_GATE.md).
+
+## Analyze-product orchestration (T05.1)
+
+`analyze-product` is deployed with gateway JWT verification and the shared trusted
+confirmed-email guard. It accepts bounded multipart barcode/idempotency/two-photo
+input, applies atomic admission and provider-spend controls, and calls the reused
+Meta adapter only after a unique provider claim. Inference remains disabled.
+
+Private `analysis_requests` bind request keys to canonical barcode and image hashes;
+`analysis_candidates` hold structured extraction for later validation/publication.
+No original images are stored. The latter expire after 24 hours when
+`pickwell_prune_analysis()` runs; configure it alongside existing telemetry
+maintenance before enabling hosted inference. Admission also runs that pruning
+opportunistically. Unknown provider outcomes require trusted reconciliation and
+must never be cleared by a client retry.
+
+See [orchestration evidence](../docs/PICKWELL_ANALYSIS_ORCHESTRATION.md). T05.2/T05.3
+and Flutter upload/result wiring remain separate; an auth preflight or private
+candidate is not a published product or a consumed successful-analysis credit.

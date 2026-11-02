@@ -311,3 +311,8 @@ verify_jwt = false
 # confirmed non-anonymous email. No inference/data write is exposed.
 [functions.authorize-analysis]
 verify_jwt = true
+
+# Verified-user only. Handler independently checks persistent confirmed email.
+# DB inference_enabled remains false until the validation/publication path is ready.
+[functions.analyze-product]
+verify_jwt = true

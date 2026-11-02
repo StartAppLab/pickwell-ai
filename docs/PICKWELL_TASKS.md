@@ -191,24 +191,28 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 - [x] Configure Supabase Auth Email OTP as an actual code flow; verify email template, provider delivery limits and session persistence.
 - [x] Prompt sign-in **only when submitting unknown-product analysis**; scanned cached products remain publicly accessible.
 - [x] Support send/verify/resend/error/cancel and safe resume of the two photos; session expiration handled.
-- [ ] Backend verifies trusted JWT and persistent verified email; do not rely solely on Flutter or on the generic `authenticated` role if anonymous auth is later enabled.
+- [x] Backend verifies trusted JWT and persistent verified email; do not rely solely on Flutter or on the generic `authenticated` role if anonymous auth is later enabled.
 
 **Acceptance:** Guest captures photos, signs in, returns to exactly the same analysis submission, and can proceed; guest direct call to analysis endpoint is forbidden.  
 **Targeted validation:** OTP integration, incorrect/expired OTP, guest rejection server-side, post-auth resume.
 
 **2026-11-03 — PARTIAL (actual analysis endpoint wiring remains T05):** [Email OTP evidence](PICKWELL_EMAIL_OTP_GATE.md). Contextual Analyze → Email code → same-photo review implemented using existing auth SDK/session and app-owned draft; send/resend/cooldown/error/cancel/expired-session handling tested. Cloud settings confirm 8-digit OTP, one-minute interval and 30 emails/hour; no security setting was weakened to match the six-digit design example. Fresh real code verified HTTP 200; wrong/consumed codes HTTP 403. Deployed auth-only `authorize-analysis`: guest/public-key/forged-token HTTP 401, verified user HTTP 200. **54 Flutter tests, 12 backend tests pass; 1 native-stack test skipped; analyzer clean; Android debug build passes.** Shared backend guard is ready, but the actual analyze-product handler does not yet exist and must enforce it in T05. Physical app OTP/restart persistence and natural code-age expiry remain unverified; UI/SDK persistence and return are automated checks. No Meta call, image upload, billing or quota change.
 
+**T05.1 follow-up:** The actual protected `analyze-product` handler now invokes the shared trusted-email guard, and hosted guest/public-key/forged-token calls are denied before model work. This resolves the backend-boundary checkbox; full app submission remains dependent on T05.2/T05.3 and Flutter upload wiring, and on-device OTP/restart evidence is still not claimed.
+
 ## 7. Phase 5 — AI processing and reusable publication (P0)
 
 ### T05.1 `analyze-product` secure job orchestration
 
-- [ ] Recheck normalized barcode and existing job/`ready` record atomically before invoking Meta; deduplicate with job lease/idempotency key.
-- [ ] Authorize verified user, apply quota reservation and rate/concurrency/global spend checks before model call; record job states.
-- [ ] Validate both image inputs; send private server-side API request with bounded timeouts; use status/polling only if necessary for hosted execution constraints.
-- [ ] Limit retries to prevent API-cost storms; user retry of same request idempotency key must not double-charge.
+- [x] Recheck normalized barcode and existing job/`ready` record atomically before invoking Meta; deduplicate with job lease/idempotency key.
+- [x] Authorize verified user, apply quota reservation and rate/concurrency/global spend checks before model call; record job states.
+- [x] Validate both image inputs; send private server-side API request with bounded timeouts; use status/polling only if necessary for hosted execution constraints.
+- [x] Limit retries to prevent API-cost storms; user retry of same request idempotency key must not double-charge.
 
 **Acceptance:** One new barcode has no duplicate published record; blocked/unverified caller cannot invoke model; concurrent users share the outcome safely.  
 **Targeted validation:** Mocked provider with parallel submit, auth, duplicate, quota rejection and timeout tests.
+
+**2026-11-03 — COMPLETE (backend orchestration/native targeted validation; hosted inference remains OFF):** [Orchestration evidence](PICKWELL_ANALYSIS_ORCHESTRATION.md). Image-bound idempotency, trusted confirmed non-anonymous identity, atomic existing-job/cache/quota admission, one provider claim and bounded Meta adapter reuse implemented. Private structured handoff awaits T05.2/T05.3; no photos are retained or premature product published. **54 native Auth/REST/SQL/handler tests plus 25 isolated/spike/auth/schema tests pass**, including 32 parallel submissions from two users, same-key retry, exact quota/attempt/spend caps, timeout/lost-acknowledgement holds and one synthetic atomic publication reused without more model calls. Migration and protected endpoint deployed; hosted guest/forged sessions 401, malformed verified input 400, valid unknown input 503 inference_disabled, cached demo 200 already_exists. Hosted provider ledger/jobs/candidates remain zero. No live Meta inference or billing activation; actual extraction/interpretation/publication and client upload remain later tasks. Native stack stopped.
 
 ### T05.2 Extract, interpret and validate
 
