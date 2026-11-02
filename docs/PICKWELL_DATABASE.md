@@ -349,3 +349,21 @@ The 30/31 lookup, 3/4 successful analysis, mutable-limit, concurrency and UTC ca
 pass against actual local Supabase Auth/REST/PostgreSQL. No hosted migration or
 public lookup/analysis endpoint was activated. Broader operational events and
 reporting remain T02.4; no live provider cost measurement is claimed here.
+
+
+## 14. T02.4 events/ledger implementation reference (2026-11-02)
+
+`20261102000400_pickwell_operational_events.sql` adds fixed-field private events,
+provider identity and separate estimates on the existing admission ledger, mandatory
+metrics recording, daily aggregate views and transactional retention maintenance.
+Optional event errors do not change quota truth; provider accounting remains mandatory.
+Event detail expires after 30 days; closed IP hashes are scrubbed after two days;
+old closed ledger details become nonpersonal aggregates retained for 365 days.
+Unresolved calls, current-day budget and publication-pending results are protected.
+
+See [operational evidence and Cron prerequisites](PICKWELL_OPERATIONAL_EVENTS.md).
+The migration registers daily cleanup only when Supabase Cron already exists.
+Native direct maintenance passed; Cron was absent locally, so automatic scheduling
+remains unverified and must be configured before deployment. Event correlations are
+opaque operation IDs, with no user/barcode/photo/token fields. No hosted migration,
+public route, third-party analytics SDK or live inference was introduced.

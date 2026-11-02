@@ -1,3 +1,5 @@
+import { createOperationalEvents } from './operational_events.mjs';
+
 // Server-only T02.3 adapter. Public routes are wired in T03.1/T05.1.
 // Never derive authorization, plan, user UUID or proxy trust from request JSON.
 const ipLiteral = value => {
@@ -37,6 +39,7 @@ export function createQuotaService(env, fetcher = fetch) {
   if ((origin.protocol !== 'https:' && !(local && origin.protocol === 'http:')) ||
     origin.username || origin.password || origin.pathname !== '/' || origin.search || origin.hash ||
     !env.SUPABASE_SERVICE_ROLE_KEY || !env.SUPABASE_ANON_KEY) throw new Error('server_config');
+  const telemetry = createOperationalEvents(env, fetcher);
   async function rpc(name, body) {
     const response = await fetcher(origin.origin + '/rest/v1/rpc/' + name, {
       method: 'POST', headers: { apikey: env.SUPABASE_SERVICE_ROLE_KEY,
@@ -68,12 +71,19 @@ export function createQuotaService(env, fetcher = fetch) {
     },
     throttle: (bucket, user = null) => rpc('pickwell_lookup_throttle', { p_ip_bucket: bucket, p_user: user }),
     snapshot: (user, metric) => rpc('pickwell_quota_snapshot', { p_user: user, p_metric: metric }),
-    reserve: (user, metric, key, barcode, job = null) => rpc('pickwell_reserve_usage', {
-      p_user: user, p_metric: metric, p_key: key, p_barcode: barcode, p_job: job }),
+    async reserve(user, metric, key, barcode, job = null) {
+      const result = await rpc('pickwell_reserve_usage', {
+        p_user: user, p_metric: metric, p_key: key, p_barcode: barcode, p_job: job });
+      // These branches create no reservation row, so no DB state trigger can emit.
+      // Event failure never changes a successful/denied quota decision.
+      if (result.status === 'quota_exceeded') await telemetry.record('quota_exceeded', key, { metric });
+      if (result.status === 'cache_hit') await telemetry.record('product_cache_hit', key, { metric });
+      return result;
+    },
     beginProvider: (reservation, bucket) => rpc('pickwell_begin_provider', { p_reservation: reservation, p_ip_bucket: bucket }),
-    recordProvider: (attempt, state, cost = null, input = null, output = null, duration = null) =>
-      rpc('pickwell_record_provider', { p_attempt: attempt, p_state: state, p_cost: cost,
-        p_input: input, p_output: output, p_duration: duration }),
+    recordProvider: (attempt, state, cost = null, input = null, output = null, duration = null, estimate = null) =>
+      rpc('pickwell_record_provider_metrics', { p_attempt: attempt, p_state: state, p_cost: cost,
+        p_input: input, p_output: output, p_duration: duration, p_estimate: estimate }),
     finish: (reservation, outcome, product = null, analysis = null) => rpc('pickwell_finish_usage', {
       p_reservation: reservation, p_outcome: outcome, p_product: product, p_analysis: analysis }),
     reconcileExpired: () => rpc('pickwell_reconcile_expired', {}),

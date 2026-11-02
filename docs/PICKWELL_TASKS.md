@@ -112,12 +112,14 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T02.4 Operational events and cost ledger
 
-- [ ] Record minimal backend events: `barcode_scanned`, `product_cache_hit`, `product_not_found`, `capture_completed` (if intentionally sent), `analysis_started`, `analysis_completed`, `analysis_failed`, `analysis_retake_required`, `quota_exceeded`.
-- [ ] Maintain server-only model/provider/tokens/estimated cost/duration ledger if available; limit access and retention.
-- [ ] Ensure nonessential analytics failures do not bypass or incorrectly deny quota checks.
+- [x] Record minimal backend events: `barcode_scanned`, `product_cache_hit`, `product_not_found`, `capture_completed` (if intentionally sent), `analysis_started`, `analysis_completed`, `analysis_failed`, `analysis_retake_required`, `quota_exceeded`.
+- [x] Maintain server-only model/provider/tokens/estimated cost/duration ledger if available; limit access and retention.
+- [x] Ensure nonessential analytics failures do not bypass or incorrectly deny quota checks.
 
 **Acceptance:** Can inspect counted cache hits, Meta calls, failures and daily spend without revealing image payloads, passwords or API tokens.  
 **Targeted validation:** Redacted event assertions and optional analytics failure behavior.
+
+**2026-11-02 — COMPLETE (backend/native validation):** [Operational evidence](PICKWELL_OPERATIONAL_EVENTS.md). Fixed-field deduplicated events, separate estimates/provider metrics, server-only daily reports and atomic retention/archival added. 128 native pgTAP assertions, 8 operational tests, 19 quota tests, 7 security tests and 9 isolated migration tests pass. Analytics-write failures preserve quota decisions; mandatory cost failures stay fail closed. No hosted change, public endpoint or live AI call occurred. Local Cron is absent: maintenance was tested directly; automatic scheduling must be enabled/verified before hosted use. Native stack stopped.
 
 ## 5. Phase 3 — Barcode scanning and cached lookup (P0)
 

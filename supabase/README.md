@@ -41,6 +41,15 @@ server-only provider spend/concurrency admission. Normal inference and billing
 remain disabled; public route wiring belongs to T03.1/T05.1. Native SQL/Auth/REST
 checks pass without Docker. No hosted migration or inference was run in this task.
 
+## Pickwell operational events and retention
+
+[T02.4 operational evidence](../docs/PICKWELL_OPERATIONAL_EVENTS.md) covers private,
+redacted lifecycle events, separate estimated provider cost, daily aggregate reports
+and protected retention/archival. Optional analytics failures cannot change quota
+allowance; mandatory provider accounting still fails closed. Cron registration is
+conditional on the extension already being enabled; verify a running retention job
+before deployment. No public analytics endpoint or hosted change was made.
+
 ## Optional premium backend access
 
 Pickwell's T02.2 server-only usage/entitlement/event foundations and read boundaries
