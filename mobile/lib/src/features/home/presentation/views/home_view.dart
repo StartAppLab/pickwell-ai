@@ -45,127 +45,126 @@ class _HomeViewState extends State<HomeView> {
                   ready: (items) => items,
                   orElse: () => <RecentProduct>[],
                 );
-                final visible = items
-                    .where(
-                      (r) =>
-                          query.isEmpty ||
-                          '${r.product?.name ?? ''} ${r.product?.brand ?? ''} ${r.barcode}'
-                              .toLowerCase()
-                              .contains(query.toLowerCase()),
-                    )
-                    .toList();
-                return CustomScrollView(
-                  slivers: [
-                    SliverPadding(
-                      padding: EdgeInsets.all(d.paddingComfortable),
-                      sliver: SliverList.list(
-                        children: [
-                          Row(
-                            children: [
-                              Tooltip(
-                                message: l.pkLemonPlaceholder,
-                                child: Semantics(
-                                  label: l.pkLemonPlaceholder,
-                                  child: const Text('🍋', style: TextStyle(fontSize: 32)),
-                                ),
-                              ),
-                              Gap(d.spacingXs),
-                              Expanded(
-                                child: Text(
-                                  getIt<AppConfig>().appName,
-                                  style: context.textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: context.colorScheme.primary,
+                final visible = filterRecentProducts(items, query: query, foodOnly: food);
+                if (state.maybeWhen(loading: () => true, orElse: () => false)) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return RefreshIndicator(
+                  onRefresh: () => context.read<HomeCubit>().load(),
+                  child: CustomScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.all(d.paddingComfortable),
+                        sliver: SliverList.list(
+                          children: [
+                            Row(
+                              children: [
+                                Tooltip(
+                                  message: l.pkLemonPlaceholder,
+                                  child: Semantics(
+                                    label: l.pkLemonPlaceholder,
+                                    child: const Text('🍋', style: TextStyle(fontSize: 32)),
                                   ),
                                 ),
-                              ),
-                              IconButton(
-                                tooltip: search ? l.pkCloseSearch : l.pkSearch,
-                                onPressed: () => setState(() {
-                                  search = !search;
-                                  if (!search) query = '';
-                                }),
-                                icon: AppIcon(icon: search ? Icons.close : Icons.search),
+                                Gap(d.spacingXs),
+                                Expanded(
+                                  child: Text(
+                                    getIt<AppConfig>().appName,
+                                    style: context.textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: context.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: search ? l.pkCloseSearch : l.pkSearch,
+                                  onPressed: () => setState(() {
+                                    search = !search;
+                                    if (!search) query = '';
+                                  }),
+                                  icon: AppIcon(icon: search ? Icons.close : Icons.search),
+                                ),
+                              ],
+                            ),
+                            if (search) ...[
+                              Gap(d.spacingMd),
+                              TextField(
+                                autofocus: true,
+                                decoration: InputDecoration(hintText: l.pkSearch),
+                                onChanged: (value) => setState(() => query = value),
                               ),
                             ],
-                          ),
-                          if (search) ...[
-                            Gap(d.spacingMd),
-                            TextField(
-                              autofocus: true,
-                              decoration: InputDecoration(hintText: l.pkSearch),
-                              onChanged: (value) => setState(() => query = value),
-                            ),
-                          ],
-                          Gap(d.spacingLg),
-                          Wrap(
-                            alignment: WrapAlignment.spaceBetween,
-                            spacing: d.spacingMd,
-                            runSpacing: d.spacingXs,
-                            children: [
-                              Wrap(
-                                spacing: d.spacingXs,
-                                runSpacing: d.spacingXs,
-                                children: [
-                                  ChoiceChip(
-                                    label: Text(l.pkAll),
-                                    selected: !food,
-                                    onSelected: (_) => setState(() => food = false),
-                                  ),
-                                  ChoiceChip(
-                                    label: Text(l.pkFood),
-                                    selected: food,
-                                    onSelected: (_) => setState(() => food = true),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(l.pkNewest, style: context.textTheme.labelLarge),
-                                  AppIcon(icon: Icons.arrow_downward, size: d.iconSmall),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Gap(d.spacingLg),
-                          if (state.maybeWhen(error: (_) => true, orElse: () => false)) ...[
-                            Text(l.pkStoredUnavailable),
-                            TextButton(
-                              onPressed: () => context.read<HomeCubit>().load(),
-                              child: Text(l.pkRetry),
-                            ),
-                          ],
-                          if (visible.isEmpty) ...[
-                            Gap(d.spacingXxl),
-                            AppIcon(
-                              icon: HugeIcons.strokeRoundedBarcodeScan,
-                              size: 64,
-                              color: context.colorScheme.primary,
+                            Gap(d.spacingLg),
+                            Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              spacing: d.spacingMd,
+                              runSpacing: d.spacingXs,
+                              children: [
+                                Wrap(
+                                  spacing: d.spacingXs,
+                                  runSpacing: d.spacingXs,
+                                  children: [
+                                    ChoiceChip(
+                                      label: Text(l.pkAll),
+                                      selected: !food,
+                                      onSelected: (_) => setState(() => food = false),
+                                    ),
+                                    ChoiceChip(
+                                      label: Text(l.pkFood),
+                                      selected: food,
+                                      onSelected: (_) => setState(() => food = true),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(l.pkNewest, style: context.textTheme.labelLarge),
+                                    AppIcon(icon: Icons.arrow_downward, size: d.iconSmall),
+                                  ],
+                                ),
+                              ],
                             ),
                             Gap(d.spacingLg),
-                            Text(
-                              items.isEmpty ? l.pkEmptyTitle : l.pkNoMatches,
-                              textAlign: TextAlign.center,
-                              style: context.textTheme.titleLarge,
-                            ),
-                            Gap(d.spacingSm),
-                            if (items.isEmpty)
-                              Text(
-                                l.pkEmptyBody,
-                                textAlign: TextAlign.center,
-                                style: context.textTheme.bodyLarge,
+                            if (state.maybeWhen(error: (_) => true, orElse: () => false)) ...[
+                              Text(l.pkStoredUnavailable),
+                              TextButton(
+                                onPressed: () => context.read<HomeCubit>().load(),
+                                child: Text(l.pkRetry),
                               ),
+                            ],
+                            if (visible.isEmpty) ...[
+                              Gap(d.spacingXxl),
+                              AppIcon(
+                                icon: HugeIcons.strokeRoundedBarcodeScan,
+                                size: 64,
+                                color: context.colorScheme.primary,
+                              ),
+                              Gap(d.spacingLg),
+                              Text(
+                                items.isEmpty ? l.pkEmptyTitle : l.pkNoMatches,
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.titleLarge,
+                              ),
+                              Gap(d.spacingSm),
+                              if (items.isEmpty)
+                                Text(
+                                  l.pkEmptyBody,
+                                  textAlign: TextAlign.center,
+                                  style: context.textTheme.bodyLarge,
+                                ),
+                            ],
+                            for (final entry in visible) ...[
+                              CatalogWidget(entry: entry, onTap: () => _open(entry.barcode)),
+                              Gap(d.spacingSm),
+                            ],
+                            const Gap(120),
                           ],
-                          for (final entry in visible) ...[
-                            CatalogWidget(entry: entry, onTap: () => _open(entry.barcode)),
-                            Gap(d.spacingSm),
-                          ],
-                          const Gap(120),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),

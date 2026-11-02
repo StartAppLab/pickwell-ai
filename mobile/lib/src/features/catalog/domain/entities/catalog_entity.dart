@@ -1,3 +1,5 @@
+import 'dart:math';
+
 enum LookupStatus { idle, scanning, checking, found, miss, processing, denied, error }
 
 class ProductRecord {
@@ -68,4 +70,31 @@ String normalizeGtin(String input, {bool upce = false}) {
   }
   if ((10 - sum % 10) % 10 != int.parse(code[code.length - 1])) throw const FormatException();
   return code.padLeft(14, '0');
+}
+
+// Request identity is independent of UI and never conveys user authorization.
+String createCatalogRequestId() {
+  final random = Random.secure();
+  final bytes = List.generate(16, (_) => random.nextInt(256));
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  final s = bytes.map((v) => v.toRadixString(16).padLeft(2, '0')).join();
+  return '${s.substring(0, 8)}-${s.substring(8, 12)}-${s.substring(12, 16)}-${s.substring(16, 20)}-${s.substring(20)}';
+}
+
+List<RecentProduct> filterRecentProducts(
+  List<RecentProduct> items, {
+  String query = '',
+  bool foodOnly = false,
+}) {
+  final needle = query.trim().toLowerCase();
+  final visible = items.where((entry) {
+    // Published Pickwell records currently describe food only. Unresolved
+    // references have no known category and remain available under All.
+    if (foodOnly && entry.product == null) return false;
+    final text = '${entry.product?.name ?? ''} ${entry.product?.brand ?? ''} ${entry.barcode}';
+    return needle.isEmpty || text.toLowerCase().contains(needle);
+  }).toList();
+  visible.sort((a, b) => b.openedAt.compareTo(a.openedAt));
+  return visible;
 }

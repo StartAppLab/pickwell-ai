@@ -160,13 +160,15 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T03.3 Local recent-products Home index and search (P0 recent index / P1 filtering polish)
 
-- [ ] Record only unique published ready barcode references and last-opened timestamps in a bounded device-local index; no personal account/cloud history, persistent user label photos or full offline analysis payloads.
+- [x] Record only unique published ready barcode references and last-opened timestamps in a bounded device-local index; no personal account/cloud history, persistent user label photos or full offline analysis payloads.
 - [ ] On app relaunch, display available last-viewed product cards with truthful thumbnails (actual authorized media or placeholder). Refresh summary online when needed and follow server lookup/quota rules; never invent package photos or pretend results are locally available offline.
-- [ ] Search icon expands into search field; filter the local list, allow All/Food and newest order; Cosmetics and Chat must remain nonfunctional concepts outside shipped MVP.
-- [ ] Empty state encourages scan without fake product fixtures.
+- [x] Search icon expands into search field; filter the local list, allow All/Food and newest order; Cosmetics and Chat must remain nonfunctional concepts outside shipped MVP.
+- [x] Empty state encourages scan without fake product fixtures.
 
 **Acceptance:** A real ready barcode opened once appears in Home after app restart, newest-first and deduplicated. Empty state correct. Scanning remains guest-accessible. Local reopening does not trigger Meta.  
 **Targeted validation:** Local persistence/dedup/search/filter unit tests, widget check for screen density and scan button, missing-photo fallback and offline handling.
+
+**2026-11-02 — PARTIAL (real-product restart acceptance pending):** [Local recents evidence](PICKWELL_LOCAL_RECENTS.md). Existing 30-entry reference-only persistence reused; online resolution after source/repository restart added without rewriting opening timestamps. Local newest/search/Food filtering, unavailable placeholders, retry and duplicate-load protection verified. **32 focused tests pass; static analysis clean.** SharedPreferences/repository restart checks use synthetic ready fixtures. A real published product and actual device restart/card restoration remain unverified; the relaunch criterion stays open. No cloud write, new Meta call, billing or later capture/submission task was performed.
 
 ## 6. Phase 4 — Guided capture and Email OTP (P0)
 

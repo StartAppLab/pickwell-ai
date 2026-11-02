@@ -13,7 +13,11 @@ class HomeCubit extends Cubit<HomeState> {
   final GetRecentProductsUseCase recents;
   HomeCubit(this.recents) : super(const HomeState.idle());
   Future<void> init() => load();
-  Future<void> load() async {
+  Future<void>? _loading;
+  Future<void> load() => _loading ??= _load().whenComplete(() => _loading = null);
+  Future<void> _load() async {
+    if (isClosed) return;
+    if (state == const HomeState.idle()) emit(const HomeState.loading());
     final result = await recents();
     if (isClosed) return;
     result.fold(

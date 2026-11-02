@@ -135,6 +135,66 @@ void main() {
     await home.close();
     semantics.dispose();
   });
+  testWidgets(
+    'unavailable recents stay truthful; Food filters unknown references and refresh retries',
+    (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final repo = FakeCatalog()
+        ..recentItems = [
+          RecentProduct('00000096385074', DateTime.utc(2026, 2)),
+          RecentProduct(
+            '00036000291452',
+            DateTime.utc(2026, 1),
+            product: const ProductRecord(
+              barcode: '00036000291452',
+              name: 'Loaded cereal',
+              summary: 'Fixture only',
+              nutrition: {},
+              ingredients: {},
+              findings: [],
+            ),
+          ),
+        ];
+      final home = HomeCubit(GetRecentProductsUseCase(repo));
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme(AppColorScheme.lightColorScheme),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: BlocProvider.value(value: home, child: const HomeView()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('00000096385074'), findsOneWidget);
+      expect(find.textContaining('Check your connection'), findsOneWidget);
+      expect(find.text('Loaded cereal'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('00000096385074')).dy,
+        lessThan(tester.getTopLeft(find.text('Loaded cereal')).dy),
+      );
+      expect(find.byType(Image), findsNothing, reason: 'No invented product images');
+      await tester.tap(find.text('Food'));
+      await tester.pumpAndSettle();
+      expect(find.text('00000096385074'), findsNothing);
+      expect(find.text('Loaded cereal'), findsOneWidget);
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+      expect(find.text('00000096385074'), findsOneWidget);
+      repo.recentItems = [];
+      final refresh = tester.state<RefreshIndicatorState>(find.byType(RefreshIndicator));
+      final pending = refresh.show();
+      await tester.pumpAndSettle();
+      await pending;
+      expect(find.text('Your next food find starts here'), findsOneWidget);
+      expect(repo.requests, isEmpty, reason: 'Search/filter widgets never issue a lookup');
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await home.close();
+    },
+  );
   testWidgets('camera permission notice exposes recovery and keeps readable text', (tester) async {
     var retried = false;
     await tester.pumpWidget(

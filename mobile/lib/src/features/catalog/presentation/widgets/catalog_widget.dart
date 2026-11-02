@@ -50,6 +50,10 @@ class CatalogWidget extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (entry.product == null) ...[
+                      Gap(d.spacingXxs),
+                      Text(context.l10n.pkError, style: context.textTheme.bodySmall),
+                    ],
                   ],
                 ),
               ),
