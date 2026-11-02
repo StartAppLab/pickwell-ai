@@ -268,3 +268,12 @@ Pickwell cloud project on 2026-11-02. See [cloud deployment evidence](../docs/PI
 for the UUID-default compatibility correction, RLS/role verification and exact commands.
 No sample/demo seed or Edge Function was deployed by that operation. Inference,
 billing and Premium remain disabled; Edge lookup and Cron activation are separate.
+
+
+## Hosted get-product follow-up
+
+`get-product` version 1 is deployed and live contract/security checks passed on
+2026-11-02. The dedicated labeled synthetic demo seed is now present for cache-hit
+testing. See [hosted lookup evidence](../docs/PICKWELL_PRODUCT_LOOKUP.md#hosted-deployment-and-live-validation--2026-11-02).
+The conservative shared network throttle remains in use; automatic retention and
+physical-device validation remain outstanding. Normal inference and billing are off.

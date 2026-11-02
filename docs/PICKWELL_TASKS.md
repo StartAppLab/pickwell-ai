@@ -151,6 +151,13 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 **2026-11-02 — PARTIAL (device/live backend acceptance pending):** [Scanner/Home evidence](PICKWELL_SCANNER_HOME.md). Mason-derived catalog layers, local recent Home/search, green/cream themes, separate scan dock action, camera/gallery/manual input, typed Cubit/lookup, minimal result/capture routes and 30-reference index implemented. 25 focused tests and static analysis pass; iOS simulator/signed device and Android debug builds pass. iPad install/launch succeeded, but user deferred physical barcode testing. Hosted get-product availability probe returned 404; no hosted deployment/write occurred. Native camera/permissions/EAN-UPC/gallery tests and live ready/miss remain unverified. Approved lemon artwork is missing (labeled emoji placeholder); new copy has English locale fallbacks. Camera/native-format checkboxes remain open; no full T04 capture/OTP/submission or monetization was started.
 
+**2026-11-02 — Hosted lookup follow-up:** Existing `get-product` is now deployed and
+live guest demo ready/miss, invalid-session/body/method, signed-in quota/idempotency
+and guest throttle checks passed; [hosted evidence](PICKWELL_PRODUCT_LOOKUP.md#hosted-deployment-and-live-validation--2026-11-02).
+Only the labeled synthetic demo seed was added. Provider ledger remains empty;
+inference/billing stay disabled. T03.2 remains PARTIAL for physical camera,
+permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox changed.
+
 ### T03.3 Local recent-products Home index and search (P0 recent index / P1 filtering polish)
 
 - [ ] Record only unique published ready barcode references and last-opened timestamps in a bounded device-local index; no personal account/cloud history, persistent user label photos or full offline analysis payloads.

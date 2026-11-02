@@ -163,3 +163,87 @@ retention still needs enabled/verified Supabase Cron; no live scheduler claim is
 No new credentials/assets/device access were needed for local validation.
 
 Next: **T03.2 — Flutter scanner/home and lookup UX**. Do not start automatically.
+
+
+## Hosted deployment and live validation — 2026-11-02
+
+**DEPLOYED AND VALIDATED** on the existing Pickwell project
+`bzmqgjinbjykhqqswdva`. Function `get-product` is ACTIVE, version 1. Earlier local-only
+statements above describe the original task-time results and are retained as history.
+
+Endpoint: `https://bzmqgjinbjykhqqswdva.supabase.co/functions/v1/get-product`.
+Deployed the existing implementation without handler, mobile, database-schema or
+architecture changes. Used the authenticated CLI API bundler without Docker:
+
+```sh
+npx --yes supabase@2.122.0 secrets set --project-ref bzmqgjinbjykhqqswdva --env-file .secrets/lookup-server.env
+npx --yes supabase@2.122.0 functions deploy get-product --project-ref bzmqgjinbjykhqqswdva --use-api
+npx --yes supabase@2.122.0 db query --linked --project-ref bzmqgjinbjykhqqswdva --file supabase/seed/04_pickwell_demo.sql
+node --test supabase/tests/get_product.test.mjs
+```
+
+Generated a cryptographically random 256-bit HMAC secret in a mode-0600 ignored
+file and uploaded only that setting. Supabase injects privileged database credentials;
+none were added to Flutter. Proxy-trust settings remain unset: the conservative
+shared unknown-network bucket is intentional until trusted ingress attribution is
+verified. Caller-provided IP headers cannot choose their own throttle bucket.
+Gateway JWT verification is disabled only for this guest-capable read function, as
+already configured; supplied user sessions are independently verified with Auth.
+No inference endpoint was deployed or enabled.
+
+Applied only the existing clearly labeled synthetic demo seed, not the generic
+sample/social seeds. Barcode `2900000000018` now resolves to the fictional oat
+fixture, with `is_demo=true`, explicit demo text, 8 nutrients, two ingredients and
+one finding. This is test data, not an actual analyzed food product.
+
+### Observed live results
+
+Requests used the existing public mobile development configuration. The existing
+normal Auth session was refreshed securely in its ignored session file; no new user,
+OTP request or administrative verification bypass was required.
+
+| Live case | Observed result | Duration |
+| --- | --- | --- |
+| Guest demo barcode | HTTP 200, `ready`, complete sanitized demo, no account quota | 3821 ms first invocation |
+| Guest missing EAN-8 `96385074` | HTTP 200, `not_found` | 374 ms |
+| Invalid check digit | HTTP 400, `invalid_barcode` | 178 ms |
+| Forged client Premium field | HTTP 400, body rejected | 200 ms |
+| Invalid supplied session | HTTP 401, `unauthorized`, no guest fallback | 531 ms |
+| GET instead of POST | HTTP 405 | 121 ms |
+| Existing public key as default bearer | HTTP 200, guest `not_found` | 500 ms |
+| Signed-in missing barcode | HTTP 200, Free limit 30, used 1, remaining 29 | 366 ms |
+| Same signed-in idempotency key/body | HTTP 200, identical quota; no second charge | 278 ms |
+| Same key, different barcode | HTTP 409, `idempotency_conflict` | 376 ms |
+| Guest requests with varying forged X-Forwarded-For | HTTP 429, `rate_limited` on ninth burst attempt | Not separately measured |
+
+The authenticated response reset is `2026-11-03T00:00:00+00:00`. The single charged
+lookup is a real test-user allowance use; counters were not reset or altered for
+testing. Guest burst requests intentionally consume the shared throttle window;
+subsequent clients may receive 429 until that window resets.
+
+Private fixture assertions checked demo nutrient/ingredient completeness, sanitized
+fields, no guest quota claims and exact quota equality on replay. Ten live contract
+cases passed, plus the separate live throttle assertion. The targeted local handler
+suite passed **7 tests**, with **1 native-stack integration test skipped** because
+the native stack was not started. Those local tests also cover simulated database
+failure/timeout returning 503 and safe processing states. No live database outage,
+quota exhaustion or processing job was forced on the hosted project.
+
+Post-test cloud assertions: one demo product and analysis, **zero provider ledger
+rows**, one unchanged existing Auth user, no unsafe client grants/RPC permissions,
+and billing, Premium and normal inference all disabled. The deployed module graph
+imports no Meta/provider adapter. No Meta API calls or provider cost were incurred;
+ordinary Edge/database requests use Supabase resources.
+
+Deployment logs, public-response evidence, query files, sessions and HMAC material
+remain ignored under `.secrets/`; no credential values appear in this report.
+
+Remaining: verify physical camera/permission/EAN-UPC/gallery behavior and live mobile
+ready/miss navigation for T03.2. Trusted per-IP attribution is not certified; the
+shared fallback is conservative and can limit unrelated guests together. Supabase
+Cron/automatic retention remains unconfigured and must be verified before broader
+hosted use. This deployment does not complete T01.1 extraction feasibility or later
+capture/submission tasks.
+
+Deployment method: [Supabase Edge deployment](https://supabase.com/docs/guides/functions/deploy)
+and [protected Edge environment settings](https://supabase.com/docs/guides/functions/secrets).

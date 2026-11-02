@@ -116,3 +116,12 @@ regression fixture, this deployment report, and backend README pointer. Credenti
 queries and deployment logs remain ignored; no secret values are in this report.
 
 CLI behavior reference: [Supabase database migration deployment](https://supabase.com/docs/guides/deployment/database-migrations).
+
+
+## Subsequent lookup deployment — 2026-11-02
+
+After the migration-only operation described above, `get-product` was deployed
+and the dedicated labeled demo seed applied. Live lookup/security/quota/throttle
+checks passed with zero provider calls. See [hosted lookup evidence](PICKWELL_PRODUCT_LOOKUP.md#hosted-deployment-and-live-validation--2026-11-02).
+Cron and physical-device acceptance remain outstanding. Earlier statements about
+no function/demo deployment describe the migration operation, not this follow-up.
