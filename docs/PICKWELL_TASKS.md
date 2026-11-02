@@ -80,7 +80,7 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 - [x] Plan product correction/invalidation without giving contributors overwrite rights; make error/retry state explicit.
 - [x] Seed a **clearly identified demo record** with complete safe nutrition and analysis for cache-hit testing.
 
-**2026-11-02 — implementation verified locally; integration acceptance PARTIAL:** [Catalog foundation evidence](PICKWELL_CATALOG_FOUNDATION.md). Nine PostgreSQL-engine tests pass, with 46 expected rejection checks, existing-data preservation and version-ledger replay. Full Supabase CLI/PostgreSQL 15 migration/seed application remains unverified: local reset/test commands fail because Docker/Postgres is unavailable. No remote database changed. Do not treat the checked implementation items as a passing full-stack gate.
+**2026-11-02 — COMPLETE, including native local Supabase validation:** [Catalog foundation evidence](PICKWELL_CATALOG_FOUNDATION.md). Nine isolated tests pass with 46 expected rejection checks. Native Supabase CLI 2.122.0/PostgreSQL 15.19 then passed clean migration/seed reset, actual migration replay with an existing-data sentinel, demo replay without duplicates, and all 37 pgTAP assertions across catalog/consumer suites. Test stack stopped afterward. Docker blocker resolved through Native Runtime; no remote database changed. T02.2 and later phases are not started.
 
 **Acceptance:** Migrations apply cleanly to clean test DB and preserve existing data when rerun via migration runner; duplicate barcode prevented; only `ready` considered published.  
 **Targeted validation:** SQL schema/assertion tests for unique barcode, FK integrity, job state and version metadata.

@@ -1,8 +1,8 @@
 # T02.1 — Shared catalog and analysis-job foundation
 
-2026-11-02. **Implementation and isolated SQL validation completed; full local
-Supabase/PostgreSQL 15 application remains unverified.** No remote migration or
-seed was applied. This task does not close T01.1's label-quality limitations.
+2026-11-02. **T02.1 COMPLETE: isolated tests and native Supabase/PostgreSQL 15
+migration, seed, replay and pgTAP checks passed.** No remote migration or seed was
+applied. This task does not close T01.1's label-quality limitations.
 
 ## Existing schema and scoped additions
 
@@ -141,11 +141,75 @@ Observed results:
 - Secret scan and diff whitespace checks passed. No additional Meta request/provider
   spend, remote schema mutation, billing activation, credential or photo commitment.
 
-The isolated version-ledger replay is **not the Supabase CLI migration runner**.
-PostgreSQL 15/Supabase extension/seed compatibility, native pgTAP, real concurrent
-transactions and a deployed schema remain unverified. Start the local Docker-backed
-stack and run the two CLI checks before treating full integration acceptance as closed.
-No full-project/native/mobile regression was needed for these SQL-only changes.
+At this initial checkpoint, the isolated version-ledger replay was **not the Supabase
+CLI migration runner**, and the actual Supabase checks were blocked. The subsequent
+Native Runtime validation below closes that migration/seed/pgTAP gap without Docker.
+Real concurrent multi-session behavior and a hosted deployment are not claimed by
+either suite. No full-project/native/mobile regression was needed for these SQL-only changes.
+
+## Native Runtime follow-up — full local validation passed
+
+Before this follow-up, the T02.1 implementation was committed as **`616c548`**.
+Used pinned **`npx --yes supabase@2.122.0`**, leaving the existing system CLI 2.48.3
+and hosted project unchanged. Official [Native Runtime documentation](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes)
+and [stack selection guidance](https://supabase.com/docs/guides/local-development/running-multiple-local-projects)
+were checked before setup.
+
+The test workspace is ignored `.secrets/native-validation/`. It contains copies of
+the repository's migrations, seed files and SQL tests, **not** real server env files
+or the Meta spike. Its copied config enables `[experimental] stack=true`, omits fixed
+ports and uses a distinct local project ID. The repository config is not rewritten
+or reinitialized. Native resolved the configured Postgres 15 requirement to
+**PostgreSQL 15.19**, service artifact **15.19.0.007-r0**, on macOS arm64.
+
+Started with:
+
+```sh
+SUPABASE_EXPERIMENTAL_STACK=1 npx --yes supabase@2.122.0 start \
+  --runtime native --preparation on-demand --stack t021 \
+  --exclude functions,realtime,studio,analytics,pooler,mail \
+  --workdir .secrets/native-validation
+```
+
+This downloads native service binaries without a Docker VM. Postgres starts first;
+other enabled services are lazy. Credentials/status output was captured only in
+ignored owner-only local files, not chat or Git. No production keys were imported.
+
+Verified results:
+
+| Check | Observed outcome |
+| --- | --- |
+| Native startup | Exit 0; all four repository migrations and both configured seeds applied without SQL edits. |
+| Native clean reset | CLI `db reset --db-url <guarded-loopback-URL> --yes` exited 0; actual server reports `15.19`, migration ledger contains `20261102000100`, one ready demo and one analysis. |
+| pgTAP | **37 assertions passed across 2 files**: new `catalog_schema_test.sql` (31) plus existing `consumer_security_test.sql` (6). Passed both before and after reset. |
+| Actual CLI migration replay | `migration up --db-url <guarded-loopback-URL>` exited 0 with the current version ledger; existing data stayed intact. |
+| Preservation sentinel and demo replay | An extra local category survived migration replay; two demo-seed replays preserved catalog/analysis/finding IDs/counts and created no duplicate demo. |
+| Stop | `stop --stack t021 --workdir .secrets/native-validation` exited 0. Native processes stopped to free memory; local data/cache remain available for reuse. |
+
+CLI 2.122 compatibility details discovered during testing:
+
+- `--stack t021` works on start/status/stop, **not** on database commands. For a
+  named stack, obtain its private `DB_URL` using status and pass `--db-url`. Every
+  reset/test target was programmatically restricted to loopback and runtime=native;
+  generic CLI wording "remote database" did not mean a hosted project was contacted.
+- The returned local URL needed **`sslmode=disable`** for direct database commands
+  because native Postgres does not accept TLS. This was used only on verified
+  loopback URLs, never a hosted connection. The initial attempt without this option
+  failed safely before tests; rerunning with it passed.
+- `[inbucket]` emits a deprecation warning in favor of `[local_smtp]`, but still
+  works. No change was required to the repository's legacy-compatible configuration.
+
+New `supabase/tests/catalog_schema_test.sql` is transaction-wrapped pgTAP coverage
+for real Supabase schemas/extensions/roles, canonical identity, publication and
+ownership, immutable revisions, jobs, client denials and account cleanup. Tests
+roll back their changes. Native validation uses the unmodified pgcrypto/uuid-ossp
+extension declarations, unlike the isolated PGlite adapter.
+
+**No migration correction was necessary.** The follow-up changes retain the native
+pgTAP test and update documentation/status. The remaining T02.1 integration gate is
+closed; production deployment, later quota concurrency and the full T02.2 security
+audit remain separate work. No AI request, remote schema/secret change or billing
+activation occurred during Native Runtime testing.
 
 ## Application and recovery
 
@@ -160,7 +224,7 @@ disposable local stack. Once deployed, preserve revisions/product facts and use 
 reviewed forward repair migration or restore from backup; do not drop/recreate the
 catalog or edit an applied migration in place.
 
-Four implementation checklist items are verified locally. **Overall T02.1 remains
-PARTIAL pending the full Supabase-stack application check.** Next dependency is a
-working local Docker stack, then T02.2's full RLS/least-privilege audit. No later
-phase or remote database deployment was started.
+All four implementation checklist items and T02.1's local migration/seed/replay
+acceptance are now verified. **T02.1 COMPLETE.** Next is T02.2's full RLS/least-privilege
+audit; no later phase or remote database deployment was started. Docker is not
+required for the documented native validation path.

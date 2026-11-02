@@ -315,6 +315,7 @@ The catalog/analysis/findings/jobs subset now has an additive implementation in
 `supabase/seed/04_pickwell_demo.sql`, and targeted PostgreSQL-engine tests.
 See [catalog foundation evidence](PICKWELL_CATALOG_FOUNDATION.md) for normalization,
 composite revision ownership, publication sealing, correction/retry behavior and
-validation limits. No remote migration was applied. Full Supabase/PostgreSQL 15
-checks remain blocked by the unavailable local Docker stack. Quota, analytics,
+validation limits. No remote migration was applied. Native Supabase/PostgreSQL
+15.19 checks now pass without Docker: clean migration/seed application, actual
+migration replay/data preservation and 37 pgTAP assertions. Quota, analytics,
 entitlement and webhook portions of this blueprint remain later tasks.

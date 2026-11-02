@@ -29,7 +29,9 @@ explicit synthetic demo seed are documented in
 [PICKWELL_CATALOG_FOUNDATION.md](../docs/PICKWELL_CATALOG_FOUNDATION.md).
 The new seed runs alongside existing sample content on local reset. Its demo
 barcode is `2900000000018` (canonical `02900000000018`); never present its fictional
-facts as a real food analysis. Full local Supabase validation still needs Docker.
+facts as a real food analysis. Full local Supabase validation has passed with
+experimental Native Runtime (CLI 2.122.0, PostgreSQL 15.19), without Docker. The
+linked evidence describes the isolated setup and named-stack command details.
 
 ## Optional premium backend access
 
