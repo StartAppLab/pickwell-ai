@@ -61,6 +61,24 @@ import '../features/auth/presentation/blocs/sign_out/sign_out_cubit.dart'
 import '../features/auth/presentation/blocs/sign_up/sign_up_cubit.dart'
     as _i341;
 import '../features/auth/presentation/services/auth_actions.dart' as _i945;
+import '../features/catalog/data/data_sources/catalog_local_source.dart'
+    as _i871;
+import '../features/catalog/data/data_sources/catalog_remote_source.dart'
+    as _i895;
+import '../features/catalog/data/data_sources/services/catalog_api_service.dart'
+    as _i988;
+import '../features/catalog/data/data_sources/services/scanner_media_service.dart'
+    as _i1007;
+import '../features/catalog/data/repositories/catalog_repository.dart' as _i496;
+import '../features/catalog/domain/_domain.dart' as _i721;
+import '../features/catalog/domain/repositories/catalog_repository.dart'
+    as _i919;
+import '../features/catalog/domain/use_cases/get_catalog_use_case.dart'
+    as _i670;
+import '../features/catalog/presentation/blocs/catalog/catalog_cubit.dart'
+    as _i1068;
+import '../features/catalog/presentation/blocs/catalog/label_capture_cubit.dart'
+    as _i84;
 import '../features/home/presentation/blocs/home/home_cubit.dart' as _i641;
 import '../features/notification/data/data_sources/_data_sources.dart' as _i66;
 import '../features/notification/data/data_sources/notification_local_source.dart'
@@ -175,7 +193,9 @@ Future<_i174.GetIt> init(
     preResolve: true,
   );
   gh.lazySingleton<_i303.SvgCache>(() => _i303.SvgCache());
-  gh.lazySingleton<_i641.HomeCubit>(() => _i641.HomeCubit());
+  gh.lazySingleton<_i1007.ScannerMediaService>(
+    () => _i1007.ScannerMediaService(),
+  );
   gh.lazySingleton<_i1012.RootCubit>(() => _i1012.RootCubit());
   gh.factory<String>(
     () => registerModule.postHogHost,
@@ -189,10 +209,10 @@ Future<_i174.GetIt> init(
     () => registerModule.revenueCatEntitlementId,
     instanceName: 'revenueCatEntitlementId',
   );
-  gh.factory<String>(() => registerModule.sentryDsn, instanceName: 'sentryDsn');
-  gh.lazySingleton<_i437.DatabaseTransactionRunner>(
-    () => _i437.DatabaseTransactionRunner(gh<_i935.AppDatabase>()),
+  gh.factory<_i84.LabelCaptureCubit>(
+    () => _i84.LabelCaptureCubit(gh<_i1007.ScannerMediaService>()),
   );
+  gh.factory<String>(() => registerModule.sentryDsn, instanceName: 'sentryDsn');
   gh.factory<String>(
     () => registerModule.postHogApiKey,
     instanceName: 'postHogApiKey',
@@ -209,9 +229,33 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i637.SecureStorage>(
     () => _i637.SecureStorage(storage: gh<_i558.FlutterSecureStorage>()),
   );
+  gh.lazySingleton<_i437.DatabaseTransactionRunner>(
+    () => _i437.DatabaseTransactionRunner(gh<_i935.AppDatabase>()),
+  );
   gh.factory<String>(() => registerModule.apiKey, instanceName: 'apiKey');
   gh.lazySingleton<_i6.NetworkInfo>(
     () => _i6.NetworkInfo(connectionChecker: gh<_i161.InternetConnection>()),
+  );
+  gh.lazySingleton<_i926.DataStorage>(
+    () => _i926.DataStorage(storage: gh<_i460.SharedPreferences>()),
+  );
+  gh.lazySingleton<_i871.CatalogLocalSource>(
+    () => _i871.CatalogLocalSource(gh<_i926.DataStorage>()),
+  );
+  gh.lazySingleton<_i1062.AuthLocalSource>(
+    () => _i1062.AuthLocalSource(storage: gh<_i172.DataStorage>()),
+  );
+  gh.lazySingleton<_i290.NotificationLocalSource>(
+    () => _i290.NotificationLocalSource(storage: gh<_i172.DataStorage>()),
+  );
+  gh.lazySingleton<_i877.PaywallLocalSource>(
+    () => _i877.PaywallLocalSource(storage: gh<_i172.DataStorage>()),
+  );
+  gh.lazySingleton<_i445.ProfileLocalSource>(
+    () => _i445.ProfileLocalSource(storage: gh<_i172.DataStorage>()),
+  );
+  gh.lazySingleton<_i1001.SettingsLocalSource>(
+    () => _i1001.SettingsLocalSource(storage: gh<_i172.DataStorage>()),
   );
   gh.singleton<_i609.AppConfig>(
     () => _i609.AppConfig(
@@ -230,19 +274,6 @@ Future<_i174.GetIt> init(
       ),
     ),
   );
-  gh.lazySingleton<_i361.Dio>(() => registerModule.dio(gh<_i369.AppConfig>()));
-  gh.lazySingleton<_i926.DataStorage>(
-    () => _i926.DataStorage(storage: gh<_i460.SharedPreferences>()),
-  );
-  gh.factory<_i834.ProfileApiService>(
-    () => _i834.ProfileApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
-  );
-  gh.lazySingleton<_i452.SubscriptionCubit>(
-    () => _i452.SubscriptionCubit(
-      gh<_i369.AppConfig>(),
-      gh<_i709.BillingClient>(),
-    ),
-  );
   gh.lazySingleton<_i465.PaywallGateService>(
     () => _i465.PaywallGateService(
       gh<_i926.DataStorage>(),
@@ -255,45 +286,17 @@ Future<_i174.GetIt> init(
       gh<_i609.AppConfig>(),
     ),
   );
-  gh.factory<_i54.PaywallApiService>(
-    () => _i54.PaywallApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
+  gh.lazySingleton<_i883.OnboardingCubit>(
+    () => _i883.OnboardingCubit(gh<_i172.DataStorage>()),
+  );
+  gh.lazySingleton<_i159.SettingsCubit>(
+    () => _i159.SettingsCubit(gh<_i172.DataStorage>()),
   );
   gh.lazySingleton<_i520.AuthRemoteSource>(
     () => _i520.AuthRemoteSource(authApiService: gh<_i87.AuthApiService>()),
   );
   gh.lazySingleton<_i904.AppSession>(
     () => _i904.AppSession(gh<_i609.AppConfig>(), gh<_i926.DataStorage>()),
-  );
-  gh.factory<_i802.NotificationApiService>(
-    () => _i802.NotificationApiServiceImpl(
-      gh<_i361.Dio>(),
-      gh<_i369.AppConfig>(),
-    ),
-  );
-  gh.factory<_i315.PaywallCubit>(
-    () => _i315.PaywallCubit(
-      gh<_i709.BillingClient>(),
-      gh<_i369.AppConfig>(),
-      gh<_i452.SubscriptionCubit>(),
-    ),
-  );
-  gh.lazySingleton<_i1062.AuthLocalSource>(
-    () => _i1062.AuthLocalSource(storage: gh<_i172.DataStorage>()),
-  );
-  gh.lazySingleton<_i290.NotificationLocalSource>(
-    () => _i290.NotificationLocalSource(storage: gh<_i172.DataStorage>()),
-  );
-  gh.lazySingleton<_i877.PaywallLocalSource>(
-    () => _i877.PaywallLocalSource(storage: gh<_i172.DataStorage>()),
-  );
-  gh.lazySingleton<_i445.ProfileLocalSource>(
-    () => _i445.ProfileLocalSource(storage: gh<_i172.DataStorage>()),
-  );
-  gh.lazySingleton<_i1001.SettingsLocalSource>(
-    () => _i1001.SettingsLocalSource(storage: gh<_i172.DataStorage>()),
-  );
-  gh.factory<_i1039.SettingsApiService>(
-    () => _i1039.SettingsApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
   );
   gh.lazySingleton<_i945.AuthActions>(
     () => _i945.AuthActions(
@@ -302,16 +305,23 @@ Future<_i174.GetIt> init(
       gh<_i926.DataStorage>(),
     ),
   );
-  gh.lazySingleton<_i338.PaywallRemoteSource>(
-    () => _i338.PaywallRemoteSource(
-      paywallApiService: gh<_i1014.PaywallApiService>(),
+  gh.lazySingleton<_i361.Dio>(() => registerModule.dio(gh<_i369.AppConfig>()));
+  gh.factory<_i1039.SettingsApiService>(
+    () => _i1039.SettingsApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
+  );
+  gh.factory<_i54.PaywallApiService>(
+    () => _i54.PaywallApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
+  );
+  gh.factory<_i834.ProfileApiService>(
+    () => _i834.ProfileApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
+  );
+  gh.lazySingleton<_i141.ProfileRemoteSource>(
+    () => _i141.ProfileRemoteSource(
+      profileApiService: gh<_i275.ProfileApiService>(),
     ),
   );
-  gh.lazySingleton<_i883.OnboardingCubit>(
-    () => _i883.OnboardingCubit(gh<_i172.DataStorage>()),
-  );
-  gh.lazySingleton<_i159.SettingsCubit>(
-    () => _i159.SettingsCubit(gh<_i172.DataStorage>()),
+  gh.lazySingleton<_i988.CatalogApiService>(
+    () => _i988.SupabaseCatalogApiService(gh<_i609.AppConfig>()),
   );
   gh.lazySingleton<_i1005.SettingsRemoteSource>(
     () => _i1005.SettingsRemoteSource(
@@ -327,21 +337,28 @@ Future<_i174.GetIt> init(
       storage: gh<_i172.DataStorage>(),
     ),
   );
-  gh.lazySingleton<_i624.SettingsAccountCubit>(
-    () => _i624.SettingsAccountCubit(gh<_i945.AuthActions>()),
-  );
-  gh.lazySingleton<_i141.ProfileRemoteSource>(
-    () => _i141.ProfileRemoteSource(
-      profileApiService: gh<_i275.ProfileApiService>(),
+  gh.lazySingleton<_i452.SubscriptionCubit>(
+    () => _i452.SubscriptionCubit(
+      gh<_i369.AppConfig>(),
+      gh<_i709.BillingClient>(),
     ),
   );
-  gh.factory<_i602.PaywallRepository>(
-    () => _i33.PaywallRepositoryImpl(
-      localSource: gh<_i348.PaywallLocalSource>(),
-      remoteSource: gh<_i348.PaywallRemoteSource>(),
+  gh.factory<_i1017.ProfileRepository>(
+    () => _i537.ProfileRepositoryImpl(
+      localSource: gh<_i56.ProfileLocalSource>(),
+      remoteSource: gh<_i56.ProfileRemoteSource>(),
       networkInfo: gh<_i172.NetworkInfo>(),
       autoMapper: gh<_i369.AutoMapper>(),
       storage: gh<_i172.DataStorage>(),
+    ),
+  );
+  gh.lazySingleton<_i624.SettingsAccountCubit>(
+    () => _i624.SettingsAccountCubit(gh<_i945.AuthActions>()),
+  );
+  gh.factory<_i802.NotificationApiService>(
+    () => _i802.NotificationApiServiceImpl(
+      gh<_i361.Dio>(),
+      gh<_i369.AppConfig>(),
     ),
   );
   gh.factory<_i482.SettingsRepository>(
@@ -353,21 +370,11 @@ Future<_i174.GetIt> init(
       storage: gh<_i172.DataStorage>(),
     ),
   );
-  gh.lazySingleton<_i729.NotificationRemoteSource>(
-    () => _i729.NotificationRemoteSource(
-      notificationApiService: gh<_i884.NotificationApiService>(),
-    ),
-  );
-  gh.lazySingleton<_i316.GetSettingsUseCase>(
-    () => _i316.GetSettingsUseCase(gh<_i482.SettingsRepository>()),
-  );
-  gh.factory<_i841.NotificationRepository>(
-    () => _i634.NotificationRepositoryImpl(
-      localSource: gh<_i66.NotificationLocalSource>(),
-      remoteSource: gh<_i66.NotificationRemoteSource>(),
-      networkInfo: gh<_i172.NetworkInfo>(),
-      autoMapper: gh<_i369.AutoMapper>(),
-      storage: gh<_i172.DataStorage>(),
+  gh.factory<_i315.PaywallCubit>(
+    () => _i315.PaywallCubit(
+      gh<_i709.BillingClient>(),
+      gh<_i369.AppConfig>(),
+      gh<_i452.SubscriptionCubit>(),
     ),
   );
   gh.lazySingleton<_i544.ChangePasswordUseCase>(
@@ -391,20 +398,40 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i500.SignUpUseCase>(
     () => _i500.SignUpUseCase(gh<_i63.AuthRepository>()),
   );
+  gh.lazySingleton<_i341.SignUpCubit>(
+    () => _i341.SignUpCubit(gh<_i63.SignUpUseCase>()),
+  );
+  gh.lazySingleton<_i338.PaywallRemoteSource>(
+    () => _i338.PaywallRemoteSource(
+      paywallApiService: gh<_i1014.PaywallApiService>(),
+    ),
+  );
+  gh.lazySingleton<_i316.GetSettingsUseCase>(
+    () => _i316.GetSettingsUseCase(gh<_i482.SettingsRepository>()),
+  );
+  gh.lazySingleton<_i330.ForgotPasswordCubit>(
+    () => _i330.ForgotPasswordCubit(gh<_i63.ForgotPasswordUseCase>()),
+  );
+  gh.lazySingleton<_i829.SignOutCubit>(
+    () => _i829.SignOutCubit(gh<_i63.SignOutUseCase>()),
+  );
+  gh.lazySingleton<_i483.GetProfileUseCase>(
+    () => _i483.GetProfileUseCase(gh<_i1017.ProfileRepository>()),
+  );
+  gh.lazySingleton<_i895.CatalogRemoteSource>(
+    () => _i895.CatalogRemoteSource(gh<_i988.CatalogApiService>()),
+  );
+  gh.lazySingleton<_i395.ProfileCubit>(
+    () => _i395.ProfileCubit(gh<_i1017.GetProfileUseCase>()),
+  );
+  gh.lazySingleton<_i919.CatalogRepository>(
+    () => _i496.CatalogRepositoryImpl(
+      gh<_i871.CatalogLocalSource>(),
+      gh<_i895.CatalogRemoteSource>(),
+    ),
+  );
   gh.lazySingleton<_i465.SignInCubit>(
     () => _i465.SignInCubit(gh<_i63.SignInUseCase>()),
-  );
-  gh.lazySingleton<_i386.GetPaywallUseCase>(
-    () => _i386.GetPaywallUseCase(gh<_i602.PaywallRepository>()),
-  );
-  gh.factory<_i1017.ProfileRepository>(
-    () => _i537.ProfileRepositoryImpl(
-      localSource: gh<_i56.ProfileLocalSource>(),
-      remoteSource: gh<_i56.ProfileRemoteSource>(),
-      networkInfo: gh<_i172.NetworkInfo>(),
-      autoMapper: gh<_i369.AutoMapper>(),
-      storage: gh<_i172.DataStorage>(),
-    ),
   );
   gh.lazySingleton<_i119.OtpCubit>(
     () => _i119.OtpCubit(
@@ -412,29 +439,52 @@ Future<_i174.GetIt> init(
       gh<_i63.OtpResendUseCase>(),
     ),
   );
-  gh.lazySingleton<_i829.SignOutCubit>(
-    () => _i829.SignOutCubit(gh<_i63.SignOutUseCase>()),
+  gh.lazySingleton<_i729.NotificationRemoteSource>(
+    () => _i729.NotificationRemoteSource(
+      notificationApiService: gh<_i884.NotificationApiService>(),
+    ),
   );
-  gh.lazySingleton<_i81.GetNotificationUseCase>(
-    () => _i81.GetNotificationUseCase(gh<_i841.NotificationRepository>()),
+  gh.factory<_i602.PaywallRepository>(
+    () => _i33.PaywallRepositoryImpl(
+      localSource: gh<_i348.PaywallLocalSource>(),
+      remoteSource: gh<_i348.PaywallRemoteSource>(),
+      networkInfo: gh<_i172.NetworkInfo>(),
+      autoMapper: gh<_i369.AutoMapper>(),
+      storage: gh<_i172.DataStorage>(),
+    ),
   );
-  gh.lazySingleton<_i330.ForgotPasswordCubit>(
-    () => _i330.ForgotPasswordCubit(gh<_i63.ForgotPasswordUseCase>()),
+  gh.lazySingleton<_i670.GetCatalogUseCase>(
+    () => _i670.GetCatalogUseCase(gh<_i919.CatalogRepository>()),
   );
-  gh.lazySingleton<_i341.SignUpCubit>(
-    () => _i341.SignUpCubit(gh<_i63.SignUpUseCase>()),
+  gh.lazySingleton<_i670.GetRecentProductsUseCase>(
+    () => _i670.GetRecentProductsUseCase(gh<_i919.CatalogRepository>()),
   );
-  gh.lazySingleton<_i483.GetProfileUseCase>(
-    () => _i483.GetProfileUseCase(gh<_i1017.ProfileRepository>()),
+  gh.lazySingleton<_i386.GetPaywallUseCase>(
+    () => _i386.GetPaywallUseCase(gh<_i602.PaywallRepository>()),
   );
   gh.lazySingleton<_i358.ChangePasswordCubit>(
     () => _i358.ChangePasswordCubit(gh<_i63.ChangePasswordUseCase>()),
   );
+  gh.lazySingleton<_i641.HomeCubit>(
+    () => _i641.HomeCubit(gh<_i721.GetRecentProductsUseCase>()),
+  );
+  gh.factory<_i841.NotificationRepository>(
+    () => _i634.NotificationRepositoryImpl(
+      localSource: gh<_i66.NotificationLocalSource>(),
+      remoteSource: gh<_i66.NotificationRemoteSource>(),
+      networkInfo: gh<_i172.NetworkInfo>(),
+      autoMapper: gh<_i369.AutoMapper>(),
+      storage: gh<_i172.DataStorage>(),
+    ),
+  );
+  gh.lazySingleton<_i81.GetNotificationUseCase>(
+    () => _i81.GetNotificationUseCase(gh<_i841.NotificationRepository>()),
+  );
   gh.lazySingleton<_i13.NotificationCubit>(
     () => _i13.NotificationCubit(gh<_i841.GetNotificationUseCase>()),
   );
-  gh.lazySingleton<_i395.ProfileCubit>(
-    () => _i395.ProfileCubit(gh<_i1017.GetProfileUseCase>()),
+  gh.factory<_i1068.CatalogCubit>(
+    () => _i1068.CatalogCubit(gh<_i721.GetCatalogUseCase>()),
   );
   return getIt;
 }

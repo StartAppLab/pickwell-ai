@@ -47,6 +47,8 @@ class NavItem extends StatelessWidget {
             ),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: context.textTheme.labelSmall?.copyWith(
                 color: isSelected
                     ? context.colorScheme.onPrimary

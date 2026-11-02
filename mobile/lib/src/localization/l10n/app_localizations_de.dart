@@ -382,4 +382,157 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get retryButton => 'Erneut versuchen';
+
+  @override
+  String get pkScan => 'Scan barcode';
+
+  @override
+  String get pkEmptyTitle => 'Your next food find starts here';
+
+  @override
+  String get pkEmptyBody =>
+      'Scan a food barcode to see its label information. Products you open will appear here.';
+
+  @override
+  String get pkSearch => 'Search your products';
+
+  @override
+  String get pkAll => 'All';
+
+  @override
+  String get pkFood => 'Food';
+
+  @override
+  String get pkNewest => 'Newest';
+
+  @override
+  String get pkPhotoPlaceholder => 'Product photo unavailable';
+
+  @override
+  String get pkLemonPlaceholder => 'Lemon logo placeholder';
+
+  @override
+  String get pkFoodProduct => 'Food product';
+
+  @override
+  String get pkNoMatches => 'No matching products';
+
+  @override
+  String get pkChecking => 'Checking barcode…';
+
+  @override
+  String get pkPoint => 'Align the food barcode inside the frame';
+
+  @override
+  String get pkTorch => 'Flashlight';
+
+  @override
+  String get pkGallery => 'Choose barcode photo';
+
+  @override
+  String get pkManual => 'Enter barcode';
+
+  @override
+  String get pkCameraDenied => 'Camera access is off';
+
+  @override
+  String get pkCameraHint =>
+      'Allow camera access in device settings, choose a photo, or enter the barcode.';
+
+  @override
+  String get pkOpenSettings => 'Open device settings';
+
+  @override
+  String get pkRetry => 'Try again';
+
+  @override
+  String get pkError => 'We could not complete this lookup. Check your connection and try again.';
+
+  @override
+  String get pkProcessing => 'This product is being processed. Try a fresh lookup shortly.';
+
+  @override
+  String get pkDenied => 'Lookup limit reached. Please try again after the reset time.';
+
+  @override
+  String get pkStoredUnavailable => 'Your recent products could not be loaded.';
+
+  @override
+  String get pkRecentNotSaved => 'Product loaded, but the recent reference could not be saved.';
+
+  @override
+  String get pkUnknown => 'This product is not in the catalogue yet';
+
+  @override
+  String get pkNutrition => 'Nutrition';
+
+  @override
+  String get pkIngredients => 'Ingredients';
+
+  @override
+  String get pkBarcode => 'Barcode';
+
+  @override
+  String get pkNutritionHint =>
+      'Capture the complete nutrition panel with serving size and units, then the ingredients and allergen statement.';
+
+  @override
+  String get pkCapture => 'Take photo';
+
+  @override
+  String get pkLabelsReady => 'Labels captured';
+
+  @override
+  String get pkUnknownAllergens => 'Not stated';
+
+  @override
+  String get pkUnknownValue => 'Unknown';
+
+  @override
+  String get pkDemo => 'Demo product — fictional data';
+
+  @override
+  String get pkFindings => 'Findings';
+
+  @override
+  String get pkOverview => 'Product overview';
+
+  @override
+  String get pkBasis => 'Nutrition basis';
+
+  @override
+  String get pkLocalRef => 'Open to refresh product details';
+
+  @override
+  String get pkCloseSearch => 'Close search';
+
+  @override
+  String get pkCancel => 'Cancel';
+
+  @override
+  String get pkNoBarcode => 'No readable barcode in this photo';
+
+  @override
+  String get pkContinue => 'Continue';
+
+  @override
+  String get pkBarcodeDone => 'Barcode ✓';
+
+  @override
+  String get pkCapturePrivacy => 'Photos stay on this device. No analysis has been submitted.';
+
+  @override
+  String get pkCaveat => 'Label information is not medical advice.';
+
+  @override
+  String get pkBack => 'Back';
+
+  @override
+  String get pkCopyBarcode => 'Copy barcode';
+
+  @override
+  String get pkInvalidBarcode => 'Enter a valid EAN or UPC barcode.';
+
+  @override
+  String get pkRetake => 'Retake labels';
 }

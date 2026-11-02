@@ -787,6 +787,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get retryButton;
+
+  /// No description provided for @pkScan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan barcode'**
+  String get pkScan;
+
+  /// No description provided for @pkEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next food find starts here'**
+  String get pkEmptyTitle;
+
+  /// No description provided for @pkEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a food barcode to see its label information. Products you open will appear here.'**
+  String get pkEmptyBody;
+
+  /// No description provided for @pkSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your products'**
+  String get pkSearch;
+
+  /// No description provided for @pkAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get pkAll;
+
+  /// No description provided for @pkFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food'**
+  String get pkFood;
+
+  /// No description provided for @pkNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get pkNewest;
+
+  /// No description provided for @pkPhotoPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Product photo unavailable'**
+  String get pkPhotoPlaceholder;
+
+  /// No description provided for @pkLemonPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Lemon logo placeholder'**
+  String get pkLemonPlaceholder;
+
+  /// No description provided for @pkFoodProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Food product'**
+  String get pkFoodProduct;
+
+  /// No description provided for @pkNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching products'**
+  String get pkNoMatches;
+
+  /// No description provided for @pkChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking barcode…'**
+  String get pkChecking;
+
+  /// No description provided for @pkPoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Align the food barcode inside the frame'**
+  String get pkPoint;
+
+  /// No description provided for @pkTorch.
+  ///
+  /// In en, this message translates to:
+  /// **'Flashlight'**
+  String get pkTorch;
+
+  /// No description provided for @pkGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose barcode photo'**
+  String get pkGallery;
+
+  /// No description provided for @pkManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter barcode'**
+  String get pkManual;
+
+  /// No description provided for @pkCameraDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is off'**
+  String get pkCameraDenied;
+
+  /// No description provided for @pkCameraHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow camera access in device settings, choose a photo, or enter the barcode.'**
+  String get pkCameraHint;
+
+  /// No description provided for @pkOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open device settings'**
+  String get pkOpenSettings;
+
+  /// No description provided for @pkRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get pkRetry;
+
+  /// No description provided for @pkError.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not complete this lookup. Check your connection and try again.'**
+  String get pkError;
+
+  /// No description provided for @pkProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'This product is being processed. Try a fresh lookup shortly.'**
+  String get pkProcessing;
+
+  /// No description provided for @pkDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Lookup limit reached. Please try again after the reset time.'**
+  String get pkDenied;
+
+  /// No description provided for @pkStoredUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recent products could not be loaded.'**
+  String get pkStoredUnavailable;
+
+  /// No description provided for @pkRecentNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Product loaded, but the recent reference could not be saved.'**
+  String get pkRecentNotSaved;
+
+  /// No description provided for @pkUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'This product is not in the catalogue yet'**
+  String get pkUnknown;
+
+  /// No description provided for @pkNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition'**
+  String get pkNutrition;
+
+  /// No description provided for @pkIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredients'**
+  String get pkIngredients;
+
+  /// No description provided for @pkBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode'**
+  String get pkBarcode;
+
+  /// No description provided for @pkNutritionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture the complete nutrition panel with serving size and units, then the ingredients and allergen statement.'**
+  String get pkNutritionHint;
+
+  /// No description provided for @pkCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get pkCapture;
+
+  /// No description provided for @pkLabelsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels captured'**
+  String get pkLabelsReady;
+
+  /// No description provided for @pkUnknownAllergens.
+  ///
+  /// In en, this message translates to:
+  /// **'Not stated'**
+  String get pkUnknownAllergens;
+
+  /// No description provided for @pkUnknownValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get pkUnknownValue;
+
+  /// No description provided for @pkDemo.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo product — fictional data'**
+  String get pkDemo;
+
+  /// No description provided for @pkFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'Findings'**
+  String get pkFindings;
+
+  /// No description provided for @pkOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Product overview'**
+  String get pkOverview;
+
+  /// No description provided for @pkBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition basis'**
+  String get pkBasis;
+
+  /// No description provided for @pkLocalRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Open to refresh product details'**
+  String get pkLocalRef;
+
+  /// No description provided for @pkCloseSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Close search'**
+  String get pkCloseSearch;
+
+  /// No description provided for @pkCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get pkCancel;
+
+  /// No description provided for @pkNoBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'No readable barcode in this photo'**
+  String get pkNoBarcode;
+
+  /// No description provided for @pkContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get pkContinue;
+
+  /// No description provided for @pkBarcodeDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode ✓'**
+  String get pkBarcodeDone;
+
+  /// No description provided for @pkCapturePrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos stay on this device. No analysis has been submitted.'**
+  String get pkCapturePrivacy;
+
+  /// No description provided for @pkCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Label information is not medical advice.'**
+  String get pkCaveat;
+
+  /// No description provided for @pkBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get pkBack;
+
+  /// No description provided for @pkCopyBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy barcode'**
+  String get pkCopyBarcode;
+
+  /// No description provided for @pkInvalidBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid EAN or UPC barcode.'**
+  String get pkInvalidBarcode;
+
+  /// No description provided for @pkRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake labels'**
+  String get pkRetake;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

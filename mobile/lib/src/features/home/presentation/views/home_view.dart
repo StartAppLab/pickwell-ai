@@ -1,34 +1,174 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
 import '../../../../config/_config.dart';
-import '../../../../resources/_resources.dart';
 import '../../../app/app.dart';
+import '../../../catalog/catalog.dart';
+import '../blocs/home/home_cubit.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  bool search = false, food = false;
+  String query = '';
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeCubit>().load();
+  }
+
+  Future<void> _open(String barcode) async {
+    await context.push('/product/$barcode');
+    if (mounted) context.read<HomeCubit>().load();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final l = context.l10n;
+    final d = context.themeData.dimensionsData;
     return Scaffold(
-      appBar: EmptyAppBar(),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: context.themeData.edgeInsetsData.pagePadding.copyWith(
-            bottom: context.themeData.edgeInsetsData.pagePadding.bottom + bottomInset + 60,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AppAssets.images.appIcon.image(width: 100, height: 100),
-              const SizedBox(height: 24),
-              Text(
-                context.l10n.welcomeTitle(getIt<AppConfig>().appName),
-                style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ],
+      body: SafeArea(
+        bottom: false,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: d.maxWidth),
+            child: BlocBuilder<HomeCubit, HomeState>(
+              builder: (context, state) {
+                final items = state.maybeWhen(
+                  ready: (items) => items,
+                  orElse: () => <RecentProduct>[],
+                );
+                final visible = items
+                    .where(
+                      (r) =>
+                          query.isEmpty ||
+                          '${r.product?.name ?? ''} ${r.product?.brand ?? ''} ${r.barcode}'
+                              .toLowerCase()
+                              .contains(query.toLowerCase()),
+                    )
+                    .toList();
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: EdgeInsets.all(d.paddingComfortable),
+                      sliver: SliverList.list(
+                        children: [
+                          Row(
+                            children: [
+                              Tooltip(
+                                message: l.pkLemonPlaceholder,
+                                child: Semantics(
+                                  label: l.pkLemonPlaceholder,
+                                  child: const Text('🍋', style: TextStyle(fontSize: 32)),
+                                ),
+                              ),
+                              Gap(d.spacingXs),
+                              Expanded(
+                                child: Text(
+                                  getIt<AppConfig>().appName,
+                                  style: context.textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    color: context.colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: search ? l.pkCloseSearch : l.pkSearch,
+                                onPressed: () => setState(() {
+                                  search = !search;
+                                  if (!search) query = '';
+                                }),
+                                icon: AppIcon(icon: search ? Icons.close : Icons.search),
+                              ),
+                            ],
+                          ),
+                          if (search) ...[
+                            Gap(d.spacingMd),
+                            TextField(
+                              autofocus: true,
+                              decoration: InputDecoration(hintText: l.pkSearch),
+                              onChanged: (value) => setState(() => query = value),
+                            ),
+                          ],
+                          Gap(d.spacingLg),
+                          Wrap(
+                            alignment: WrapAlignment.spaceBetween,
+                            spacing: d.spacingMd,
+                            runSpacing: d.spacingXs,
+                            children: [
+                              Wrap(
+                                spacing: d.spacingXs,
+                                runSpacing: d.spacingXs,
+                                children: [
+                                  ChoiceChip(
+                                    label: Text(l.pkAll),
+                                    selected: !food,
+                                    onSelected: (_) => setState(() => food = false),
+                                  ),
+                                  ChoiceChip(
+                                    label: Text(l.pkFood),
+                                    selected: food,
+                                    onSelected: (_) => setState(() => food = true),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(l.pkNewest, style: context.textTheme.labelLarge),
+                                  AppIcon(icon: Icons.arrow_downward, size: d.iconSmall),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Gap(d.spacingLg),
+                          if (state.maybeWhen(error: (_) => true, orElse: () => false)) ...[
+                            Text(l.pkStoredUnavailable),
+                            TextButton(
+                              onPressed: () => context.read<HomeCubit>().load(),
+                              child: Text(l.pkRetry),
+                            ),
+                          ],
+                          if (visible.isEmpty) ...[
+                            Gap(d.spacingXxl),
+                            AppIcon(
+                              icon: HugeIcons.strokeRoundedBarcodeScan,
+                              size: 64,
+                              color: context.colorScheme.primary,
+                            ),
+                            Gap(d.spacingLg),
+                            Text(
+                              items.isEmpty ? l.pkEmptyTitle : l.pkNoMatches,
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.titleLarge,
+                            ),
+                            Gap(d.spacingSm),
+                            if (items.isEmpty)
+                              Text(
+                                l.pkEmptyBody,
+                                textAlign: TextAlign.center,
+                                style: context.textTheme.bodyLarge,
+                              ),
+                          ],
+                          for (final entry in visible) ...[
+                            CatalogWidget(entry: entry, onTap: () => _open(entry.barcode)),
+                            Gap(d.spacingSm),
+                          ],
+                          const Gap(120),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

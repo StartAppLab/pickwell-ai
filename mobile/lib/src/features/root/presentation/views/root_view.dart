@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -9,6 +12,7 @@ import '../../../../config/_config.dart';
 import '../../../../core/_core.dart';
 import '../../../app/app.dart';
 import '../../../settings/domain/entities/app_release.dart';
+import '../../../home/home.dart';
 import '../blocs/_blocs.dart';
 import '../widgets/_widgets.dart';
 
@@ -59,6 +63,7 @@ class _RootViewState extends State<RootView> {
       ModalRoute.isCurrentOf(context) == true;
 
   Future<void> _showHomeSheets() async {
+    if (!getIt<AppConfig>().features.onboardingEnabled) return;
     if (!_isHome || _isShowingHomeSheets || _didCheckHomeSheets) return;
     _isShowingHomeSheets = true;
     final storage = getIt<DataStorage>();
@@ -148,7 +153,7 @@ class _RootViewState extends State<RootView> {
       bottomNavigationBar: BlocSelector<RootCubit, RootState, int>(
         selector: (state) => state.selectedIndex,
         builder: (context, selectedIndex) {
-          final hasActionButton = widget.actionButton != null;
+          final hasActionButton = true;
           final routeSelectedIndex = tabs.indexWhere((tab) => tab.routeName == widget.currentPath);
           final safeSelectedIndex = (routeSelectedIndex >= 0 ? routeSelectedIndex : selectedIndex)
               .clamp(0, tabs.length - 1);
@@ -161,7 +166,19 @@ class _RootViewState extends State<RootView> {
               child: Row(
                 children: [
                   Expanded(child: navShell),
-                  if (hasActionButton) ...[const SizedBox(width: 12), widget.actionButton!],
+                  if (hasActionButton) ...[
+                    Gap(context.themeData.dimensionsData.spacingSm),
+                    widget.actionButton ??
+                        IconButton.filled(
+                          tooltip: context.l10n.pkScan,
+                          style: IconButton.styleFrom(minimumSize: const Size(56, 56)),
+                          onPressed: () async {
+                            await context.push('/scan');
+                            if (context.mounted) await getIt<HomeCubit>().load();
+                          },
+                          icon: const AppIcon(icon: HugeIcons.strokeRoundedBarcodeScan),
+                        ),
+                  ],
                 ],
               ),
             ),
@@ -185,56 +202,65 @@ class _RootViewState extends State<RootView> {
   ];
 
   Widget _buildNavShell(BuildContext context, int selectedIndex, List<RootTab> tabs) {
-    return Container(
-      height: 56,
-      decoration: BoxDecoration(
-        color: context.colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: context.colorScheme.outlineVariant, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: context.colorScheme.shadow.withValues(alpha: 0.08),
-            offset: const Offset(0, 10),
-            blurRadius: 20,
-          ),
-        ],
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final itemWidth = constraints.maxWidth / tabs.length;
-          return Stack(
-            children: [
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                left: selectedIndex * itemWidth,
-                top: 0,
-                bottom: 0,
-                child: Container(
-                  width: itemWidth,
-                  decoration: BoxDecoration(
-                    color: context.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  for (var index = 0; index < tabs.length; index++)
-                    Expanded(
-                      child: NavItem(
-                        index: index,
-                        selectedIndex: selectedIndex,
-                        icon: tabs[index].icon,
-                        label: tabs[index].label,
-                        onTap: () => _changeTab(index, tabs),
-                      ),
-                    ),
-                ],
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: Theme.of(context).platform == TargetPlatform.android ? 0 : 12,
+          sigmaY: Theme.of(context).platform == TargetPlatform.android ? 0 : 12,
+        ),
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: context.colorScheme.surfaceContainerLowest.withValues(alpha: 0.88),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: context.colorScheme.outlineVariant, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: context.colorScheme.shadow.withValues(alpha: 0.08),
+                offset: const Offset(0, 10),
+                blurRadius: 20,
               ),
             ],
-          );
-        },
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = constraints.maxWidth / tabs.length;
+              return Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    left: selectedIndex * itemWidth,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: itemWidth,
+                      decoration: BoxDecoration(
+                        color: context.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      for (var index = 0; index < tabs.length; index++)
+                        Expanded(
+                          child: NavItem(
+                            index: index,
+                            selectedIndex: selectedIndex,
+                            icon: tabs[index].icon,
+                            label: tabs[index].label,
+                            onTap: () => _changeTab(index, tabs),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

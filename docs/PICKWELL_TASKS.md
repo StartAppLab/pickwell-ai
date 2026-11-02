@@ -138,16 +138,18 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T03.2 Flutter scanner/home and lookup UX
 
-- [ ] Reuse existing template/navigation; implement **lemon-branded recent-products Home**, not scanner-first. Header logo + only search icon, All/Food chips, Newest sort, separate rounded cards, no section heading or list/grid toggle.
-- [ ] Create liquid-glass-inspired translucent Home/Settings pill, **separate far-right scan circle with icon only**; hide it on nested routes, with Android visual fallback. Chat is future visual reference and must not ship as dead tab.
+- [x] Reuse existing template/navigation; implement **lemon-branded recent-products Home**, not scanner-first. Header logo + only search icon, All/Food chips, Newest sort, separate rounded cards, no section heading or list/grid toggle.
+- [x] Create liquid-glass-inspired translucent Home/Settings pill, **separate far-right scan circle with icon only**; hide it on nested routes, with Android visual fallback. Chat is future visual reference and must not ship as dead tab.
 - [ ] Implement minimal scanner camera and permissions following DESIGN.
 - [ ] Integrate suitable scanner dependency only if none exists; enable camera and gallery where needed; test common EAN/UPC.
-- [ ] Use Cubit/Bloc states for idle, scanning, checking, found, miss, processing, denied, error.
-- [ ] Navigate directly to results for `ready`; to 3-step wizard for `not_found`; expose retry for network failure.
-- [ ] Optionally add manual barcode input as a P1 fallback, without displacing P0.
+- [x] Use Cubit/Bloc states for idle, scanning, checking, found, miss, processing, denied, error.
+- [x] Navigate directly to results for `ready`; to 3-step wizard for `not_found`; expose retry for network failure.
+- [x] Optionally add manual barcode input as a P1 fallback, without displacing P0.
 
 **Acceptance:** Guest lands on correct empty/local recents Home, opens scanner with prominent rightmost Scan icon, scans existing and unknown demo barcodes; no sign-in gate before lookup.  
 **Targeted validation:** Scanner/lookup Cubit tests, camera permission-denied flow, one real-device barcode scan.
+
+**2026-11-02 — PARTIAL (device/live backend acceptance pending):** [Scanner/Home evidence](PICKWELL_SCANNER_HOME.md). Mason-derived catalog layers, local recent Home/search, green/cream themes, separate scan dock action, camera/gallery/manual input, typed Cubit/lookup, minimal result/capture routes and 30-reference index implemented. 25 focused tests and static analysis pass; iOS simulator/signed device and Android debug builds pass. iPad install/launch succeeded, but user deferred physical barcode testing. Hosted get-product availability probe returned 404; no hosted deployment/write occurred. Native camera/permissions/EAN-UPC/gallery tests and live ready/miss remain unverified. Approved lemon artwork is missing (labeled emoji placeholder); new copy has English locale fallbacks. Camera/native-format checkboxes remain open; no full T04 capture/OTP/submission or monetization was started.
 
 ### T03.3 Local recent-products Home index and search (P0 recent index / P1 filtering polish)
 

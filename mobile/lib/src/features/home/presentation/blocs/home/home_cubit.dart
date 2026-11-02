@@ -3,22 +3,22 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../core/_core.dart';
+import '../../../../catalog/domain/_domain.dart';
 
 part 'home_state.dart';
 part 'home_cubit.freezed.dart';
 
 @lazySingleton
 class HomeCubit extends Cubit<HomeState> {
-  @factoryMethod
-  HomeCubit() : super(const _HomeStateIdle());
-
-  Future<void> init() async {
-    // Initialize home data if needed
-  }
-
+  final GetRecentProductsUseCase recents;
+  HomeCubit(this.recents) : super(const HomeState.idle());
+  Future<void> init() => load();
   Future<void> load() async {
-    emit(const HomeState.loading());
-    await Future.delayed(const Duration(milliseconds: 2000));
-    emit(const HomeState.idle());
+    final result = await recents();
+    if (isClosed) return;
+    result.fold(
+      (failure) => emit(HomeState.error(error: failure.error)),
+      (items) => emit(HomeState.ready(items: items)),
+    );
   }
 }

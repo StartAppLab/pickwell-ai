@@ -115,6 +115,33 @@ class AppRouter {
           ),
         ),
       ),
+      GoRoute(
+        path: '/scan',
+        builder: (context, state) =>
+            BlocProvider(create: (_) => getIt<CatalogCubit>(), child: const CatalogView()),
+      ),
+      GoRoute(
+        path: '/product/:barcode',
+        builder: (context, state) => BlocProvider(
+          create: (_) =>
+              getIt<CatalogCubit>()..check(state.pathParameters['barcode'] ?? '', local: true),
+          child: const ProductDetailView(),
+        ),
+      ),
+      GoRoute(
+        path: '/capture/:barcode',
+        builder: (context, state) {
+          try {
+            final barcode = normalizeGtin(state.pathParameters['barcode'] ?? '');
+            return BlocProvider(
+              create: (_) => getIt<LabelCaptureCubit>(),
+              child: CaptureEntryView(barcode: barcode),
+            );
+          } catch (_) {
+            return BlocProvider(create: (_) => getIt<CatalogCubit>(), child: const CatalogView());
+          }
+        },
+      ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
         builder: (context, state, child) =>

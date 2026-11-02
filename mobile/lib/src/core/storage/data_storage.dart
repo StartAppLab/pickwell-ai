@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../_core.dart';
 
 class DataStorageKeys {
+  static const recentProducts = 'PICKWELL_RECENT_PRODUCTS_V1';
   static const onboardingAnswers = 'ONBOARDING_ANSWERS';
   static const remindersEnabled = 'REMINDERS_ENABLED';
   static const onboardingCompleted = 'ONBOARDING_COMPLETED';

@@ -463,3 +463,34 @@ new Flutter users. The real app smoke test, broader template contract tests, and
 their fakes remain in the repository for template maintenance and are excluded
 from the archive. Adapt or remove those maintenance tests when a generated app
 changes its supported capabilities.
+
+
+## Pickwell barcode/Home integration (T03.2)
+
+The guest Home, Home/Settings dock and separate Scan action now use the approved
+lemon palette. The source lemon mark is not in this repository: Home uses a labeled
+emoji placeholder; native icon/splash remain template assets. Scanner uses
+mobile_scanner 7.5.0 and image_picker 1.2.4 with iOS SPM and native permission copy.
+Camera/gallery/manual EAN/UPC input calls the existing `get-product` function via
+public Supabase configuration and any current session. No AI or client quota writes.
+
+Use the existing ignored define file for backend-enabled development; keep optional
+auth, onboarding disabled and billing disabled. Default builds remain offline-capable
+for local UI but do not pretend lookup works without enabled/configured Supabase.
+The configured hosted function returned 404 during this task: review/deploy the
+T03.1 backend before expecting real ready/miss responses. Do not put server keys
+or network-HMAC secrets into mobile defines.
+
+Recents persist only 30 barcode/timestamp references. Product details live in RAM;
+opening a reference after relaunch makes a normal metered lookup. Fresh camera scans
+always hit the backend; reopening a currently loaded result can use memory. Capture
+entry holds two photos locally without submission; full review/OTP/analysis remains
+later work. New feature copy is English fallback in other locales.
+
+See [T03.2 evidence, checks and deferred hardware test](../docs/PICKWELL_SCANNER_HOME.md).
+After a full build_runner run, generate formatted Home state with:
+
+```sh
+fvm dart run build_runner build --define=freezed:freezed=format=true --build-filter=lib/src/features/home/presentation/blocs/home/home_cubit.freezed.dart
+fvm flutter test --no-pub test/catalog test/app_config_security_test.dart
+```
