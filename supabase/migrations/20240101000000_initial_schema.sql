@@ -7,6 +7,7 @@ create type user_role as enum ('user', 'admin', 'moderator');
 create type post_status as enum ('draft', 'published', 'archived');
 create type notification_type as enum ('like', 'comment', 'follow', 'mention');
 
+-- UUID defaults use PostgreSQL 13+ built-ins, independent of extension search_path.
 -- Create profiles table (extends auth.users)
 create table public.profiles (
   id uuid references auth.users on delete cascade not null primary key,
@@ -23,7 +24,7 @@ create table public.profiles (
 
 -- Create posts table
 create table public.posts (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   user_id uuid references public.profiles(id) on delete cascade not null,
   title text not null,
   content text,
@@ -36,7 +37,7 @@ create table public.posts (
 
 -- Create comments table
 create table public.comments (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   post_id uuid references public.posts(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
   content text not null,
@@ -47,7 +48,7 @@ create table public.comments (
 
 -- Create likes table
 create table public.likes (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   post_id uuid references public.posts(id) on delete cascade not null,
   user_id uuid references public.profiles(id) on delete cascade not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -56,7 +57,7 @@ create table public.likes (
 
 -- Create follows table
 create table public.follows (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   follower_id uuid references public.profiles(id) on delete cascade not null,
   following_id uuid references public.profiles(id) on delete cascade not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -65,7 +66,7 @@ create table public.follows (
 
 -- Create notifications table
 create table public.notifications (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   user_id uuid references public.profiles(id) on delete cascade not null,
   type notification_type not null,
   title text not null,
@@ -77,7 +78,7 @@ create table public.notifications (
 
 -- Create categories table
 create table public.categories (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   name text unique not null,
   slug text unique not null,
   description text,
@@ -94,7 +95,7 @@ create table public.post_categories (
 
 -- Create tags table
 create table public.tags (
-  id uuid default uuid_generate_v4() primary key,
+  id uuid default gen_random_uuid() primary key,
   name text unique not null,
   slug text unique not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

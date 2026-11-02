@@ -37,6 +37,9 @@ test('T02.1 additive migrations and catalog/job invariants', async t => {
       create schema supabase_migrations;
       create table supabase_migrations.schema_migrations(version text primary key);`);
 
+    // Match hosted extension placement and the migration runner's public-only path.
+    await db.exec('create schema extensions; create extension if not exists "uuid-ossp" with schema extensions; set search_path=public;');
+
     const files = (await readdir('supabase/migrations')).filter(f => f.endsWith('.sql')).sort();
     const apply = async files => {
       let count = 0;

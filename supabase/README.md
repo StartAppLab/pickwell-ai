@@ -260,3 +260,11 @@ supabase db reset
 # Generate types
 supabase gen types typescript --local > types/database.types.ts
 ```
+
+## Current cloud migration deployment
+
+All eight repository migrations through `20261102000500` were applied to the existing
+Pickwell cloud project on 2026-11-02. See [cloud deployment evidence](../docs/PICKWELL_CLOUD_MIGRATIONS.md)
+for the UUID-default compatibility correction, RLS/role verification and exact commands.
+No sample/demo seed or Edge Function was deployed by that operation. Inference,
+billing and Premium remain disabled; Edge lookup and Cron activation are separate.
