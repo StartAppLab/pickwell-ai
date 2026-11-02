@@ -35,6 +35,12 @@ linked evidence describes the isolated setup and named-stack command details.
 
 ## Optional premium backend access
 
+Pickwell's T02.2 server-only usage/entitlement/event foundations and read boundaries
+are documented in [PICKWELL_SECURITY_BOUNDARY.md](../docs/PICKWELL_SECURITY_BOUNDARY.md).
+They use the approved Pickwell schema; do not install the generic subscription
+module below without reconciling its different entitlement contract. No billing or
+webhook is active. Public lookup remains deferred until quota/rate admission exists.
+
 [modules/subscriptions/README.md](modules/subscriptions/README.md) provides an
 explicitly installed entitlement schema, RLS helper, RevenueCat webhook,
 authenticated refresh endpoint, and protected-operation example. It requires

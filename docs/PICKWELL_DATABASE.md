@@ -319,3 +319,14 @@ validation limits. No remote migration was applied. Native Supabase/PostgreSQL
 15.19 checks now pass without Docker: clean migration/seed application, actual
 migration replay/data preservation and 37 pgTAP assertions. Quota, analytics,
 entitlement and webhook portions of this blueprint remain later tasks.
+
+## 12. T02.2 security boundary reference (2026-11-02)
+
+`20261102000200_pickwell_security_boundary.sql` adds protected usage counters/
+reservations, environment-separated entitlement/event storage and explicit privilege
+defaults. The shared read boundary and owner-scoped status adapter are in
+`supabase/functions/`; no hosted deployment occurred. Entitlements use a composite
+user/environment key and require verified same-environment event references for
+future RevenueCat sources; this strengthens the illustrative user-only key.
+No authoritative Premium resolver, webhook reconciliation or atomic quota logic
+exists yet. See [security evidence and deferred public endpoint](PICKWELL_SECURITY_BOUNDARY.md).

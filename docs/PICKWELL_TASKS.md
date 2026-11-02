@@ -87,10 +87,12 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T02.2 RLS and least-privilege boundary
 
-- [ ] Enable RLS on every exposed table; deny direct anonymous/authenticated writes to shared catalog, jobs, entitlements, usage, and webhook data.
+- [x] Enable RLS on every exposed table; deny direct anonymous/authenticated writes to shared catalog, jobs, entitlements, usage, and webhook data.
 - [ ] Keep privileged DB access in Edge Functions; public `get-product` returns a sanitized published projection only.
-- [ ] Ensure `get-analysis-status` is owner-scoped; avoid overprivileged callable SQL functions and harden any security-definer functions.
-- [ ] Separate all test/sandbox billing events from production entitlements.
+- [x] Ensure `get-analysis-status` is owner-scoped; avoid overprivileged callable SQL functions and harden any security-definer functions.
+- [x] Separate all test/sandbox billing events from production entitlements.
+
+**2026-11-02 — PARTIAL (public lookup runtime deferred):** [Security boundary evidence](PICKWELL_SECURITY_BOUNDARY.md). Native PostgreSQL 15.19 passes 59 pgTAP assertions and 7 Auth/REST tests, including 64 denied client table operations, server-only inserts and cross-user job rejection. Server-only quota/entitlement/webhook storage and default-privilege hardening added; no quota/billing logic activated. Sanitized published reader is verified, but public `get-product` waits for T02.3 admission controls and T03.1 endpoint wiring. Status handler core exercised with real local Auth/REST; Edge deployment is not claimed. Native stack stopped; no hosted project changed.
 
 **Acceptance:** Client cannot directly forge findings, grant Premium, increment/decrement quota or retrieve another user's jobs.  
 **Targeted validation:** Negative DB/REST authorization tests using publishable and verified-user tokens; server-only insert works.

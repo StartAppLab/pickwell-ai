@@ -57,13 +57,13 @@ test('T02.1 additive migrations and catalog/job invariants', async t => {
     };
 
     await t.test('existing migrations and sample content survive additive migration and runner replay', async () => {
-      assert.equal(await apply(files.filter(f => !f.includes('pickwell_catalog'))), 3);
+      assert.equal(await apply(files.filter(f => f.split('_')[0] < '20261102000100')), 3);
       await db.exec(await readFile('supabase/seed.sql', 'utf8'));
       await db.exec(`insert into auth.users(id,email,raw_user_meta_data) values
         ('${alice}','alice@example.invalid','{}'),('${bob}','bob@example.invalid','{}');
         insert into public.posts(user_id,title,content) values ('${alice}','Preserve this post','legacy sentinel');`);
       const before = await scalar('select count(*)::int as value from public.posts');
-      assert.equal(await apply(files), 1);
+      assert.equal(await apply(files), files.length - 3);
       assert.equal(await apply(files), 0);
       assert.equal(await scalar('select count(*)::int as value from public.posts'), before);
       assert.equal(await scalar("select content as value from public.posts where title='Preserve this post'"), 'legacy sentinel');
