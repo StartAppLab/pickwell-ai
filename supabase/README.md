@@ -50,6 +50,15 @@ allowance; mandatory provider accounting still fails closed. Cron registration i
 conditional on the extension already being enabled; verify a running retention job
 before deployment. No public analytics endpoint or hosted change was made.
 
+## Pickwell get-product endpoint
+
+[T03.1 lookup evidence](../docs/PICKWELL_PRODUCT_LOOKUP.md) describes the guest-capable
+POST endpoint, canonical GTINs, throttling, signed-in quota, atomic read/settlement
+and bounded idempotent retries. Only sanitized published products or safe explicit
+miss/processing states are returned; no AI is invoked. Configure the private network
+HMAC secret and verify ingress/gateway behavior before hosted deployment. Local HTTP
+handler tests passed against native Supabase; Deno/hosted gateway execution is unverified.
+
 ## Optional premium backend access
 
 Pickwell's T02.2 server-only usage/entitlement/event foundations and read boundaries

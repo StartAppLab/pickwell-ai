@@ -88,7 +88,7 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 ### T02.2 RLS and least-privilege boundary
 
 - [x] Enable RLS on every exposed table; deny direct anonymous/authenticated writes to shared catalog, jobs, entitlements, usage, and webhook data.
-- [ ] Keep privileged DB access in Edge Functions; public `get-product` returns a sanitized published projection only.
+- [x] Keep privileged DB access in Edge Functions; public `get-product` returns a sanitized published projection only.
 - [x] Ensure `get-analysis-status` is owner-scoped; avoid overprivileged callable SQL functions and harden any security-definer functions.
 - [x] Separate all test/sandbox billing events from production entitlements.
 
@@ -96,6 +96,8 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 **Acceptance:** Client cannot directly forge findings, grant Premium, increment/decrement quota or retrieve another user's jobs.  
 **Targeted validation:** Negative DB/REST authorization tests using publishable and verified-user tokens; server-only insert works.
+
+**T03.1 follow-up:** The deferred sanitized public-read handler is now implemented and verified over local HTTP against native Auth/REST; see [lookup evidence](PICKWELL_PRODUCT_LOOKUP.md). All T02.2 local implementation checks are now covered. Hosted Edge gateway execution remains unverified; the earlier PARTIAL report above records its original task-time state.
 
 ### T02.3 Plan config, quotas, reservations, and spend controls
 
@@ -125,12 +127,14 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T03.1 Implement `get-product` backend endpoint
 
-- [ ] Validate/canonicalize barcode; return typed `ready`, `not_found`, `processing`, `rate_limited`/`quota_exceeded`, or `error` states.
-- [ ] Apply correct guest throttling/authenticated quota; securely read published projection; do not trigger AI.
-- [ ] Return effective quota/remaining and UTC reset when reliably known; never trust client counters.
+- [x] Validate/canonicalize barcode; return typed `ready`, `not_found`, `processing`, `rate_limited`/`quota_exceeded`, or `error` states.
+- [x] Apply correct guest throttling/authenticated quota; securely read published projection; do not trigger AI.
+- [x] Return effective quota/remaining and UTC reset when reliably known; never trust client counters.
 
 **Acceptance:** Seeded barcode returns complete results with **zero Meta calls**; missing barcode explicitly returns `not_found`; timeout/DB unavailable does not masquerade as a miss.  
 **Targeted validation:** Function endpoint tests for found, miss, malformed, throttled and DB error; trace confirms no model invocation.
+
+**2026-11-02 — COMPLETE (backend/local HTTP validation):** [Lookup evidence](PICKWELL_PRODUCT_LOOKUP.md). Guest-capable handler with independent Auth verification, throttling, canonical GTIN validation, sanitized published responses, atomic quota/read settlement and bounded replay receipts. Native tests pass 142 pgTAP assertions, 11 lookup HTTP/handler tests, 19 quota tests, 15 security/events tests and 9 isolated migration tests. Trace and unchanged provider ledger confirm zero Meta calls. No hosted deployment or Deno gateway execution was performed; HMAC/ingress configuration and actual gateway checks remain deployment prerequisites. Native services stopped.
 
 ### T03.2 Flutter scanner/home and lookup UX
 

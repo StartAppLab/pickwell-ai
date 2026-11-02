@@ -61,7 +61,7 @@ export function createQuotaService(env, fetcher = fetch) {
         headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: authorization },
         redirect: 'error', signal: AbortSignal.timeout(5000),
       });
-      if (!response.ok) throw new Error('unauthorized');
+      if (!response.ok) throw new Error([401,403].includes(response.status) ? 'unauthorized' : 'identity_unavailable');
       const user = await response.json();
       if (!/^[0-9a-f-]{36}$/i.test(user.id ?? '') || user.is_anonymous !== false ||
         (verified && (typeof user.email !== 'string' || !user.email || !Number.isFinite(Date.parse(user.email_confirmed_at ?? ''))))) {

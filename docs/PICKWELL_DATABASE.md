@@ -367,3 +367,18 @@ Native direct maintenance passed; Cron was absent locally, so automatic scheduli
 remains unverified and must be configured before deployment. Event correlations are
 opaque operation IDs, with no user/barcode/photo/token fields. No hosted migration,
 public route, third-party analytics SDK or live inference was introduced.
+
+
+## 15. T03.1 atomic public lookup reference (2026-11-02)
+
+`20261102000500_pickwell_product_lookup.sql` adds private five-minute lookup replay
+references and a server-only RPC combining published/miss/processing determination
+with atomic signed-in lookup settlement. Existing 30/3 config, RLS, published view
+and quota operations are reused. No provider admission or model call occurs.
+The guest-capable Edge handler applies network throttling, verifies any supplied
+user session and sanitizes the result. No table/RPC grant is made to clients.
+
+See [lookup contract and validation](PICKWELL_PRODUCT_LOOKUP.md) for replay expiry,
+original-revision checks, transport ambiguity and deployment prerequisites. The
+handler is verified through local HTTP/native Auth/REST; actual Deno gateway and
+hosted migration/deployment remain unverified. Guest usage remains best effort.

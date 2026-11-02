@@ -1,0 +1,27 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select no_plan();
+insert into auth.users(id,email,is_anonymous,raw_user_meta_data) values
+ ('a1250000-0000-4000-8000-000000000001','lookup@example.invalid',false,'{}');
+select is(public.pickwell_get_product(null,gen_random_uuid(),'2900000000018')->>'status','ready','Guest sees synthetic published demo');
+select is(public.pickwell_get_product(null,gen_random_uuid(),'96385074')->>'status','not_found','Actual absent barcode is explicit miss');
+select throws_ok($$select public.pickwell_get_product(null,gen_random_uuid(),'96385075')$$,'22023',null,'Bad check digit rejected');
+select is(public.pickwell_get_product('a1250000-0000-4000-8000-000000000001','a1250000-0000-4000-8000-000000000002','2900000000018')->>'status','ready','Persistent unconfirmed reader needs no submission OTP');
+select is(public.pickwell_get_product('a1250000-0000-4000-8000-000000000001','a1250000-0000-4000-8000-000000000002','02900000000018')->>'replay','true','Alias retry reuses original receipt');
+select is((select used from public.usage_daily where user_id='a1250000-0000-4000-8000-000000000001' and metric='barcode_lookup'),1,'Replay charges once');
+select throws_ok($$select public.pickwell_get_product('a1250000-0000-4000-8000-000000000001','a1250000-0000-4000-8000-000000000002','96385074')$$,'22023',null,'Key cannot switch barcodes');
+update public.lookup_receipts set expires_at=now()-interval '1 second';
+select is(public.pickwell_get_product('a1250000-0000-4000-8000-000000000001','a1250000-0000-4000-8000-000000000002','2900000000018')->>'status','retry_expired','Expired key cannot refresh free catalogue reads');
+insert into public.products(barcode,name,is_demo) values('96385074','SYNTHETIC processing fixture',true);
+select is(public.pickwell_get_product(null,gen_random_uuid(),'96385074')->>'status','processing','Unpublished processing row gives safe processing state');
+select is((select count(*)::integer from public.ai_usage),0,'All catalogue lookups authorize zero model calls');
+set local role anon;
+select throws_ok('select * from public.lookup_receipts','42501',null,'Guest cannot read private receipts');
+select throws_ok($$select public.pickwell_get_product(null,gen_random_uuid(),'96385074')$$,'42501',null,'Public key cannot call privileged lookup SQL directly');
+reset role;
+set local role authenticated;
+select throws_ok('select * from public.lookup_receipts','42501',null,'User cannot read other account receipts');
+select throws_ok($$select public.pickwell_get_product(null,gen_random_uuid(),'96385074')$$,'42501',null,'Signed-in client cannot bypass function throttle by SQL RPC');
+reset role;
+select * from finish();
+rollback;
