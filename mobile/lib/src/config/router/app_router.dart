@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -133,8 +134,10 @@ class AppRouter {
         builder: (context, state) {
           try {
             final barcode = normalizeGtin(state.pathParameters['barcode'] ?? '');
-            return BlocProvider(
-              create: (_) => getIt<LabelCaptureCubit>(),
+            final draft = getIt<LabelCaptureCubit>();
+            unawaited(draft.begin(barcode));
+            return BlocProvider.value(
+              value: draft,
               child: CaptureEntryView(barcode: barcode),
             );
           } catch (_) {

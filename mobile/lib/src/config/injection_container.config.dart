@@ -70,9 +70,15 @@ import '../features/catalog/data/data_sources/services/catalog_api_service.dart'
 import '../features/catalog/data/data_sources/services/scanner_media_service.dart'
     as _i1007;
 import '../features/catalog/data/repositories/catalog_repository.dart' as _i496;
+import '../features/catalog/data/repositories/label_capture_repository.dart'
+    as _i10;
 import '../features/catalog/domain/_domain.dart' as _i721;
 import '../features/catalog/domain/repositories/catalog_repository.dart'
     as _i919;
+import '../features/catalog/domain/repositories/label_capture_repository.dart'
+    as _i0;
+import '../features/catalog/domain/use_cases/capture_label_use_case.dart'
+    as _i835;
 import '../features/catalog/domain/use_cases/get_catalog_use_case.dart'
     as _i670;
 import '../features/catalog/presentation/blocs/catalog/catalog_cubit.dart'
@@ -209,9 +215,6 @@ Future<_i174.GetIt> init(
     () => registerModule.revenueCatEntitlementId,
     instanceName: 'revenueCatEntitlementId',
   );
-  gh.factory<_i84.LabelCaptureCubit>(
-    () => _i84.LabelCaptureCubit(gh<_i1007.ScannerMediaService>()),
-  );
   gh.factory<String>(() => registerModule.sentryDsn, instanceName: 'sentryDsn');
   gh.factory<String>(
     () => registerModule.postHogApiKey,
@@ -233,6 +236,9 @@ Future<_i174.GetIt> init(
     () => _i437.DatabaseTransactionRunner(gh<_i935.AppDatabase>()),
   );
   gh.factory<String>(() => registerModule.apiKey, instanceName: 'apiKey');
+  gh.lazySingleton<_i0.LabelCaptureRepository>(
+    () => _i10.LabelCaptureRepositoryImpl(gh<_i1007.ScannerMediaService>()),
+  );
   gh.lazySingleton<_i6.NetworkInfo>(
     () => _i6.NetworkInfo(connectionChecker: gh<_i161.InternetConnection>()),
   );
@@ -274,11 +280,18 @@ Future<_i174.GetIt> init(
       ),
     ),
   );
+  gh.lazySingleton<_i835.CaptureLabelUseCase>(
+    () => _i835.CaptureLabelUseCase(gh<_i0.LabelCaptureRepository>()),
+  );
   gh.lazySingleton<_i465.PaywallGateService>(
     () => _i465.PaywallGateService(
       gh<_i926.DataStorage>(),
       gh<_i460.SharedPreferences>(),
     ),
+  );
+  gh.lazySingleton<_i84.LabelCaptureCubit>(
+    () => _i84.LabelCaptureCubit(gh<_i721.CaptureLabelUseCase>()),
+    dispose: (i) => i.close(),
   );
   gh.factory<_i176.AuthApiService>(
     () => _i176.AuthApiServiceImpl(

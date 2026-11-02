@@ -1085,8 +1085,98 @@ abstract class AppLocalizations {
   /// No description provided for @pkRetake.
   ///
   /// In en, this message translates to:
-  /// **'Retake labels'**
+  /// **'Retake photo'**
   String get pkRetake;
+
+  /// No description provided for @pkCaptureStepBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1 · Barcode ✓'**
+  String get pkCaptureStepBarcode;
+
+  /// No description provided for @pkCaptureStepNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2 · Nutrition'**
+  String get pkCaptureStepNutrition;
+
+  /// No description provided for @pkCaptureStepIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 3 · Ingredients'**
+  String get pkCaptureStepIngredients;
+
+  /// No description provided for @pkCaptureProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Label capture progress'**
+  String get pkCaptureProgress;
+
+  /// No description provided for @pkIngredientsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture the complete ingredient list and any allergen statements. Keep all text sharp and readable.'**
+  String get pkIngredientsHint;
+
+  /// No description provided for @pkCaptureSizeError.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is empty or larger than 5 MiB. Please retake it.'**
+  String get pkCaptureSizeError;
+
+  /// No description provided for @pkCaptureFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo could not be read. Retake it as a JPEG or PNG image.'**
+  String get pkCaptureFormatError;
+
+  /// No description provided for @pkCaptureDimensionsError.
+  ///
+  /// In en, this message translates to:
+  /// **'This photo is too large. Retake it with a maximum dimension of 2400 pixels.'**
+  String get pkCaptureDimensionsError;
+
+  /// No description provided for @pkCaptureExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your capture draft expired. Please capture both labels again.'**
+  String get pkCaptureExpired;
+
+  /// No description provided for @pkCaptureCleanupError.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary photos could not be cleared. Please try again before taking more photos.'**
+  String get pkCaptureCleanupError;
+
+  /// No description provided for @pkCaptureCameraError.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera could not capture a photo. Check camera permission and try again.'**
+  String get pkCaptureCameraError;
+
+  /// No description provided for @pkCapturePreviewMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo unavailable. Please retake this label.'**
+  String get pkCapturePreviewMissing;
+
+  /// No description provided for @pkCaptureReviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Check that both labels are readable. You can retake either photo without losing the other.'**
+  String get pkCaptureReviewHint;
+
+  /// No description provided for @pkCaptureSubmissionPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are ready for review. Email verification and analysis submission are not available in this build yet.'**
+  String get pkCaptureSubmissionPending;
+
+  /// No description provided for @pkDiscardPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard both photos'**
+  String get pkDiscardPhotos;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

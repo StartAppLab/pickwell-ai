@@ -84,6 +84,13 @@ Future<void> _bootstrapApplication() async {
     );
   }
   await configureDependencies();
+  try {
+    // Sweep previous-process label drafts even when this launch only opens Home.
+    await getIt<CaptureLabelUseCase>().prepare();
+  } catch (_) {
+    // Capture retries initialization and fails closed with a local cleanup error.
+    // A temporary cache failure must not block public cached-product browsing.
+  }
   await getIt<AppSession>().init(config.features.backendEnabled ? getIt<SupabaseClient>() : null);
   if (config.features.analyticsEnabled) {
     final posthog = PostHogConfig(config.postHogApiKey)
@@ -133,8 +140,7 @@ class PickwellApp extends StatefulWidget {
   State<PickwellApp> createState() => _PickwellAppState();
 }
 
-class _PickwellAppState extends State<PickwellApp>
-    with WidgetsBindingObserver {
+class _PickwellAppState extends State<PickwellApp> with WidgetsBindingObserver {
   StreamSubscription<AuthState>? _authStateSubscription;
   bool _didPrecache = false;
   Timer? _splashTimer;

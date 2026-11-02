@@ -531,5 +531,57 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pkInvalidBarcode => 'Enter a valid EAN or UPC barcode.';
 
   @override
-  String get pkRetake => 'Retake labels';
+  String get pkRetake => 'Retake photo';
+
+  @override
+  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+
+  @override
+  String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
+
+  @override
+  String get pkCaptureStepIngredients => 'Step 3 · Ingredients';
+
+  @override
+  String get pkCaptureProgress => 'Label capture progress';
+
+  @override
+  String get pkIngredientsHint =>
+      'Capture the complete ingredient list and any allergen statements. Keep all text sharp and readable.';
+
+  @override
+  String get pkCaptureSizeError => 'This photo is empty or larger than 5 MiB. Please retake it.';
+
+  @override
+  String get pkCaptureFormatError =>
+      'This photo could not be read. Retake it as a JPEG or PNG image.';
+
+  @override
+  String get pkCaptureDimensionsError =>
+      'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
+
+  @override
+  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+
+  @override
+  String get pkCaptureCleanupError =>
+      'Temporary photos could not be cleared. Please try again before taking more photos.';
+
+  @override
+  String get pkCaptureCameraError =>
+      'The camera could not capture a photo. Check camera permission and try again.';
+
+  @override
+  String get pkCapturePreviewMissing => 'Photo unavailable. Please retake this label.';
+
+  @override
+  String get pkCaptureReviewHint =>
+      'Check that both labels are readable. You can retake either photo without losing the other.';
+
+  @override
+  String get pkCaptureSubmissionPending =>
+      'Photos are ready for review. Email verification and analysis submission are not available in this build yet.';
+
+  @override
+  String get pkDiscardPhotos => 'Discard both photos';
 }

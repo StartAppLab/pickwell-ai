@@ -174,13 +174,17 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T04.1 Three-step nutrition + ingredients photo capture
 
-- [ ] Display **Step 1 Barcode ✓ → Step 2 Nutrition → Step 3 Ingredients**, with preview, retake, guidance, and progress.
-- [ ] Store in-progress photos only in bounded app-local transient state; compress/resize; check supported MIME and size before upload.
+- [x] Display **Step 1 Barcode ✓ → Step 2 Nutrition → Step 3 Ingredients**, with preview, retake, guidance, and progress.
+- [x] Store in-progress photos only in bounded app-local transient state; compress/resize; check supported MIME and size before upload.
 - [ ] Optionally infer/edit product name and brand without extra mandatory step; never accept them as authoritative replacements for labels.
 - [ ] Preserve selected photos/barcode across OTP redirect and return.
 
 **Acceptance:** After a missing barcode, user captures 2 readable photos without rescanning barcode; can retake one image independently.  
 **Targeted validation:** Wizard state persistence across navigation, invalid-format/oversize, camera failure, separate retake paths.
+
+**Follow-up — PARTIAL (hardware capture and real OTP return pending):** [Capture draft evidence](PICKWELL_CAPTURE_DRAFT.md). Fixed three-step guided capture, separate retakes/previews, signature/size/decode/dimension checks and app-private temporary file references implemented. Single one-hour draft survives route replacement; discard/retake/expiry/late-result and startup cleanup covered. **42 focused tests pass; static analysis clean.** Physical label readability/native camera behavior and the actual T04.2 OTP redirect remain unverified, so those checkboxes stay open. Optional name/brand editing is omitted. No upload, Meta call, new package, billing change or later-phase implementation.
+
+**2026-11-03 user confirmation:** Physical-camera capture works on the user's device. Capture UI checkbox verified using that report plus automated tests; actual OTP return remains pending T04.2. No agent-run hardware test is claimed.
 
 ### T04.2 Email OTP auth and submission gate
 
