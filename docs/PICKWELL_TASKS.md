@@ -99,14 +99,16 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T02.3 Plan config, quotas, reservations, and spend controls
 
-- [ ] Seed Free plan with `barcode_lookup=30` and `ai_analysis=3`, reset at 00:00 UTC, with server-controlled mutable config and version/audit fields.
-- [ ] Implement atomic per-user quota consumption/reservations and idempotency. Successful publication finalizes one AI usage; cache hit/failed extraction releases a reserved AI slot.
-- [ ] Prevent repeated retries, cross-request races and multiple AI calls on the same barcode; track provider spending separately from user allowance.
-- [ ] Implement best-effort public lookup throttling for guests (IP/proxy-aware) and authenticated exact barcode usage. Set global spend ceiling and concurrency caps.
+- [x] Seed Free plan with `barcode_lookup=30` and `ai_analysis=3`, reset at 00:00 UTC, with server-controlled mutable config and version/audit fields.
+- [x] Implement atomic per-user quota consumption/reservations and idempotency. Successful publication finalizes one AI usage; cache hit/failed extraction releases a reserved AI slot.
+- [x] Prevent repeated retries, cross-request races and multiple AI calls on the same barcode; track provider spending separately from user allowance.
+- [x] Implement best-effort public lookup throttling for guests (IP/proxy-aware) and authenticated exact barcode usage. Set global spend ceiling and concurrency caps.
 
 **Acceptance:** 30th authenticated lookup allowed and 31st denied; 3rd successful new analysis allowed and 4th denied; changing limit to 20 applies on subsequent calls without mobile release. Guest is not promised enforceable per-person usage.  
 **Targeted validation:** Concurrent atomic reservation, 00:00 UTC reset, negative usage, idempotent retry and rollback/release tests.  
 **Note:** Quota counting semantics must match PRD: charge only valid definitive lookup statuses; no charge for local reopening or lookup transport errors.
+
+**2026-11-02 — COMPLETE (backend/native validation):** [Quota controls evidence](PICKWELL_QUOTA_CONTROLS.md). Additive audited 30/3 Free config, atomic UTC reservations/finalization, bounded job/barcode provider claims, separate spend/concurrency admission and trusted-proxy-aware guest throttling. Native checks pass 85 pgTAP assertions, 19 quota/Auth/REST tests, 7 existing security tests and 9 isolated migration tests. No hosted migration, public endpoint or Meta call occurred. Billing and normal inference remain disabled; verified model cost bounds/proxy attribution and endpoint integration are deployment prerequisites. T02.2 public lookup remains open for T03.1. Native services stopped.
 
 ### T02.4 Operational events and cost ledger
 

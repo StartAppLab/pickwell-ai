@@ -330,3 +330,22 @@ user/environment key and require verified same-environment event references for
 future RevenueCat sources; this strengthens the illustrative user-only key.
 No authoritative Premium resolver, webhook reconciliation or atomic quota logic
 exists yet. See [security evidence and deferred public endpoint](PICKWELL_SECURITY_BOUNDARY.md).
+
+
+## 13. T02.3 quota/admission implementation reference (2026-11-02)
+
+`20261102000300_pickwell_quota_controls.sql` extends the protected quota foundations
+with Free/Premium plan shells, audited mutable 30/3 Free limits, atomic UTC
+reservations, replay-safe publication/credit finalization, guest/network throttles
+and conservative provider spend/concurrency admission. The sole Auth guard is a
+server-only fixed-query definer with an empty search path; all business operations
+use invoker permissions. Billing remains disabled and normal inference defaults off
+until model/cost bounds are reviewed. Provider cost/unknown-call holds survive
+account deletion; private usage/account references are removed.
+
+See [quota evidence and integration contract](PICKWELL_QUOTA_CONTROLS.md) for exact
+RPC sequencing, retention/deployment requirements and native validation results.
+The 30/31 lookup, 3/4 successful analysis, mutable-limit, concurrency and UTC cases
+pass against actual local Supabase Auth/REST/PostgreSQL. No hosted migration or
+public lookup/analysis endpoint was activated. Broader operational events and
+reporting remain T02.4; no live provider cost measurement is claimed here.

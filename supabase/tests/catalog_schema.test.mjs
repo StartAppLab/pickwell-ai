@@ -26,7 +26,7 @@ test('T02.1 additive migrations and catalog/job invariants', async t => {
   try {
     // Minimal platform fixtures, not real accounts or an alternate Auth service.
     await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
-      create schema auth; create table auth.users(id uuid primary key, email text, raw_user_meta_data jsonb);
+      create schema auth; create table auth.users(id uuid primary key, email text, raw_user_meta_data jsonb, is_anonymous boolean not null default false, email_confirmed_at timestamptz default now());
       create function auth.uid() returns uuid language sql stable as
         $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
       create schema storage;

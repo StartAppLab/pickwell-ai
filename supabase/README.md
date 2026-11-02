@@ -33,6 +33,14 @@ facts as a real food analysis. Full local Supabase validation has passed with
 experimental Native Runtime (CLI 2.122.0, PostgreSQL 15.19), without Docker. The
 linked evidence describes the isolated setup and named-stack command details.
 
+## Pickwell quota and provider admission
+
+[T02.3 quota controls](../docs/PICKWELL_QUOTA_CONTROLS.md) documents audited mutable
+Free 30/3 limits, atomic reservations/publication, guest network throttling and
+server-only provider spend/concurrency admission. Normal inference and billing
+remain disabled; public route wiring belongs to T03.1/T05.1. Native SQL/Auth/REST
+checks pass without Docker. No hosted migration or inference was run in this task.
+
 ## Optional premium backend access
 
 Pickwell's T02.2 server-only usage/entitlement/event foundations and read boundaries
