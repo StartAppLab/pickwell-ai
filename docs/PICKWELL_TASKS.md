@@ -188,13 +188,15 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T04.2 Email OTP auth and submission gate
 
-- [ ] Configure Supabase Auth Email OTP as an actual code flow; verify email template, provider delivery limits and session persistence.
-- [ ] Prompt sign-in **only when submitting unknown-product analysis**; scanned cached products remain publicly accessible.
-- [ ] Support send/verify/resend/error/cancel and safe resume of the two photos; session expiration handled.
+- [x] Configure Supabase Auth Email OTP as an actual code flow; verify email template, provider delivery limits and session persistence.
+- [x] Prompt sign-in **only when submitting unknown-product analysis**; scanned cached products remain publicly accessible.
+- [x] Support send/verify/resend/error/cancel and safe resume of the two photos; session expiration handled.
 - [ ] Backend verifies trusted JWT and persistent verified email; do not rely solely on Flutter or on the generic `authenticated` role if anonymous auth is later enabled.
 
 **Acceptance:** Guest captures photos, signs in, returns to exactly the same analysis submission, and can proceed; guest direct call to analysis endpoint is forbidden.  
 **Targeted validation:** OTP integration, incorrect/expired OTP, guest rejection server-side, post-auth resume.
+
+**2026-11-03 — PARTIAL (actual analysis endpoint wiring remains T05):** [Email OTP evidence](PICKWELL_EMAIL_OTP_GATE.md). Contextual Analyze → Email code → same-photo review implemented using existing auth SDK/session and app-owned draft; send/resend/cooldown/error/cancel/expired-session handling tested. Cloud settings confirm 8-digit OTP, one-minute interval and 30 emails/hour; no security setting was weakened to match the six-digit design example. Fresh real code verified HTTP 200; wrong/consumed codes HTTP 403. Deployed auth-only `authorize-analysis`: guest/public-key/forged-token HTTP 401, verified user HTTP 200. **54 Flutter tests, 12 backend tests pass; 1 native-stack test skipped; analyzer clean; Android debug build passes.** Shared backend guard is ready, but the actual analyze-product handler does not yet exist and must enforce it in T05. Physical app OTP/restart persistence and natural code-age expiry remain unverified; UI/SDK persistence and return are automated checks. No Meta call, image upload, billing or quota change.
 
 ## 7. Phase 5 — AI processing and reusable publication (P0)
 

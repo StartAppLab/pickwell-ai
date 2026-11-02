@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../config/_config.dart';
+import '../../core/_core.dart';
 import '../../features/_features.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -128,6 +129,31 @@ class AppRouter {
               getIt<CatalogCubit>()..check(state.pathParameters['barcode'] ?? '', local: true),
           child: const ProductDetailView(),
         ),
+      ),
+      GoRoute(
+        path: '/capture-auth/:barcode',
+        redirect: (context, state) {
+          try {
+            final code = normalizeGtin(state.pathParameters['barcode'] ?? '');
+            final draft = getIt<LabelCaptureCubit>().state;
+            if (draft.barcode != code || !draft.ready) return '/capture/$code';
+          } catch (_) {
+            return '/scan';
+          }
+          return null;
+        },
+        builder: (context, state) {
+          if (!getIt<AppConfig>().features.authEnabled) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: SafeArea(child: Center(child: Text(context.l10n.pkOtpUnavailable))),
+            );
+          }
+          return BlocProvider(
+            create: (_) => getIt<EmailOtpCubit>()..check(),
+            child: EmailOtpGateView(barcode: normalizeGtin(state.pathParameters['barcode']!)),
+          );
+        },
       ),
       GoRoute(
         path: '/capture/:barcode',

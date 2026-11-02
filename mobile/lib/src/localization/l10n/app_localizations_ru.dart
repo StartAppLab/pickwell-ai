@@ -580,8 +580,58 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pkCaptureSubmissionPending =>
-      'Photos are ready for review. Email verification and analysis submission are not available in this build yet.';
+      'Choose Analyze Product to verify your email. Email verification does not upload these photos.';
 
   @override
   String get pkDiscardPhotos => 'Discard both photos';
+
+  @override
+  String get pkAnalyzeProduct => 'Analyze Product';
+
+  @override
+  String get pkAnalysisPending =>
+      'Email verified. Analysis is not available yet; no photos have been submitted.';
+
+  @override
+  String get pkOtpTitle => 'Continue with Email';
+
+  @override
+  String get pkOtpDraftSafe =>
+      'Your captured labels stay on this device while you sign in. Cancel returns to your photos.';
+
+  @override
+  String get pkOtpCode => 'Verification code';
+
+  @override
+  String get pkOtpCodeHint => 'Enter the 6- or 8-digit code from your email.';
+
+  @override
+  String get pkOtpVerify => 'Verify';
+
+  @override
+  String get pkOtpSend => 'Send Code';
+
+  @override
+  String get pkOtpResend => 'Resend Code';
+
+  @override
+  String get pkOtpChangeEmail => 'Change email';
+
+  @override
+  String get pkOtpInvalidEmail => 'Enter a valid email address.';
+
+  @override
+  String get pkOtpInvalidCode =>
+      'The code is incorrect or expired. Try again or request another code.';
+
+  @override
+  String get pkOtpRateLimited =>
+      'Please wait before requesting another code. Email delivery is rate limited.';
+
+  @override
+  String get pkOtpUnavailable => 'Email sign-in is unavailable in this build.';
+
+  @override
+  String get pkOtpNetworkError =>
+      'We could not verify your sign-in. Check your connection and try again.';
 }

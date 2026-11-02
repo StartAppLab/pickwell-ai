@@ -1169,7 +1169,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCaptureSubmissionPending.
   ///
   /// In en, this message translates to:
-  /// **'Photos are ready for review. Email verification and analysis submission are not available in this build yet.'**
+  /// **'Choose Analyze Product to verify your email. Email verification does not upload these photos.'**
   String get pkCaptureSubmissionPending;
 
   /// No description provided for @pkDiscardPhotos.
@@ -1177,6 +1177,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Discard both photos'**
   String get pkDiscardPhotos;
+
+  /// No description provided for @pkAnalyzeProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze Product'**
+  String get pkAnalyzeProduct;
+
+  /// No description provided for @pkAnalysisPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Email verified. Analysis is not available yet; no photos have been submitted.'**
+  String get pkAnalysisPending;
+
+  /// No description provided for @pkOtpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Email'**
+  String get pkOtpTitle;
+
+  /// No description provided for @pkOtpDraftSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Your captured labels stay on this device while you sign in. Cancel returns to your photos.'**
+  String get pkOtpDraftSafe;
+
+  /// No description provided for @pkOtpCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get pkOtpCode;
+
+  /// No description provided for @pkOtpCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6- or 8-digit code from your email.'**
+  String get pkOtpCodeHint;
+
+  /// No description provided for @pkOtpVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get pkOtpVerify;
+
+  /// No description provided for @pkOtpSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get pkOtpSend;
+
+  /// No description provided for @pkOtpResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get pkOtpResend;
+
+  /// No description provided for @pkOtpChangeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Change email'**
+  String get pkOtpChangeEmail;
+
+  /// No description provided for @pkOtpInvalidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get pkOtpInvalidEmail;
+
+  /// No description provided for @pkOtpInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'The code is incorrect or expired. Try again or request another code.'**
+  String get pkOtpInvalidCode;
+
+  /// No description provided for @pkOtpRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait before requesting another code. Email delivery is rate limited.'**
+  String get pkOtpRateLimited;
+
+  /// No description provided for @pkOtpUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Email sign-in is unavailable in this build.'**
+  String get pkOtpUnavailable;
+
+  /// No description provided for @pkOtpNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not verify your sign-in. Check your connection and try again.'**
+  String get pkOtpNetworkError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

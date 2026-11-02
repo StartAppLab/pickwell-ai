@@ -312,6 +312,21 @@
   "pkCaptureCameraError": "The camera could not capture a photo. Check camera permission and try again.",
   "pkCapturePreviewMissing": "Photo unavailable. Please retake this label.",
   "pkCaptureReviewHint": "Check that both labels are readable. You can retake either photo without losing the other.",
-  "pkCaptureSubmissionPending": "Photos are ready for review. Email verification and analysis submission are not available in this build yet.",
-  "pkDiscardPhotos": "Discard both photos"
+  "pkCaptureSubmissionPending": "Choose Analyze Product to verify your email. Email verification does not upload these photos.",
+  "pkDiscardPhotos": "Discard both photos",
+  "pkAnalyzeProduct": "Analyze Product",
+  "pkAnalysisPending": "Email verified. Analysis is not available yet; no photos have been submitted.",
+  "pkOtpTitle": "Continue with Email",
+  "pkOtpDraftSafe": "Your captured labels stay on this device while you sign in. Cancel returns to your photos.",
+  "pkOtpCode": "Verification code",
+  "pkOtpCodeHint": "Enter the 6- or 8-digit code from your email.",
+  "pkOtpVerify": "Verify",
+  "pkOtpSend": "Send Code",
+  "pkOtpResend": "Resend Code",
+  "pkOtpChangeEmail": "Change email",
+  "pkOtpInvalidEmail": "Enter a valid email address.",
+  "pkOtpInvalidCode": "The code is incorrect or expired. Try again or request another code.",
+  "pkOtpRateLimited": "Please wait before requesting another code. Email delivery is rate limited.",
+  "pkOtpUnavailable": "Email sign-in is unavailable in this build.",
+  "pkOtpNetworkError": "We could not verify your sign-in. Check your connection and try again."
 }

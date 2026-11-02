@@ -38,10 +38,16 @@ import '../features/auth/data/data_sources/auth_remote_source.dart' as _i520;
 import '../features/auth/data/data_sources/services/_services.dart' as _i87;
 import '../features/auth/data/data_sources/services/auth_api_service.dart'
     as _i176;
+import '../features/auth/data/data_sources/services/email_otp_api_service.dart'
+    as _i455;
 import '../features/auth/data/repositories/auth_repository.dart' as _i243;
+import '../features/auth/data/repositories/email_otp_repository.dart' as _i499;
 import '../features/auth/domain/_domain.dart' as _i63;
+import '../features/auth/domain/repositories/email_otp_repository.dart'
+    as _i172;
 import '../features/auth/domain/use_cases/change_password_use_case.dart'
     as _i544;
+import '../features/auth/domain/use_cases/email_otp_use_case.dart' as _i744;
 import '../features/auth/domain/use_cases/forgot_password_use_case.dart'
     as _i301;
 import '../features/auth/domain/use_cases/otp_resend_use_case.dart' as _i507;
@@ -51,6 +57,8 @@ import '../features/auth/domain/use_cases/sign_out_use_case.dart' as _i964;
 import '../features/auth/domain/use_cases/sign_up_use_case.dart' as _i500;
 import '../features/auth/presentation/blocs/change_password/change_password_cubit.dart'
     as _i358;
+import '../features/auth/presentation/blocs/email_otp/email_otp_cubit.dart'
+    as _i789;
 import '../features/auth/presentation/blocs/forgot_password/forgot_password_cubit.dart'
     as _i330;
 import '../features/auth/presentation/blocs/otp/otp_cubit.dart' as _i119;
@@ -328,6 +336,13 @@ Future<_i174.GetIt> init(
   gh.factory<_i834.ProfileApiService>(
     () => _i834.ProfileApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
   );
+  gh.lazySingleton<_i455.EmailOtpApiService>(
+    () => _i455.EmailOtpApiService(
+      gh<_i454.SupabaseClient>(),
+      gh<_i609.AppConfig>(),
+      gh<_i176.AuthApiService>(),
+    ),
+  );
   gh.lazySingleton<_i141.ProfileRemoteSource>(
     () => _i141.ProfileRemoteSource(
       profileApiService: gh<_i275.ProfileApiService>(),
@@ -356,40 +371,6 @@ Future<_i174.GetIt> init(
       gh<_i709.BillingClient>(),
     ),
   );
-  gh.factory<_i1017.ProfileRepository>(
-    () => _i537.ProfileRepositoryImpl(
-      localSource: gh<_i56.ProfileLocalSource>(),
-      remoteSource: gh<_i56.ProfileRemoteSource>(),
-      networkInfo: gh<_i172.NetworkInfo>(),
-      autoMapper: gh<_i369.AutoMapper>(),
-      storage: gh<_i172.DataStorage>(),
-    ),
-  );
-  gh.lazySingleton<_i624.SettingsAccountCubit>(
-    () => _i624.SettingsAccountCubit(gh<_i945.AuthActions>()),
-  );
-  gh.factory<_i802.NotificationApiService>(
-    () => _i802.NotificationApiServiceImpl(
-      gh<_i361.Dio>(),
-      gh<_i369.AppConfig>(),
-    ),
-  );
-  gh.factory<_i482.SettingsRepository>(
-    () => _i1020.SettingsRepositoryImpl(
-      localSource: gh<_i1037.SettingsLocalSource>(),
-      remoteSource: gh<_i1037.SettingsRemoteSource>(),
-      networkInfo: gh<_i172.NetworkInfo>(),
-      autoMapper: gh<_i369.AutoMapper>(),
-      storage: gh<_i172.DataStorage>(),
-    ),
-  );
-  gh.factory<_i315.PaywallCubit>(
-    () => _i315.PaywallCubit(
-      gh<_i709.BillingClient>(),
-      gh<_i369.AppConfig>(),
-      gh<_i452.SubscriptionCubit>(),
-    ),
-  );
   gh.lazySingleton<_i544.ChangePasswordUseCase>(
     () => _i544.ChangePasswordUseCase(gh<_i63.AuthRepository>()),
   );
@@ -411,6 +392,43 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i500.SignUpUseCase>(
     () => _i500.SignUpUseCase(gh<_i63.AuthRepository>()),
   );
+  gh.factory<_i1017.ProfileRepository>(
+    () => _i537.ProfileRepositoryImpl(
+      localSource: gh<_i56.ProfileLocalSource>(),
+      remoteSource: gh<_i56.ProfileRemoteSource>(),
+      networkInfo: gh<_i172.NetworkInfo>(),
+      autoMapper: gh<_i369.AutoMapper>(),
+      storage: gh<_i172.DataStorage>(),
+    ),
+  );
+  gh.lazySingleton<_i624.SettingsAccountCubit>(
+    () => _i624.SettingsAccountCubit(gh<_i945.AuthActions>()),
+  );
+  gh.factory<_i802.NotificationApiService>(
+    () => _i802.NotificationApiServiceImpl(
+      gh<_i361.Dio>(),
+      gh<_i369.AppConfig>(),
+    ),
+  );
+  gh.lazySingleton<_i358.ChangePasswordCubit>(
+    () => _i358.ChangePasswordCubit(gh<_i63.ChangePasswordUseCase>()),
+  );
+  gh.factory<_i482.SettingsRepository>(
+    () => _i1020.SettingsRepositoryImpl(
+      localSource: gh<_i1037.SettingsLocalSource>(),
+      remoteSource: gh<_i1037.SettingsRemoteSource>(),
+      networkInfo: gh<_i172.NetworkInfo>(),
+      autoMapper: gh<_i369.AutoMapper>(),
+      storage: gh<_i172.DataStorage>(),
+    ),
+  );
+  gh.factory<_i315.PaywallCubit>(
+    () => _i315.PaywallCubit(
+      gh<_i709.BillingClient>(),
+      gh<_i369.AppConfig>(),
+      gh<_i452.SubscriptionCubit>(),
+    ),
+  );
   gh.lazySingleton<_i341.SignUpCubit>(
     () => _i341.SignUpCubit(gh<_i63.SignUpUseCase>()),
   );
@@ -421,6 +439,9 @@ Future<_i174.GetIt> init(
   );
   gh.lazySingleton<_i316.GetSettingsUseCase>(
     () => _i316.GetSettingsUseCase(gh<_i482.SettingsRepository>()),
+  );
+  gh.lazySingleton<_i172.EmailOtpRepository>(
+    () => _i499.EmailOtpRepositoryImpl(gh<_i455.EmailOtpApiService>()),
   );
   gh.lazySingleton<_i330.ForgotPasswordCubit>(
     () => _i330.ForgotPasswordCubit(gh<_i63.ForgotPasswordUseCase>()),
@@ -475,8 +496,8 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i386.GetPaywallUseCase>(
     () => _i386.GetPaywallUseCase(gh<_i602.PaywallRepository>()),
   );
-  gh.lazySingleton<_i358.ChangePasswordCubit>(
-    () => _i358.ChangePasswordCubit(gh<_i63.ChangePasswordUseCase>()),
+  gh.lazySingleton<_i744.EmailOtpUseCase>(
+    () => _i744.EmailOtpUseCase(gh<_i172.EmailOtpRepository>()),
   );
   gh.lazySingleton<_i641.HomeCubit>(
     () => _i641.HomeCubit(gh<_i721.GetRecentProductsUseCase>()),
@@ -489,6 +510,9 @@ Future<_i174.GetIt> init(
       autoMapper: gh<_i369.AutoMapper>(),
       storage: gh<_i172.DataStorage>(),
     ),
+  );
+  gh.factory<_i789.EmailOtpCubit>(
+    () => _i789.EmailOtpCubit(gh<_i744.EmailOtpUseCase>()),
   );
   gh.lazySingleton<_i81.GetNotificationUseCase>(
     () => _i81.GetNotificationUseCase(gh<_i841.NotificationRepository>()),

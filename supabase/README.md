@@ -277,3 +277,16 @@ billing and Premium remain disabled; Edge lookup and Cron activation are separat
 testing. See [hosted lookup evidence](../docs/PICKWELL_PRODUCT_LOOKUP.md#hosted-deployment-and-live-validation--2026-11-02).
 The conservative shared network throttle remains in use; automatic retention and
 physical-device validation remain outstanding. Normal inference and billing are off.
+
+## Contribution authorization gate (T04.2)
+
+`authorize-analysis` is deployed as a POST-only auth preflight with JWT gateway
+verification and an independent Auth user lookup. It requires confirmed email and
+`is_anonymous=false`, rejects client identity/verification fields, and returns only
+`status=authorized`. It needs only injected Supabase URL/anon configuration; it
+performs no DB writes, uploads, usage reservation, billing or inference.
+
+`_shared/analysis_authorization.mjs` exports `requireVerifiedEmail` for T05's actual
+submission handler. That handler must recheck identity; a prior preflight response
+or a client flag grants no submission capability. See
+[Email OTP evidence](../docs/PICKWELL_EMAIL_OTP_GATE.md).

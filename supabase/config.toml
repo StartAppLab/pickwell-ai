@@ -306,3 +306,8 @@ verify_jwt = true
 # Guest-capable read-only lookup: handler verifies any supplied session itself.
 [functions.get-product]
 verify_jwt = false
+
+# T04.2 auth-only preflight. Handler independently validates JWT with Auth and
+# confirmed non-anonymous email. No inference/data write is exposed.
+[functions.authorize-analysis]
+verify_jwt = true

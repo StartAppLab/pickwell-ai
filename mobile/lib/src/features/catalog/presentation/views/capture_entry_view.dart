@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
 import '../../domain/entities/label_photo.dart';
 import '../blocs/catalog/label_capture_cubit.dart';
@@ -100,6 +101,22 @@ class CaptureEntryView extends StatelessWidget {
                     Text(l.pkCaptureReviewHint),
                     Gap(d.spacingSm),
                     Text(l.pkCaptureSubmissionPending),
+                    Gap(d.spacingMd),
+                    FilledButton(
+                      onPressed: state.busy
+                          ? null
+                          : () async {
+                              final authorized = await context.push<bool>(
+                                '/capture-auth/${state.barcode}',
+                              );
+                              if (context.mounted && authorized == true) {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(l.pkAnalysisPending)));
+                              }
+                            },
+                      child: Text(l.pkAnalyzeProduct),
+                    ),
                   ],
                   Gap(d.spacingMd),
                   Text(l.pkCapturePrivacy),

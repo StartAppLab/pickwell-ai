@@ -115,3 +115,5 @@ export async function readPublishedProduct(env, canonicalBarcode, fetcher = fetc
   if (!Array.isArray(rows)) throw new Error('invalid_server_shape');
   return rows.length ? sanitizePublishedProduct(rows[0]) : null;
 }
+
+export { jsonBody as readBoundedJson };

@@ -494,3 +494,24 @@ After a full build_runner run, generate formatted Home state with:
 fvm dart run build_runner build --define=freezed:freezed=format=true --build-filter=lib/src/features/home/presentation/blocs/home/home_cubit.freezed.dart
 fvm flutter test --no-pub test/catalog test/app_config_security_test.dart
 ```
+
+## Pickwell contribution Email OTP
+
+After both label photos, **Analyze Product** opens the contextual Email OTP gate.
+Use `AUTH_MODE=optional` so Home/scanning/published lookup stay guest-accessible.
+The default reusable template configuration remains disabled until configured.
+
+The gate uses the existing Supabase client/session persistence, passwordless
+`signInWithOtp` for send/resend and `verifyOTP(type: email)` for verification.
+Configure the Supabase Magic Link email template to include `{{ .Token }}` for a
+numeric code. The existing Pickwell cloud project was verified with **8 digits**,
+a one-minute send interval and a 30-email/hour project limit. Both legacy 6-digit
+and current 8-digit input are supported; server settings decide which is valid.
+No SMTP credentials or server secrets belong in Flutter configuration.
+
+`authorize-analysis` is an auth-only preflight that independently checks the trusted
+Auth user for a confirmed, non-anonymous email. It returns no reusable capability,
+identity or Premium flag. It does not upload photos, reserve quota or call Meta.
+T05's actual submission endpoint must invoke the shared verified-email guard again.
+See [T04.2 evidence](../docs/PICKWELL_EMAIL_OTP_GATE.md) for live verification and
+remaining full-submission/device acceptance.
