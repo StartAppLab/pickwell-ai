@@ -7,3 +7,6 @@
 !**/.env.*.example
 **/.secrets/
 **/.fvm/
+
+# Private real food-label inputs for the Meta feasibility test.
+/test_fixtures/meta_vision/

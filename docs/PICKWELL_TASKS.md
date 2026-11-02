@@ -60,10 +60,12 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T01.1 Supabase → Meta vision proof of concept
 
-- [ ] Deploy a narrowly scoped, non-public or separately protected test Edge Function that sends **two real food-package photos** (nutrition and ingredients) to the selected Meta vision model.
+- [x] Deploy a narrowly scoped, non-public or separately protected test Edge Function that sends **two real food-package photos** (nutrition and ingredients) to the selected Meta vision model.
 - [ ] Validate authentication/authorization, request format, model availability, response schema, per-image behavior, max input size, duration, provider token/cost reporting, timeout and failure modes.
 - [ ] Test at least two clearly different product pairs and one unreadable label. Demand null/unknown rather than fabricated values; evaluate image basis/units.
-- [ ] Remove or lock down temporary spike endpoint after use; retain tests/fixtures with non-sensitive sample data.
+- [x] Remove or lock down temporary spike endpoint after use; retain tests/fixtures with non-sensitive sample data.
+
+**2026-11-02 — PARTIAL:** [Live spike evidence](PICKWELL_META_VISION_SPIKE.md). Verified Email OTP, protected hosted multi-image Meta calls and post-trial disabled-state/token rotation. Product A nutrition and Product B ingredients extracted in diagnostic candidates; their other labels requested retakes, so complete two-product extraction did not pass. The supplied third image passed a mismatch-retake test; genuinely unreadable testing is deferred by user direction. Eleven local tests pass. Original full T01.1 acceptance remains unmet; no later phase started.
 
 **Acceptance:** Actual live Meta call returns structured ingredient and nutrient extraction from two photos; unreadable sample fails safely. Capture measured real latency/tokens and blocked constraints.  
 **Targeted validation:** One real API integration script/test, explicit invalid-image case, model access and secret-leak check.  

@@ -79,7 +79,8 @@ test('two labeled images use documented request format and usage is sanitized', 
   assert.equal(result.metadata.estimated_cost_usd, null);
   const outbound = JSON.parse(calls[1].options.body);
   assert.equal(calls[1].url, META_URL); assert.equal(outbound.store, false);
-  assert.equal(outbound.max_completion_tokens, 2048);
+  assert.equal(outbound.max_completion_tokens, 4096);
+  assert.equal(outbound.reasoning_effort, 'minimal');
   assert.equal(outbound.messages[1].content.filter(part => part.type === 'image_url').length, 2);
   assert.equal(calls[1].options.headers.Authorization, `Bearer ${env.META_API_KEY}`);
   assert.equal(calls[0].options.headers.Authorization, 'Bearer fixture.header.signature');
@@ -111,6 +112,8 @@ test('unreadable and unknown basis request retake without returning partial fact
   const result = await (await handler(request())).json();
   assert.equal(result.status, 'needs_retake'); assert.deepEqual(result.retake, ['ingredients']);
   assert.equal(result.ingredients, undefined);
+  assert.equal(result.diagnostic_extraction.status, 'needs_retake');
+  assert.equal(result.diagnostic_extraction.ingredients.raw, null);
   const unknown = extraction(); unknown.nutrition.basis = 'unknown';
   assert.deepEqual(parseExtraction(unknown), { status: 'needs_retake', retake: ['nutrition'] });
 });

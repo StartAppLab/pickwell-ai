@@ -1,5 +1,5 @@
 // Operator-only live integration runner. No Meta key is needed on this client.
-import { readFile } from 'node:fs/promises';
+import { readFile, open } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { validateImage, MAX_IMAGE } from './core.mjs';
 
@@ -38,24 +38,32 @@ async function main() {
     throw new Error('The first two cases must use distinct product pairs');
   }
   let passed = true;
-  for (let index = 0; index < cases.length; index++) {
-    const response = await fetch(url, {
-      method: 'POST', redirect: 'error', signal: AbortSignal.timeout(45000),
-      headers: { Authorization: `Bearer ${SPIKE_USER_JWT}`, apikey: SPIKE_PUBLISHABLE_KEY,
-        'x-spike-token': SPIKE_OPERATOR_TOKEN, 'content-type': 'application/json' },
-      body: JSON.stringify({ idempotency_key: crypto.randomUUID(),
-        nutrition_image: cases[index][0], ingredients_image: cases[index][1] }),
-    });
-    const result = await response.json();
-    const matches = response.ok && result.status === expected[index];
-    passed &&= matches;
-    // Print an allowlisted receipt, not raw model content, images or credentials.
-    console.log(JSON.stringify({ case: index + 1, http_status: response.status, passed: matches,
-      status: ['extracted', 'needs_retake'].includes(result.status) ? result.status : 'failed',
-      basis: result.nutrition?.basis ?? null, nutrient_count: result.nutrition?.nutrients?.length ?? 0,
-      retake: result.retake, metadata: result.metadata }));
-    if (!response.ok) break; // No automatic retry or continued spending after errors.
-  }
+  // Optional private evidence for manual comparison with labels; never log raw
+  // provider responses or images. Refuse to overwrite an existing evidence file.
+  const evidence = process.env.SPIKE_EVIDENCE_PATH
+    ? await open(process.env.SPIKE_EVIDENCE_PATH, 'wx', 0o600) : null;
+  try {
+    for (let index = 0; index < cases.length; index++) {
+      const response = await fetch(url, {
+        method: 'POST', redirect: 'error', signal: AbortSignal.timeout(45000),
+        headers: { Authorization: `Bearer ${SPIKE_USER_JWT}`, apikey: SPIKE_PUBLISHABLE_KEY,
+          'x-spike-token': SPIKE_OPERATOR_TOKEN, 'content-type': 'application/json' },
+        body: JSON.stringify({ idempotency_key: crypto.randomUUID(),
+          nutrition_image: cases[index][0], ingredients_image: cases[index][1] }),
+      });
+      const result = await response.json();
+      const matches = response.ok && result.status === expected[index];
+      passed &&= matches;
+      if (evidence) await evidence.writeFile(JSON.stringify({ case: index + 1,
+        http_status: response.status, result }) + '\n');
+      // Print an allowlisted receipt, not raw model content, images or credentials.
+      console.log(JSON.stringify({ case: index + 1, http_status: response.status, passed: matches,
+        status: ['extracted', 'needs_retake'].includes(result.status) ? result.status : 'failed',
+        basis: result.nutrition?.basis ?? null, nutrient_count: result.nutrition?.nutrients?.length ?? 0,
+        retake: result.retake, metadata: result.metadata }));
+      if (!response.ok) break; // No automatic retry or continued spending after errors.
+    }
+  } finally { await evidence?.close(); }
   if (!passed) process.exitCode = 1;
 }
 

@@ -191,7 +191,8 @@ export function createHandler(env, fetcher = fetch) {
           method: 'POST', redirect: 'error', signal: AbortSignal.timeout(30000),
           headers: { Authorization: `Bearer ${env.META_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: env.META_MODEL, max_completion_tokens: 2048, stream: false, store: false,
+            model: env.META_MODEL, max_completion_tokens: 4096, reasoning_effort: 'minimal',
+            stream: false, store: false,
             response_format: { type: 'json_schema', json_schema: {
               name: 'label_extraction_v1', strict: true, schema: extractionSchema,
             } },
@@ -209,6 +210,8 @@ export function createHandler(env, fetcher = fetch) {
         metadata.provider_status = response.status;
         if (!response.ok) fail(response.status === 429 ? 'provider_rate_limited' : 'provider_failed', 502);
         const result = await readJson(response.body, 65536);
+        metadata.finish_reason = ['stop', 'length', 'content_filter', 'tool_calls']
+          .includes(result.choices?.[0]?.finish_reason) ? result.choices[0].finish_reason : null;
         const usage = result.usage;
         if (Number.isSafeInteger(usage?.prompt_tokens) && usage.prompt_tokens >= 0 &&
             Number.isSafeInteger(usage?.completion_tokens) && usage.completion_tokens >= 0) {
@@ -221,7 +224,11 @@ export function createHandler(env, fetcher = fetch) {
         let extracted;
         try { extracted = JSON.parse(result.choices[0].message.content); }
         catch { fail('invalid_model_output', 502); }
-        return json({ ...parseExtraction(extracted), metadata: {
+        return json({ ...parseExtraction(extracted),
+          // Operator-only spike diagnostics: schema-validated candidate facts,
+          // never a published product. The runner saves these privately and
+          // omits them from console receipts, including when retake is required.
+          diagnostic_extraction: extracted, metadata: {
           ...metadata, duration_ms: Math.round(performance.now() - started),
         } });
       } finally { metadata.duration_ms = Math.round(performance.now() - started); }
