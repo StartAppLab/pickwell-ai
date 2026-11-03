@@ -1,8 +1,8 @@
 # PICKWELL AI V2 — SUPABASE DATABASE & BACKEND DATA DESIGN
 
-**Version:** 1.0 · **Date:** 2026-11-02 · **Repository:** `pickwell-ai`  
-**Source of truth:** `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2.  
-**Status:** Implementation blueprint, **not deployed SQL**. Migration and deployment require verification against the actual project, schema linting and transactional tests.  
+**Version:** 1.1 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
+**Source of truth:** `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3.\
+**Status:** Original illustrative SQL remains a blueprint; later implementation references and TASKS record actual migrations/verification. Section 16 is proposed data design only. This revision creates/applies no SQL migration and makes no deployment claim.\
 **Goal:** Shared barcode product catalog, authenticated Meta AI contributions, server-enforced adjustable daily quotas, RevenueCat-ready Premium entitlements, no active purchase flow.
 
 ## 1. Product rules / schema invariants
@@ -401,3 +401,35 @@ refresh is a no-op; stale different-version writes fail. Invalidated products ca
 be silently refreshed. No usage reservation, provider call, user allowance or old
 revision is modified. The operator CLI defaults to dry run. This is intentionally
 not a public refresh endpoint. See [interpretation evidence](PICKWELL_INTERPRETATION.md).
+
+
+## 16. Planned product trust and Product Passport data contract (2026-11-04)
+
+**Documentation only:** Reuse existing products, immutable product analyses/findings, current-revision pointer, jobs, provenance and interpretation refresh. Do not add parallel catalog tables, rewrite historical migrations or treat illustrative fields below as deployed schema. Audit actual schema/RPCs before any later migration. [TASKS](PICKWELL_TASKS.md) owns the implementation gates.
+
+### 16.1 Pre-submission audit and conditional mitigation — T07.1B/C/D
+
+Review unique canonical barcode behavior, barcode/image association, cross-photo identity observations, candidate validation and transaction boundaries, expected-current-revision checks, trusted-record replacement, contributor privileges, duplicate jobs and concurrent publication. Include reformulations/barcode reuse, missing evidence, schema-valid poisoned input and repeated abuse. Record demonstrated safeguards/gaps separately from proposed fixes. T07.1C may introduce only critical audited, tested controls; any necessary migration belongs to that later implementation task. T07.1D must verify duplicates/races/rollback, no public writes, safe public projection and exactly-once quota settlement without exposing photos or emails.
+
+### 16.2 Post-submission logical extensions — not implemented
+
+| Concern | Planned minimal information | Rules |
+| --- | --- | --- |
+| T08.1 Passport identity | Observed name/brand/variant/package size with source, normalized barcode, current revision and explicit unknowns | Label observations are not independently verified identity. Preserve existing IDs and explain missing/conflicting evidence. |
+| Validation dimensions | Schema/content validation result; extraction uncertainty; cross-photo consistency; identity verification method/result and evidence references, when actually performed | Store dimensions separately. No model-derived identity certificate or invented numeric confidence. Publication `ready` does not mean identity verified. |
+| Provenance/revisions | Source type, minimal observed identity text, relevant evidence excerpts, model/prompt/rule/reference versions, timestamps, revision parent/reason and privileged change attribution | Immutable accepted revisions; retain only necessary non-image data. Do not copy entire request bodies, tokens or contributor emails into public data. |
+| T08.2 comparison | References to the exact two accepted revisions, original quantities/units/bases and deterministic normalization-rule version | Derived comparison may be computed on demand; no new history table by default. Missing data remains non-comparable; no unsafe mass/volume assumptions. |
+| T08.3 identity/disputes | Conditional evidence request result, conflict/dispute status, method/reviewer decision and formulation/revision relationship | Plan server-only transitions and explicit authority. A claim/report is not permission to overwrite a trusted row. One current barcode resolution remains; reused codes require explicit conflict/formulation handling. |
+| T08.4 investigator | Allowlisted action type, targeted field/photo, bounded request state, attempt/expiry/budget metadata | Authenticated owner-scoped jobs; only backend can accept an action or advance validation. Do not persist full conversations or photos as an audit substitute. |
+
+Choose concrete column names/enums, retention limits and compatibility migrations only during those tasks after reviewing the deployed schema. Unknown/unverified, conflicting and actually verified identity need distinct semantics, even if implemented through existing JSON provenance rather than new tables. A model's assertion must never set independent verification status.
+
+### 16.3 Publication and privacy invariants to preserve
+
+- A validated JSON schema alone does not establish barcode/package identity. Future policy checks must execute server-side before the atomic `ready` transition, with concurrency-safe revision expectations; clients cannot supply trusted status or contributor overwrite rights.
+- Failed/rejected/duplicate analysis must not consume an extra successful-analysis allowance; provider spend remains separately recorded. Regular cached reads do not call Meta. Authenticated new analyses and guest cached lookup remain unchanged.
+- Delete submitted nutrition, ingredients and future front-package images after processing; temporary storage only when justified, private and expiry-cleaned. Pending device recovery stays bounded at five drafts/24 hours, cleared on completed submission. No permanent photo evidence repository or public contributor email. Retain only justified minimal non-image provenance; an image hash, if later justified, cannot prove identity by itself.
+- Future disputes/formulation changes preserve historical revisions rather than silently altering extracted facts. Sanitized public projections need review for each newly exposed field; private abuse/reviewer/account identifiers stay server-only with access and retention limits.
+- CKD context does not require patient/diagnosis/prescription tables. T06.3 remains deferred; billing disabled. No entitlement or plan change is part of this roadmap update.
+
+**v1.1:** Added planned trust/Passport data boundaries; no SQL or deployment changes.

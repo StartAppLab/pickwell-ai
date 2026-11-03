@@ -1,12 +1,16 @@
 # PICKWELL AI V2 — AGENT PROMPTS
 
-**Version:** 1.1 — Final lemon interface reconciled  
-**Date:** 2026-11-02  
-**Sources:** PRD v1.4, DESIGN v1.2, SPEC v1.2, DATABASE v1.0, TASKS v1.1, AGENTS v1.0.
+**Version:** 1.2 — Trust gates and post-submission roadmap\
+**Date:** 2026-11-04\
+**Sources:** PRD v1.5, DESIGN v1.3, SPEC v1.3, DATABASE v1.1, TASKS v1.2 and actual applicable repository `AGENTS.md`.
 
 ## Usage
 
-Standalone copy/paste prompts for every approved `TASKS.md` implementation item. Start at T00.1 unless repository evidence confirms completion, then follow task prerequisites. **No code has been implemented** by generating these prompts. Repository and live Meta API access remain unverified. Existing project `AGENTS.md` must be merged with generated Pickwell rules, not overwritten blindly.
+Standalone copy/paste prompts for every approved `TASKS.md` implementation item. Start at T00.1 unless repository evidence confirms completion, then follow task prerequisites. Generating a prompt does not implement its task. Current completed implementation, live evidence and T07.1 QA are recorded in TASKS and the linked evidence reports; old prompts are not proof that prerequisites remain unfinished. Existing project `AGENTS.md` must be merged with generated Pickwell rules, not overwritten blindly.
+
+**2026-11-04 roadmap authority:** Follow current PRD/SPEC/DATABASE/TASKS rather than stale assumptions in older prompt boilerplate. Preserve completed T07.1. T07.1A UI polish has implementation evidence with remaining visual review; use [UI polish report](PICKWELL_UI_POLISH.md) to finish only outstanding work. Run T07.1B audit before T07.1C critical fixes, then T07.1D before T07.2. T08.1–T08.4 are post-submission only. T06.3 remains deferred, billing disabled; T06.4 is optional. Owner-approved cloud testing allowances remain 1,000/100; baseline production policy is 30/3. Do not reset live limits without authorization or mistake test configuration for production readiness.
+
+**Trust and mission:** Pickwell is an evidence-aware consumer product intelligence and transparency platform for Filipinos, including everyday nutrition awareness and CKD-related concerns. No medical advice, diagnosis, food safety certification, personalized dietary prescriptions, invented confidence scores or unperformed identity verification. Schema validity, model uncertainty, cross-photo consistency and barcode/package identity are different questions. Preserve guest cached lookup, verified new analyses, the approved UI, server-only Meta, no inference on ordinary cache hits and image deletion with existing bounded private draft recovery. Retain only justified minimal non-image provenance.
 
 ## T00.1 — Inspect actual repo, docs and environment
 
@@ -14,7 +18,7 @@ Standalone copy/paste prompts for every approved `TASKS.md` implementation item.
 TASK: Pickwell AI V2 — T00.1: Inspect actual repo, docs and environment
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -51,7 +55,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T00.2: Configure secret-safe dev environment
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -90,7 +94,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T01.1: Supabase → Meta vision proof of concept
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -131,7 +135,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T02.1: Migrations for shared catalog and analysis jobs
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -169,7 +173,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T02.2: RLS and least-privilege boundary
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -207,7 +211,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T02.3: Plan config, quotas, reservations, and spend controls
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -246,7 +250,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T02.4: Operational events and cost ledger
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -285,7 +289,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T03.1: Implement `get-product` backend endpoint
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -322,7 +326,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T03.2: Flutter scanner/home and lookup UX
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -363,7 +367,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T03.3: Local recent-products Home index and search (P0 recent index / P1 filtering polish)
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -403,7 +407,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T04.1: Three-step nutrition + ingredients photo capture
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -441,7 +445,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T04.2: Email OTP auth and submission gate
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -481,7 +485,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T05.1: `analyze-product` secure job orchestration
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -519,7 +523,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T05.2: Extract, interpret and validate
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -558,7 +562,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T05.3: Publish product and securely dispose photos
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -598,7 +602,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T06.1: Product results and accountable findings (P0)
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -636,7 +640,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T06.2: Remaining usage and quota-exceeded states (P0)
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -674,7 +678,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T06.3: Premium-ready entitlement tables and RevenueCat webhook safety (P0 backend design; deploy only when prerequisites satisfied)
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -714,7 +718,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T06.4: Settings/account & minimal operational UI (P1)
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -752,7 +756,7 @@ Report task ID, exact modified files, work completed, commands/tests run with AC
 TASK: Pickwell AI V2 — T07.1: End-to-end acceptance and security pass
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
+- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3, and `PICKWELL_DATABASE.md` v1.1. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
 - Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
 
 LOCKED PRODUCT / ARCHITECTURE
@@ -788,39 +792,285 @@ COMPLETION REPORT
 Report task ID, exact modified files, work completed, commands/tests run with ACTUAL observed outcomes, pending credentials/device or UI assets, security/privacy/cost implications, remaining blockers, and which TASKS checkbox(es) were verified. Never mark incomplete tasks done.
 ```
 
+## T07.1B — Product Identity & Data Integrity Audit
+
+```text
+TASK: Pickwell AI V2 — T07.1B: Product Identity & Data Integrity Audit
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T07.1B (pre-submission) and directly necessary prerequisites after checking its dependencies. This is an audit/report task: do not implement fixes, migrations or deployments. Stop with evidence and a minimal mitigation plan.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** Pre-submission P0 audit; NOT STARTED. Depends on completed T07.1 and the current T07.1A implementation baseline. Finish remaining UI review before the final release gate.
+
+- [ ] Audit barcode belonging to Product A with photos belonging to Product B; conflicting nutrition/ingredient images; inconsistent names, brands, variants and package sizes.
+- [ ] Trace schema-valid publication with missing/unverifiable identity evidence, trusted-record overwrite paths, and the distinction between model uncertainty, cross-photo consistency and actual identity verification.
+- [ ] Audit simultaneous submissions/publication races, duplicate barcodes, reformulations and barcode reuse; distinguish current tested safeguards from untested assumptions.
+- [ ] Evaluate deliberate data poisoning, prompt injection in labels and repeat abuse without bypassing auth/RLS or exposing secrets/image payloads.
+- [ ] Produce an evidence-based report with actual code/schema paths, reproducible observations, severity, affected paths, unknowns and a minimal safe mitigation plan for T07.1C; do not implement protections in the audit task.
+
+**Acceptance:** Every listed threat has an evidence-backed finding or explicit unverified result; critical risks and the smallest safely testable mitigations are identified. Schema validity or model certainty is never reported as barcode/package verification.
+
+**Targeted validation:** Targeted adversarial fixtures and transaction/concurrency inspection or isolated tests; record observed outcomes and evidence gaps. No destructive production experiments or unapproved paid calls.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+## T07.1C — Minimum Product Trust Protection
+
+```text
+TASK: Pickwell AI V2 — T07.1C: Minimum Product Trust Protection
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T07.1C (pre-submission) and directly necessary prerequisites after checking its dependencies. Implement only critical audit-backed protections that can be safely verified before submission; document blockers rather than waive them. Do not build Phase 8.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report and prioritized critical findings.
+
+- [ ] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
+- [ ] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
+- [ ] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
+- [ ] Preserve guest cached lookup, two-label capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
+- [ ] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
+
+**Acceptance:** Each critical audit finding has a verified mitigation or an explicit release-blocking/restricted-path disposition; no false identity assurance or unsafe trusted-record overwrite. Deadline pressure does not waive a P0 blocker.
+
+**Targeted validation:** Reproduce each critical case before/after; negative auth/RLS, concurrent publication/idempotency, quota rollback, photo disposal and sanitized cache projection tests for affected paths.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+## T07.1D — Targeted Regression and Release Gate
+
+```text
+TASK: Pickwell AI V2 — T07.1D: Targeted Regression and Release Gate
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T07.1D (pre-submission) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** Pre-submission P0 gate; NOT STARTED. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+
+- [ ] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
+- [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
+- [ ] Verify identity/conflict protections from the audit, races/duplicates, trusted revision protection, auth/RLS, quota settlement, rate/spend controls and absence of secret/PII/image leaks.
+- [ ] Check affected UI/navigation/accessibility and owner/device observations. Record exact deployed/configured version and testing versus production limits; preserve owner-approved 1,000/100 testing allowances unless changed explicitly, and require 30/3 restoration before production public release.
+- [ ] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
+
+**Acceptance:** Affected end-to-end and security/privacy paths have recorded results, no regressions against T07.1, and no known unresolved P0 blockers. Untested capabilities are explicitly excluded/restricted; the approved deployment profile is clear.
+
+**Targeted validation:** Run affected integration/regression suites and necessary live/device checks; distinguish automated, provider, hosted and owner-reported evidence. Broaden regression only when impact requires it.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
 ## T07.2 — Hackathon submission handoff
 
 ```text
 TASK: Pickwell AI V2 — T07.2: Hackathon submission handoff
 
 READ FIRST
-- Inspect real repository `AGENTS.md`, `PICKWELL_TASKS.md`, `PICKWELL_PRD.md` v1.4, `PICKWELL_DESIGN.md` v1.2, `PICKWELL_SPEC.md` v1.2, and `PICKWELL_DATABASE.md` v1.0. Locate filenames by role if placed in another directory. Follow nested repo instructions; preserve uncommitted edits.
-- Inspect actual implementation and prerequisites; check earlier completed work before changing anything. Task checkboxes are not proof of incompletion.
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
 
 LOCKED PRODUCT / ARCHITECTURE
-- Pickwell AI V2 (`pickwell-ai`) is a lasting Flutter iOS/Android app. Reuse existing StartAppLab template, Cubit/Bloc conventions, routes, deps and theme; never invent repo paths or assets.
-- Barcode-first, guest cached lookup; three-step Barcode ✓ → Nutrition → Ingredients for unknown products; verified Supabase Email OTP required to submit new Meta vision analysis. Supabase Edge Functions/PostgreSQL secure AI and writes.
-- Backend controls Free 30 signed-in barcode lookups/day and 3 successful new-product analyses/day, UTC reset, guest best-effort limits, per-user/IP and spend controls. RevenueCat backend-ready only with billing disabled and no paywall.
-- Approved UI: whole lemon logo, 60/30/10 cream/white + greens + restrained yellow. Home is local recently viewed/scanned **product cards**, expandable top-right search, All/Food/Newest filters, independent rightmost scan icon and glass-like Home/Settings dock. Hide Chat/cosmetics from working hackathon nav; no list/grid or Recently scanned heading. Details has no bottom nav or Pickwell header title; no numeric score or Add to List. Use truthful images or placeholders; no image generation.
-- Future-only: cosmetic analysis, chat, food score, global discovery, collections, cloud history, active monetization, premium storefront, extensive onboarding. No unauthorized Supabase writes, secrets in app, permanently retained label photos or false health claims.
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
 
 SCOPE / IMPLEMENT
-Implement ONLY T07.2 and directly required prerequisites, using actual repo patterns. Preserve existing features and don't refactor unrelated modules. For backend logic, validate types, RLS/JWT, quotas and idempotency. For Flutter UI, match approved DESIGN rather than earlier generated screenshots. Don't claim hardware/provider/deployment tests if not done.
+Work ONLY on T07.2 (pre-submission) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
 
 EXACT TASK REQUIREMENTS
+**Status / dependencies:** Pre-submission handoff; NOT STARTED. Depends on T07.1D release sign-off; optional T06.4 must be explicitly implemented or deferred, never silently treated as complete.
+
 - [ ] Record a truthful ≤3-minute demo using actual working flows and confirmed Meta model; don't misrepresent mock responses as live.
 - [ ] Capture quick technical explanation: shared barcode cache, two-image Meta analysis, rule-based findings, safe retries/auth/quotas.
 - [ ] Prepare public GitHub repository/submission materials according to verified organizer instructions while removing secrets and sensitive credentials.
 - [ ] Verify organizer deadline and upload requirements directly before final submission.
+- [ ] Document which functionality was built during the hackathon, which template/pre-existing work was reused, actual limitations and proposed-only roadmap; do not claim medical certification, independent identity verification or unbuilt T08 capabilities.
+- [ ] Verify the public repository is runnable from documented clean setup with safe environment examples, prerequisites and deployment/test instructions; ensure the genuine three-minute demo reflects the submitted revision and approved organizer duration rules.
 
-**Acceptance:** Public demonstration and repository reflect actual product; submission checklist and proof of Meta integration are complete.
+**Acceptance:** Public demonstration and repository reflect actual product; submission checklist and proof of Meta integration are complete. Hackathon-built functionality is accurately identified, the public repository has a verified runnable setup, and a genuine three-minute demo is supplied within organizer rules.
 
-ACCEPTANCE
-Meet each listed checkbox/observable condition and the task's stated acceptance criteria. Identify genuine unverified prerequisites or blocked cases rather than declaring success.
-
-TARGETED VALIDATION
-Run tests relevant to touched code and directly affected dependencies; negative authorization and concurrency tests for security-sensitive backend changes; real device photo/barcode checks when available. No blanket project-wide regression except the dedicated T07.1 release QA task.
+**Targeted validation:** Clean documented setup/run check, public repository secret/privacy/license review, demo-to-revision comparison and direct verification of organizer requirements. Record upload/submission evidence without exposing credentials.
 
 COMPLETION REPORT
-Report task ID, exact modified files, work completed, commands/tests run with ACTUAL observed outcomes, pending credentials/device or UI assets, security/privacy/cost implications, remaining blockers, and which TASKS checkbox(es) were verified. Never mark incomplete tasks done.
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
 ```
+
+## T08.1 — Product Passport
+
+```text
+TASK: Pickwell AI V2 — T08.1: Product Passport
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T08.1 (post-submission only) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T07.2 and T07.1B–D evidence; existing cache/provenance/revisions are reusable foundations, not full Passport completion.
+
+- [ ] Extend the existing product/analysis record into an evidence-aware reusable Product Passport with identity, nutrition, ingredients, provenance, validation state and revision history; avoid a parallel catalog rewrite.
+- [ ] Distinguish extracted facts and interpretations, model uncertainty, cross-photo consistency and actual identity verification method/result; preserve unknowns without invented scores or verified claims.
+- [ ] Expose a sanitized current record and revision context through existing guest-safe reads; keep new analyses authenticated and normal barcode lookups free of model calls.
+- [ ] Retain model/prompt/rule/reference versions and justified minimal non-image provenance; preserve immutable accepted history, privileged correction/invalidation, photo deletion and private contributor identifiers.
+- [ ] Present the Passport within approved Product Details patterns with accessible evidence/uncertainty; CKD-related information remains educational, never diagnosis, certification or personalized dietary prescriptions.
+
+**Acceptance:** A reusable published product exposes identity, structured facts, provenance, explicit validation/identity limits and navigable revision history without photos/PII or repeated lookup inference; existing flows remain intact.
+
+**Targeted validation:** Schema/API/projection/revision tests, unknown identity/partial labels, immutable correction, cache-hit zero-model regression and relevant Product Details widget tests.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+## T08.2 — Product Comparison
+
+```text
+TASK: Pickwell AI V2 — T08.2: Product Comparison
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T08.2 (post-submission only) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1. May proceed independently of T08.3 after the Passport contract is stable.
+
+- [ ] Compare two accepted Product Passport revisions using structured validated ingredients/nutrition and explicit product/variant/package identity context.
+- [ ] Normalize compatible units and serving/per-100g bases deterministically using versioned rules; preserve original values and show calculation basis.
+- [ ] Keep missing, ambiguous or incompatible quantities explicitly unknown/non-comparable; do not assume serving mass, density, added sugar or absent nutrients.
+- [ ] Present meaningful evidence-backed differences within the approved visual system; no numeric overall food score, unsupported health ranking, safety certification or personalized CKD suitability recommendation.
+- [ ] Reuse cached validated data and sources; do not trigger ordinary lookup/comparison AI calls or add account history, billing or unapproved services.
+
+**Acceptance:** Two products can be compared on compatible validated bases with reproducible normalization and explicit unknowns; incompatible data cannot produce a misleading ranking.
+
+**Targeted validation:** Unit/basis/serving conversion tests, mass/volume incompatibility, partial labels, total-versus-added-sugar cases, revision consistency and accessible comparison UI tests.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+## T08.3 — Enhanced Identity Verification
+
+```text
+TASK: Pickwell AI V2 — T08.3: Enhanced Identity Verification
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T08.3 (post-submission only) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1 and T07.1B/C findings. Does not require T08.2.
+
+- [ ] Introduce conditional front-package evidence and product identity cross-checks where current evidence is insufficient; keep the existing two-label path unless a justified additional request is needed.
+- [ ] Define identity methods, evidence requirements and explicit unknown/conflict/verified semantics; model uncertainty or a matching barcode format alone cannot establish verification.
+- [ ] Implement dispute resolution with authorized review and safe formulation/barcode-reuse handling; no contributor overwrite of trusted records or silent loss of prior revisions.
+- [ ] Validate new evidence and revision transitions server-side with auth/RLS, idempotency, concurrency protection and sanitized public status; preserve guest reads and authenticated contributions.
+- [ ] Delete processing/front-package photos after use and expire bounded pending drafts; retain only justified minimal non-image provenance, not permanent evidence images.
+
+**Acceptance:** Insufficient/conflicting identity requests appropriate conditional evidence, disputes/formulation changes preserve trusted history, and verified claims are tied to a defined performed method rather than a model guess.
+
+**Targeted validation:** Barcode A/photos B, variant/package-size conflicts, missing front evidence, disputes, reformulation/reuse, concurrent corrections and image cleanup/projection tests.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+## T08.4 — Agentic Label Investigator
+
+```text
+TASK: Pickwell AI V2 — T08.4: Agentic Label Investigator
+
+READ FIRST
+- Read root and applicable nested AGENTS.md, docs/PICKWELL_PRD.md v1.5, docs/PICKWELL_DESIGN.md v1.3, docs/PICKWELL_SPEC.md v1.3, docs/PICKWELL_DATABASE.md v1.1 and docs/PICKWELL_TASKS.md v1.2. Inspect actual implementation, git diff and existing evidence; preserve completed work.
+- Read docs/PICKWELL_END_TO_END_QA.md and docs/PICKWELL_UI_POLISH.md plus the audit/mitigation reports when available. Use the exact task contract below. Never treat a proposed roadmap feature as implemented.
+
+LOCKED PRODUCT / ARCHITECTURE
+- Preserve the Flutter/StartAppLab Cubit/Bloc conventions, approved lemon/cream/green UI, guest barcode cache reads, two-label capture and verified Email OTP for new analyses. No mandatory front-package step before its conditional future implementation.
+- Keep deterministic findings, Meta server-side, atomic publication/quotas/idempotency, image deletion after processing and bounded private pending drafts. Retain only justified minimal non-image provenance; never expose secrets, image payloads or contributor email.
+- Separate extraction/model uncertainty, cross-photo consistency and actual barcode/package identity verification. No invented confidence, medical advice, diagnosis, safety certification, personalized CKD prescriptions or overall health score.
+- T06.3 deferred, billing disabled; no paywalls, Chat, cosmetics, collections or unrelated refactors. Preserve owner-approved testing limits unless explicitly changed; document production 30/3 readiness separately.
+
+SCOPE / IMPLEMENT
+Work ONLY on T08.4 (post-submission only) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
+
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1 and T08.3 evidence/identity contracts; T08.2 is not required.
+
+- [ ] Allow Muse Spark to request specific additional evidence or clarifications through an allowlisted structured action contract; verify actual model access/capability before relying on it.
+- [ ] Deterministically validate each action server-side against user/job ownership, state, target field/photo, allowed reason, payload constraints and evidence policy; model output cannot authorize itself.
+- [ ] Bound rounds, retries, time, concurrency and provider spend; support cancel/expiry and safe resume without duplicate publication or successful-analysis credit charges.
+- [ ] Keep model requests server-side and user-visible, with no arbitrary tool/URL execution, autonomous publication, general chatbot or medical/personalized dietary recommendations.
+- [ ] Validate returned evidence through existing trusted publication rules; preserve transient photo disposal, minimal non-image provenance, cache reuse, approved UI and billing disabled.
+
+**Acceptance:** A bounded Muse Spark investigation requests and validates a specific missing piece of evidence and either produces an accountable result or stops safely; invalid actions and budget exhaustion cannot bypass backend policy.
+
+**Targeted validation:** Mock action/schema/state/ownership/prompt-injection tests, bounded-loop/cost/cancel/expiry tests and authorized real-model evidence-request integration; no success claim based only on mocks.
+
+COMPLETION REPORT
+Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
+```
+
+**v1.2 (2026-11-04):** Added audit/critical protection/release and post-submission prompts, synchronized their contracts with TASKS, retained historical prompts/completed-work evidence and updated read-first document versions. No implementation or new QA claimed.

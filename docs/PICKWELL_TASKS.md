@@ -1,8 +1,8 @@
 # PICKWELL AI V2 — IMPLEMENTATION TASKS
 
 **Document:** `PICKWELL_TASKS.md`  
-**Version:** 1.1 — Final lemon UI and local recents  
-**Date:** 2026-11-02  
+**Version:** 1.2 — Trust gates and post-submission product roadmap\
+**Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
 **Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
@@ -23,7 +23,10 @@ This section and the dated reconciliation notes below describe current status. E
 | T06.3 | DEFERRED explicitly by owner; billing disabled and RevenueCat webhook undeployed. |
 | T06.4 | OPTIONAL / DECISION PENDING after UI polish. Existing sign-in/sign-out fixes do not complete the broader Settings task. |
 | T07.1 | COMPLETE for the owner-approved testing profile; [QA matrix and evidence](PICKWELL_END_TO_END_QA.md). |
-| T07.2 | NOT STARTED; submission handoff follows UI polish and the T06.4 decision. |
+| T07.1A | UI polish implementation/regression evidence exists; remaining screen fidelity and fresh device visual review are pending. No new sign-off in this roadmap update. |
+| T07.1B–T07.1D | NOT STARTED; new pre-submission identity/data-integrity audit, conditional critical protection and targeted release gate. |
+| T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
+| T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
 **Evidence boundary:** Device and further real-product/unreadable-label passes are owner-reported in the conversation and recorded in T07.1. Automated/native/hosted checks are separately identified in the QA report. This documentation-only reconciliation performs no new device test, provider call, deployment or full regression.
 
@@ -33,11 +36,13 @@ This section and the dated reconciliation notes below describe current status. E
 
 **Remaining release checks:** Signed store/iOS release artifacts and production signing ownership remain outside this sign-off. The first naturally scheduled daily telemetry-retention run was not observed during T07.1; registration and accelerated execution were verified. This reconciliation does not claim a new scheduler observation or configured CI/staging deployment.
 
-**Agreed order:** statuses reconciled → UI polish implemented ([changes, validation and remaining visual deviations](PICKWELL_UI_POLISH.md)) → owner UI review / decide whether to implement T06.4 → T07.2. Optional name/brand editing and RevenueCat do not block this sequence.
+**Agreed order (updated 2026-11-04):** completed T07.1 baseline → T07.1A remaining UI review and T07.1B audit (may proceed alongside review) → T07.1C critical mitigation/disposition → T07.1D release gate → T07.2 submission → T08.1 Passport → T08.2 comparison / T08.3 enhanced identity → T08.4 investigator after T08.3. T06.4 requires an explicit implement/defer decision before handoff; T06.3 remains deferred.
 
 ## 0. Source of truth and non-goals
 
 Read `PICKWELL_PRD.md`, `PICKWELL_DESIGN.md`, `PICKWELL_SPEC.md`, and `PICKWELL_DATABASE.md` before implementing. Respect existing repository structure and Flutter boilerplate; do not invent file paths, replace existing code wholesale, or assume work is unfinished if the repository proves otherwise.
+
+**Mission:** Pickwell is an evidence-aware consumer product intelligence and transparency platform, helping Filipinos understand packaged-food information for everyday nutrition awareness and CKD-related concerns. No medical advice, diagnosis, food safety certification or personalized dietary prescriptions. Model uncertainty and identity verification are separate; schema-valid output does not prove barcode/package association.
 
 **Locked MVP:** Flutter local recent-product Home → separate Scan action → Supabase cache lookup → immediately display published ready record OR three-step capture (Barcode ✓ → Nutrition → Ingredients) → require verified Supabase Email OTP to submit uncached analysis → Meta multimodal AI via Supabase Edge Function → validate nutrition, ingredients and findings with documented rules → publish reusable result → future cache hits skip AI. Optional name/brand. Green/yellow/red findings, with explanations and evidence.
 
@@ -45,7 +50,7 @@ Read `PICKWELL_PRD.md`, `PICKWELL_DESIGN.md`, `PICKWELL_SPEC.md`, and `PICKWELL_
 
 **RevenueCat:** Prepare backend identity mapping, entitlements, webhook authentication/idempotency and `billing_enabled=false`. **No purchases, paywall, pricing UI, or premium offering during the hackathon.** Future Premium quotas and billing products remain unspecified.
 
-**Not MVP:** product comparison, cosmetics, AI Q&A/chat (visual-only future concept), numeric food score, cloud/offline analysis history, Add to List/collections, subscriptions, community, favorites, advanced onboarding, broad localization. Device-local barcode recents are included without a backend history table. No new backend service beyond approved Supabase + Meta API.
+**Not MVP (including newly approved post-submission T08 work):** product comparison, cosmetics, AI Q&A/chat (visual-only future concept), numeric food score, cloud/offline analysis history, Add to List/collections, subscriptions, community, favorites, advanced onboarding, broad localization. Device-local barcode recents are included without a backend history table. No new backend service beyond approved Supabase + Meta API.
 
 **Definition of done for each task:** implementation completed; acceptance criteria met; targeted tests run and outcomes recorded; no keys committed or client privilege escalation; mark checkbox only with evidence. Avoid blanket full regression until final release gate.
 
@@ -60,7 +65,8 @@ Read `PICKWELL_PRD.md`, `PICKWELL_DESIGN.md`, `PICKWELL_SPEC.md`, and `PICKWELL_
 | 4 | Capture wizard & Email OTP | 3 | Guest can capture then sign in seamlessly |
 | 5 | Server AI analysis + publishing | 1,2,4 | New product → saved ready result |
 | 6 | Results UI + metering + premium-ready backend | 2,3,5 | Color findings, usage, RevenueCat backend safety |
-| 7 | End-to-end targeted QA and hackathon demo | All P0 | Submission-ready demo |
+| 7 | Completed T07.1, UI review, T07.1B audit → C critical protection → D release gate → T07.2 | Existing P0 + new safety gates | Evidence-backed submission decision |
+| 8 (post-submission) | T08.1 Passport → T08.2 comparison / T08.3 identity → T08.4 investigator | T07.2; investigator also needs T08.3 | Separate future implementation/validation |
 
 Work on Phase 1 as early as possible, even in parallel with Phase 2. If time becomes critical, defer P1 polish and any unnecessary webhook deployment, **not** authorization, RLS, quotas or the functioning AI/cache path. A simplified entitlement table with secure future migration is preferable to a broken primary flow.
 
@@ -361,14 +367,66 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **2026-11-03 — COMPLETE for owner-approved hackathon testing profile:** [QA matrix, fixes and evidence](PICKWELL_END_TO_END_QA.md). 115 Flutter, 146 backend, 142 SQL assertions, 21 tooling tests and 30 hosted boundary checks passed; analyzer and rebuilt Android APK credential checks passed. Device/accuracy checks are owner-reported passes. Cloud testing allowances remain 1,000/100 by explicit request; baseline 30/3 and mutable 20 passed in isolation. Restore production allowances before public release. Billing stays disabled; T06.3 explicitly deferred. No new Meta inference or fresh hardware/store-release test claimed.
 
+### T07.1A Final UI polish and design fidelity (existing work)
+
+**2026-11-04 — IMPLEMENTATION EVIDENCE; FINAL REVIEW PENDING:** [UI polish report](PICKWELL_UI_POLISH.md) records changes and automated tests. Preserve that work and completed T07.1; remaining screen-reference fidelity and fresh device visual review are not claimed complete. This roadmap introduces the stable T07.1A pointer without reopening verified functionality. Record remaining deviations or fixes before T07.1D. No further UI changes are implemented by this documentation update.
+
+### T07.1B Product Identity & Data Integrity Audit
+
+**Status / dependencies:** Pre-submission P0 audit; NOT STARTED. Depends on completed T07.1 and the current T07.1A implementation baseline. Finish remaining UI review before the final release gate.
+
+- [ ] Audit barcode belonging to Product A with photos belonging to Product B; conflicting nutrition/ingredient images; inconsistent names, brands, variants and package sizes.
+- [ ] Trace schema-valid publication with missing/unverifiable identity evidence, trusted-record overwrite paths, and the distinction between model uncertainty, cross-photo consistency and actual identity verification.
+- [ ] Audit simultaneous submissions/publication races, duplicate barcodes, reformulations and barcode reuse; distinguish current tested safeguards from untested assumptions.
+- [ ] Evaluate deliberate data poisoning, prompt injection in labels and repeat abuse without bypassing auth/RLS or exposing secrets/image payloads.
+- [ ] Produce an evidence-based report with actual code/schema paths, reproducible observations, severity, affected paths, unknowns and a minimal safe mitigation plan for T07.1C; do not implement protections in the audit task.
+
+**Acceptance:** Every listed threat has an evidence-backed finding or explicit unverified result; critical risks and the smallest safely testable mitigations are identified. Schema validity or model certainty is never reported as barcode/package verification.
+
+**Targeted validation:** Targeted adversarial fixtures and transaction/concurrency inspection or isolated tests; record observed outcomes and evidence gaps. No destructive production experiments or unapproved paid calls.
+
+### T07.1C Minimum Product Trust Protection
+
+**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report and prioritized critical findings.
+
+- [ ] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
+- [ ] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
+- [ ] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
+- [ ] Preserve guest cached lookup, two-label capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
+- [ ] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
+
+**Acceptance:** Each critical audit finding has a verified mitigation or an explicit release-blocking/restricted-path disposition; no false identity assurance or unsafe trusted-record overwrite. Deadline pressure does not waive a P0 blocker.
+
+**Targeted validation:** Reproduce each critical case before/after; negative auth/RLS, concurrent publication/idempotency, quota rollback, photo disposal and sanitized cache projection tests for affected paths.
+
+### T07.1D Targeted Regression and Release Gate
+
+**Status / dependencies:** Pre-submission P0 gate; NOT STARTED. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+
+- [ ] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
+- [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
+- [ ] Verify identity/conflict protections from the audit, races/duplicates, trusted revision protection, auth/RLS, quota settlement, rate/spend controls and absence of secret/PII/image leaks.
+- [ ] Check affected UI/navigation/accessibility and owner/device observations. Record exact deployed/configured version and testing versus production limits; preserve owner-approved 1,000/100 testing allowances unless changed explicitly, and require 30/3 restoration before production public release.
+- [ ] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
+
+**Acceptance:** Affected end-to-end and security/privacy paths have recorded results, no regressions against T07.1, and no known unresolved P0 blockers. Untested capabilities are explicitly excluded/restricted; the approved deployment profile is clear.
+
+**Targeted validation:** Run affected integration/regression suites and necessary live/device checks; distinguish automated, provider, hosted and owner-reported evidence. Broaden regression only when impact requires it.
+
 ### T07.2 Hackathon submission handoff
+
+**Status / dependencies:** Pre-submission handoff; NOT STARTED. Depends on T07.1D release sign-off; optional T06.4 must be explicitly implemented or deferred, never silently treated as complete.
 
 - [ ] Record a truthful ≤3-minute demo using actual working flows and confirmed Meta model; don't misrepresent mock responses as live.
 - [ ] Capture quick technical explanation: shared barcode cache, two-image Meta analysis, rule-based findings, safe retries/auth/quotas.
 - [ ] Prepare public GitHub repository/submission materials according to verified organizer instructions while removing secrets and sensitive credentials.
 - [ ] Verify organizer deadline and upload requirements directly before final submission.
+- [ ] Document which functionality was built during the hackathon, which template/pre-existing work was reused, actual limitations and proposed-only roadmap; do not claim medical certification, independent identity verification or unbuilt T08 capabilities.
+- [ ] Verify the public repository is runnable from documented clean setup with safe environment examples, prerequisites and deployment/test instructions; ensure the genuine three-minute demo reflects the submitted revision and approved organizer duration rules.
 
-**Acceptance:** Public demonstration and repository reflect actual product; submission checklist and proof of Meta integration are complete.
+**Acceptance:** Public demonstration and repository reflect actual product; submission checklist and proof of Meta integration are complete. Hackathon-built functionality is accurately identified, the public repository has a verified runnable setup, and a genuine three-minute demo is supplied within organizer rules.
+
+**Targeted validation:** Clean documented setup/run check, public repository secret/privacy/license review, demo-to-revision comparison and direct verification of organizer requirements. Record upload/submission evidence without exposing credentials.
 
 ## 10. Risk-based fallback order
 
@@ -390,7 +448,7 @@ If timeline threatens completion, narrow in this order **without changing approv
 - `AGENTS.md` is the next StartAppLab artifact; preserve any existing agent instructions and extend rather than overwrite.
 - If any requirement contradicts approved PRD/SPEC/DATABASE, stop only that conflicting implementation step and document the conflict; do not silently change the product.
 
-**Prepared documents:** `PICKWELL_PRD.md` v1.4; `PICKWELL_DESIGN.md` v1.2; `PICKWELL_SPEC.md` v1.2; `PICKWELL_DATABASE.md` v1.0; this `PICKWELL_TASKS.md` v1.1.
+**Prepared documents (current):** `PICKWELL_PRD.md` v1.5; `PICKWELL_DESIGN.md` v1.3; `PICKWELL_SPEC.md` v1.3; `PICKWELL_DATABASE.md` v1.1; this `PICKWELL_TASKS.md` v1.2; `PICKWELL_AGENT_PROMPTS.md` v1.2.
 
 **2026-11-03 — T05.2 real-fixture follow-up:** Three real Meta calls reproduced
 Product B's redundant raw/source rejection. Both supplied pairs now validate after
@@ -421,3 +479,66 @@ limitations and uncertainty. Versioned operator refresh preserves immutable fact
 and performs no model call on lookup. The understandable-explanations checkbox is
 verified; no broader task completion is implied. The low-resolution cereal fixture
 has inconsistent OCR and further product/accuracy testing is deferred at user request.
+
+
+## 12. Phase 8 — Post-submission product intelligence (approved roadmap; not implemented)
+
+These tasks do not block T07.2. Reuse the existing pipeline and immutable revisions; approval here is not implementation. T08.2 and T08.3 may proceed independently after T08.1; T08.4 requires T08.3. Preserve guest cached lookup, authenticated new analyses, photo deletion with bounded pending-draft recovery, minimal non-image provenance, deterministic findings and the approved visual system. T06.3 remains deferred with `billing_enabled=false`.
+
+### T08.1 Product Passport
+
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T07.2 and T07.1B–D evidence; existing cache/provenance/revisions are reusable foundations, not full Passport completion.
+
+- [ ] Extend the existing product/analysis record into an evidence-aware reusable Product Passport with identity, nutrition, ingredients, provenance, validation state and revision history; avoid a parallel catalog rewrite.
+- [ ] Distinguish extracted facts and interpretations, model uncertainty, cross-photo consistency and actual identity verification method/result; preserve unknowns without invented scores or verified claims.
+- [ ] Expose a sanitized current record and revision context through existing guest-safe reads; keep new analyses authenticated and normal barcode lookups free of model calls.
+- [ ] Retain model/prompt/rule/reference versions and justified minimal non-image provenance; preserve immutable accepted history, privileged correction/invalidation, photo deletion and private contributor identifiers.
+- [ ] Present the Passport within approved Product Details patterns with accessible evidence/uncertainty; CKD-related information remains educational, never diagnosis, certification or personalized dietary prescriptions.
+
+**Acceptance:** A reusable published product exposes identity, structured facts, provenance, explicit validation/identity limits and navigable revision history without photos/PII or repeated lookup inference; existing flows remain intact.
+
+**Targeted validation:** Schema/API/projection/revision tests, unknown identity/partial labels, immutable correction, cache-hit zero-model regression and relevant Product Details widget tests.
+
+### T08.2 Product Comparison
+
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1. May proceed independently of T08.3 after the Passport contract is stable.
+
+- [ ] Compare two accepted Product Passport revisions using structured validated ingredients/nutrition and explicit product/variant/package identity context.
+- [ ] Normalize compatible units and serving/per-100g bases deterministically using versioned rules; preserve original values and show calculation basis.
+- [ ] Keep missing, ambiguous or incompatible quantities explicitly unknown/non-comparable; do not assume serving mass, density, added sugar or absent nutrients.
+- [ ] Present meaningful evidence-backed differences within the approved visual system; no numeric overall food score, unsupported health ranking, safety certification or personalized CKD suitability recommendation.
+- [ ] Reuse cached validated data and sources; do not trigger ordinary lookup/comparison AI calls or add account history, billing or unapproved services.
+
+**Acceptance:** Two products can be compared on compatible validated bases with reproducible normalization and explicit unknowns; incompatible data cannot produce a misleading ranking.
+
+**Targeted validation:** Unit/basis/serving conversion tests, mass/volume incompatibility, partial labels, total-versus-added-sugar cases, revision consistency and accessible comparison UI tests.
+
+### T08.3 Enhanced Identity Verification
+
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1 and T07.1B/C findings. Does not require T08.2.
+
+- [ ] Introduce conditional front-package evidence and product identity cross-checks where current evidence is insufficient; keep the existing two-label path unless a justified additional request is needed.
+- [ ] Define identity methods, evidence requirements and explicit unknown/conflict/verified semantics; model uncertainty or a matching barcode format alone cannot establish verification.
+- [ ] Implement dispute resolution with authorized review and safe formulation/barcode-reuse handling; no contributor overwrite of trusted records or silent loss of prior revisions.
+- [ ] Validate new evidence and revision transitions server-side with auth/RLS, idempotency, concurrency protection and sanitized public status; preserve guest reads and authenticated contributions.
+- [ ] Delete processing/front-package photos after use and expire bounded pending drafts; retain only justified minimal non-image provenance, not permanent evidence images.
+
+**Acceptance:** Insufficient/conflicting identity requests appropriate conditional evidence, disputes/formulation changes preserve trusted history, and verified claims are tied to a defined performed method rather than a model guess.
+
+**Targeted validation:** Barcode A/photos B, variant/package-size conflicts, missing front evidence, disputes, reformulation/reuse, concurrent corrections and image cleanup/projection tests.
+
+### T08.4 Agentic Label Investigator
+
+**Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1 and T08.3 evidence/identity contracts; T08.2 is not required.
+
+- [ ] Allow Muse Spark to request specific additional evidence or clarifications through an allowlisted structured action contract; verify actual model access/capability before relying on it.
+- [ ] Deterministically validate each action server-side against user/job ownership, state, target field/photo, allowed reason, payload constraints and evidence policy; model output cannot authorize itself.
+- [ ] Bound rounds, retries, time, concurrency and provider spend; support cancel/expiry and safe resume without duplicate publication or successful-analysis credit charges.
+- [ ] Keep model requests server-side and user-visible, with no arbitrary tool/URL execution, autonomous publication, general chatbot or medical/personalized dietary recommendations.
+- [ ] Validate returned evidence through existing trusted publication rules; preserve transient photo disposal, minimal non-image provenance, cache reuse, approved UI and billing disabled.
+
+**Acceptance:** A bounded Muse Spark investigation requests and validates a specific missing piece of evidence and either produces an accountable result or stops safely; invalid actions and budget exhaustion cannot bypass backend policy.
+
+**Targeted validation:** Mock action/schema/state/ownership/prompt-injection tests, bounded-loop/cost/cancel/expiry tests and authorized real-model evidence-request integration; no success claim based only on mocks.
+
+**Revision history addition — v1.2 (2026-11-04):** Preserved all existing completion checkboxes and historical evidence; added the T07.1A status pointer, proposed T07.1B–D and T08.1–T08.4, and strengthened the existing T07.2 handoff. Documentation only; no task newly marked complete.

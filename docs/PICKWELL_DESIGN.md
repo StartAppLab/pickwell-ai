@@ -1,12 +1,12 @@
 # PICKWELL AI V2 — DESIGN SPECIFICATION
 
 **File:** `PICKWELL_DESIGN.md`  
-**Version:** 1.2 — Approved lemon-inspired UX and complete hackathon screen set  
-**Date:** November 2, 2026  
+**Version:** 1.3 — Preserved UI and planned trust presentation\
+**Date:** November 4, 2026\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework / DESIGN  
 **Status:** Final visual direction approved through iterative reference mockups; platform fidelity and real product-photo sources remain implementation checks.  
-**Source of truth:** `PICKWELL_PRD.md` v1.4. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
+**Source of truth:** `PICKWELL_PRD.md` v1.5. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
 
 ## 1. Design goals and scope boundaries
 
@@ -86,7 +86,7 @@ App launch
 1. iOS status bar/safe top area. Small full yellow lemon emblem + dark forest **Pickwell** wordmark on left; **only magnifier button** upper right (no user/profile icon).
 2. Do **not** show a persistent full-width search bar. Tapping magnifier reveals focused search input and keyboard with cancel/close, and filters currently loaded local recent items.
 3. A single compact row of category chips (`All` selected, `Food` available) and **right-aligned `Newest` sort**. Use compact capsule pills; no list/grid toggle. Cosmetics only if it becomes a real approved category in future.
-4. Immediately below chips: scrollable stacked **individual rounded product cards**. **No 'Recently scanned' heading**, long marketing copy or statistics block above list. Card consists of left 64–84dp photographic thumbnail / neutral placeholder, center product name + one supporting line (brand or descriptor), right chevron. Show a positive/warning icon *only when meaning and evidence are clear*, and it must never imply a holistic food safety certification.
+4. Immediately below chips: scrollable stacked **individual rounded product cards**. **No 'Recently scanned' heading**, long marketing copy or statistics block above list. Card consists of left 64–84dp photographic thumbnail / neutral placeholder, center product title only (no barcode or subtitle), right Cupertino chevron. The later owner-approved Home dimensions and controls in section 14 supersede the earlier thumbnail dimensions in this paragraph. Show a positive/warning icon *only when meaning and evidence are clear*, and it must never imply a holistic food safety certification.
 5. Cards use white with subtle borders/soft lift over mainly warm white/cream canvas. Real-world photos originate only from authorized stored/returned product media; no fabricated real packaging. If none exists, elegant placeholder with product initials/category, not invented product photo.
 6. At bottom, separate softly translucent glass pill for primary available navigation (`Home`,`Settings`) and standalone circle **scan icon** on the right. Chat can be represented in future comps but must be absent from working build. Avoid inconsistent text label under scan icon.
 7. Empty Home: same header/chips/nav and a short pleasant empty message with scanner action, no fabricated recently scanned records. Do not require login to use Home.
@@ -151,3 +151,29 @@ App launch
 7. Color is never the only signal; warnings are clearly differentiated from decorative lemon yellow.
 
 **Version history:** v1.1 quotas/preparatory UI; v1.2 November 2 2026 aligned with final visual iterations and clarified temporary local recents vs deferred cloud history.
+
+
+## 14. Current UI baseline and planned trust presentation (2026-11-04)
+
+**Status:** T07.1 remains complete for its recorded profile; T07.1A polish has implementation/test evidence in [UI polish](PICKWELL_UI_POLISH.md), with remaining screen fidelity/device review explicitly pending. The following roadmap adds no screens or controls in this documentation task.
+
+**Preserve the latest approved Home:** 16dp page margins; title-only cards with 8dp padding and 100×80 (5:4) images or theme-gray honest placeholders. Search replaces the brand row in place: Cupertino back restores the normal header, the in-field X clears only the query. Search and brand rows have matching height; All/Food chips and sort match heights with light neutral inactive backgrounds. Custom sort offers Newest, Oldest, Name A–Z and Name Z–A, without a dropdown chevron. Home uses HugeIcons except the requested Cupertino chevrons. Keep the animated glass-inspired Home/Settings dock, independent far-right Scan, current selector padding and transparent Android edge-to-edge treatment. Keep accessible text scaling, safe areas and keyboard behavior. These owner-approved refinements supersede conflicting earlier Home dimensions/supporting-line guidance, not the established flows. Product Details retains no logo app-bar title or bottom tabs; no numeric score, Chat, cosmetics, collections or paywall.
+
+### 14.1 Pre-submission trust work — T07.1B–D
+
+Audit before proposing UI changes. T07.1C may add only minimal recovery or uncertainty wording justified by critical audit findings, preserving barcode → nutrition → ingredients → contextual OTP. A model-readable label and a barcode are not proof of association. Avoid “verified product,” certification badges or invented confidence percentages. If identity is unknown, distinguish it from an unreadable nutrient value and show a truthful actionable state only where implemented. Do not add a mandatory front-package capture or dispute workflow before its later task. T07.1D verifies any affected navigation, accessibility and recovery against the existing T07.1 baseline.
+
+### 14.2 Post-submission presentation — proposed, not implemented
+
+| Task | Planned presentation | Safety and continuity |
+| --- | --- | --- |
+| T08.1 | Extend existing Product Details with a reusable Product Passport: identity, facts, sources, validation state and revision history | Separate observed facts, model uncertainty and identity verification. Evidence availability is not certification. Keep truthful images or placeholders. |
+| T08.2 | Focused two-product comparison with aligned quantity/basis labels | Show serving/package differences and unknown/non-comparable fields; no overall score or renal-safe verdict. |
+| T08.3 | Conditional request for front-package evidence, identity conflict/dispute status and revision context | Explain what evidence is requested and why; preserve existing captures, allow cancel/recovery, never claim a dispute is resolved before review. |
+| T08.4 | Specific Muse Spark evidence/clarification prompts with bounded progress and stop states | User chooses to supply evidence; no free-form chatbot, endless loop or hidden paid calls. Accessibility cannot depend on color. |
+
+CKD-related copy supports educational label awareness for Filipinos. It must not diagnose, prescribe portions/targets, certify safety or recommend personalized renal diets. Missing label information stays unknown. Continue the cream/white, green and restrained yellow balance, source references and readable non-color status labels.
+
+Processing photos (including future front-package evidence) remain transient, never permanent card art. Existing private pending drafts remain bounded for recovery; successful processing clears them. UI provenance may expose minimal safe evidence descriptions/revision dates, never contributor emails, private tokens or image payloads. T06.3 remains deferred and billing disabled.
+
+**v1.3:** Roadmap presentation boundaries and current approved Home reconciled; no new UI implemented or mockup/device verification claimed.

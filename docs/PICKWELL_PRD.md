@@ -1,11 +1,11 @@
 # PICKWELL AI V2 — PRODUCT REQUIREMENTS DOCUMENT
 
 **File:** `PICKWELL_PRD.md`  
-**Version:** 1.4 — Approved lemon UI and product-list Home  
-**Date:** November 2, 2026  
+**Version:** 1.5 — Consumer product intelligence and trust roadmap\
+**Date:** November 4, 2026\
 **Project / repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2, PRD  
-**Status:** Product scope and eight new decisions approved; implementation and technical verification pending  
+**Status:** Core flow and T07.1 QA complete for the recorded hackathon testing profile; UI polish has implementation evidence. T07.1B–D and Phase 8 below are approved roadmap work, not implemented by this revision.\
 **Platforms:** iOS and Android via Flutter; prioritize one end-to-end demonstrable build for the hackathon  
 **Backend:** Supabase; **AI:** Meta multimodal AI API  
 **Target submission:** Meta AI Hackathon, November 4, 2026 (US Eastern); reconfirm cutoff and required submission materials on official portal.
@@ -16,7 +16,7 @@
 
 ## 1. Product vision and positioning
 
-Pickwell AI V2 is the revival of Pickwell: a practical packaged-food intelligence app that lets shoppers understand ingredient lists and nutrition labels with minimal effort.
+Pickwell is an **evidence-aware consumer product intelligence and transparency platform**, beginning with packaged-food ingredient and nutrition information. Its mission includes helping Filipinos understand labels relevant to everyday nutrition awareness and CKD-related concerns, without medical advice, diagnosis, food safety certification, or personalized dietary prescriptions.
 
 **Core promise:** **Scan a barcode. If we know the product, see its existing analysis immediately. If not, capture its nutrition and ingredient labels once so Pickwell can analyze it and make the information available to future shoppers.**
 
@@ -269,7 +269,7 @@ Logical entities: `products`, `product_analyses` / structured `nutrition` and `i
 
 Never imply absence of a listed allergen is proof of safety. Never invent nutrition values, references, high-risk claims, or numeric health scores.
 
-## 8. Out of scope: preserved Pickwell V2 roadmap
+## 8. Out of scope for the hackathon: preserved Pickwell V2 roadmap
 
 - Ask Pickwell product-specific chat and suggested questions.
 - Cosmetics and personal care scanning.
@@ -282,7 +282,7 @@ Never imply absence of a listed allergen is proof of safety. Never invent nutrit
 - Full onboarding, advanced dashboards, expanded nutrition personalization.
 - Automatic reformulation/version management (basic provenance + admin invalidation still required).
 
-**Authentication itself is in scope.** This is the deliberate change from PRD v1.1.
+**Authentication itself is in scope.** This is the deliberate change from PRD v1.1. The post-submission features approved in section 13 remain outside hackathon implementation; they do not authorize expanding the submission build.
 
 ## 9. Minimum success criteria and observability
 
@@ -358,6 +358,8 @@ Maintain a separate future `ROADMAP.md` when needed; roadmap items are **not** P
 
 ### State of decisions
 
+**Historical v1.4 planning snapshot:** The unverified items below describe the original planning date. Current implementation evidence and completed work are recorded in [TASKS](PICKWELL_TASKS.md) and [T07.1 QA](PICKWELL_END_TO_END_QA.md); the new roadmap does not reopen that completed work.
+
 - **Locked:** six-step-plus barcode flow, Supabase, Meta AI, Email OTP, optional product identity, validated rules, auto-publish after validation, transient images, user quotas, retake, guest lookup and authenticated analysis.
 - **Unverified:** Meta model credentials and image capabilities in your account, real SMTP delivery, host timeout/budget suitability, exact deterministic nutritional thresholds and credible reference sources, OS/device camera behavior, current submission portal details.
 - **Not implemented by this PRD:** any mobile UI, live Edge Functions, production policies or database migrations.
@@ -382,3 +384,35 @@ risk; unfamiliar ingredients are not automatically harmful. Coverage and missing
 information stay explicit. No new product scope, overall health score or clinical
 recommendations. Cached reference refresh is operator-only, immutable/versioned and
 never an ordinary barcode-lookup inference. See [interpretation evidence](PICKWELL_INTERPRETATION.md).
+
+
+## 13. Approved trust and product-transparency roadmap (2026-11-04)
+
+**Status:** Approved requirements only. This revision changes documentation, not code, database schema, deployment or completed QA. [TASKS](PICKWELL_TASKS.md) defines acceptance and dependencies; [SPEC](PICKWELL_SPEC.md) and [DATABASE](PICKWELL_DATABASE.md) define technical/data boundaries.
+
+### 13.1 Pre-submission safety gates
+
+Preserve completed T07.1 and finish the remaining T07.1A UI review using its existing evidence. Before T07.2, perform **T07.1B Product Identity & Data Integrity Audit**, then **T07.1C Minimum Product Trust Protection** for critical, safely verifiable findings, followed by **T07.1D Targeted Regression and Release Gate**. The audit must cover barcode/photo mismatches, conflicting images, names/brands/variants/package sizes, schema-only publication, trusted-record overwrites, races, duplicate/reused barcodes and reformulations, missing identity evidence, poisoning and repeat abuse. It must distinguish demonstrated defects from unknowns and propose the smallest safe mitigations. These protections have not yet been audited or implemented under the new task IDs.
+
+If a critical issue cannot be mitigated and verified before submission, restrict the affected capability or hold the release gate and document the blocker. Timing is not permission to publish known unsafe shared records. If the audit finds no critical changes needed, record an evidence-backed no-change disposition for T07.1C; never invent implementation work.
+
+**Identity is a separate trust question:** A valid barcode/check digit, schema-valid extraction, internally consistent photos, or a model's apparent certainty does not prove the photos belong to the scanned barcode. Track what identity evidence actually exists and what remains unverified. Keep model extraction uncertainty separate from identity verification; do not create percentage confidence scores or a verified badge without a defined, performed verification method. Existing automated validation remains valuable but is not independent identity verification.
+
+### 13.2 Post-submission features — not built or required for T07.2
+
+| Task | Approved capability | Boundary |
+| --- | --- | --- |
+| T08.1 Product Passport | Reusable product identity, nutrition, ingredients, provenance, validation state and revision history | Extend existing product/analysis revisions; distinguish label facts, interpretation, model uncertainty and identity evidence. No claim of full implementation from current caching alone. |
+| T08.2 Product Comparison | Compare two products using structured validated information | Deterministic unit/serving normalization; explicit missing/non-comparable values; no overall health ranking or CKD suitability verdict. |
+| T08.3 Enhanced Identity Verification | Conditional front-package evidence, identity cross-checks, disputes and formulation-change handling | No universal new capture step now; no silent replacement of a trusted revision or assumption that a barcode identifies a formulation forever. |
+| T08.4 Agentic Label Investigator | Muse Spark requests specific additional evidence or clarification | Bounded structured actions, deterministic authorization/validation and budgets; no autonomous publication, arbitrary tools or medical advice. Not a general chat feature. |
+
+### 13.3 Safety, evidence and continuity
+
+- CKD-related awareness is educational label transparency. Use reviewed reference material with population/basis/limitations; do not repurpose general nutrition thresholds as renal prescriptions, imply suitability for a disease stage, or infer that an undeclared nutrient is absent. Patient profiles, diagnosis, treatment and personalized dietary targets are outside this roadmap.
+- Preserve guest barcode lookups, verified Email OTP for new analyses, deterministic findings, server-only Meta requests, ordinary cache hits with no model call, and approved visuals/navigation. A future investigator's additional evidence is conditional and does not replace the current two-label workflow before implementation/validation.
+- Delete processing images after extraction; retain only justified minimal non-image provenance (source type, observed identity text, validation method/result, versions and revision links). Preserve bounded private pending drafts for recovery under the existing five-draft/24-hour policy; clear completed drafts. No permanent front/label photos or contributor email in public records.
+- T06.3 remains explicitly deferred, `billing_enabled=false`; no paywall, purchases or new Premium promises. T06.4 remains an optional scope decision, independent of this extension. The owner-approved cloud testing allowances remain unchanged; the production 30/3 policy and release configuration decision must be explicit at the gate.
+- T07.2 must truthfully distinguish pre-existing template, hackathon-built functionality, remaining limitations and proposed roadmap; provide a runnable public repository and a genuine three-minute demo of actual behavior.
+
+**Revision history addition — v1.5 (Nov 4, 2026):** Approved platform mission, pre-submission trust audit/mitigation/regression gates and post-submission T08.1–T08.4. No implementation or new verification claimed.

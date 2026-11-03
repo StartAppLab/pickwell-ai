@@ -1,15 +1,15 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
 **File:** `PICKWELL_SPEC.md`  
-**Version:** 1.2 — Approved Home/navigation, entitlement foundations  
-**Date:** 2026-11-02  
+**Version:** 1.3 — Product trust gates and post-submission architecture\
+**Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (PRD → DESIGN → SPEC → DATABASE → TASKS → AGENTS)  
-**Status:** Proposed technical design implementing approved product requirements; API/model access, original boilerplate and device support remain to be verified.
+**Status:** Existing implementation/verification is recorded in TASKS and T07.1 evidence. Section 18 is an approved future contract, not implemented by this documentation revision; earlier feasibility caveats remain historical planning context.
 
 ## 1. Source of truth, principles and scope
 
-Read `PICKWELL_PRD.md` (canonical v1.4), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
+Read `PICKWELL_PRD.md` (canonical v1.5), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
 
 **App promise:** Barcode-first packaged food scanning. Guests can scan and view previously published nutrition/ingredient analysis immediately without AI. Unknown products enter a **Barcode ✓ → Nutrition photo → Ingredients photo** capture. Verified Email OTP user can submit. Meta AI analyzes labels in Supabase Edge Functions; validated structured results and documented red/yellow/green findings are published and reused by all subsequent scanners.
 
@@ -367,3 +367,39 @@ existing facts, an immutable revision and compare-and-swap; it does not rescan,
 rerate old findings, spend a user credit or call Meta. See
 [PICKWELL_INTERPRETATION.md](PICKWELL_INTERPRETATION.md) for coverage, evidence,
 operator commands and limitations. Future source changes require review/versioning.
+
+
+## 18. Product trust and post-submission extension (approved 2026-11-04; planned)
+
+### 18.1 Existing behavior and audit boundary
+
+Reuse the existing `analyze-product` handler, `analysis_validation.mjs`, `analysis_publication.mjs`, versioned interpretation and server-only admission/publication RPCs. The current validator has cross-photo `consistent` / `unknown` / `mismatch` output and mismatch handling; publication revalidates a staged candidate. These mechanisms and existing leases, immutable revisions and RLS are starting evidence for T07.1B, not proof of barcode-to-package identity. A model judgment about two photos cannot independently bind them to a scanned code. The new audit has not been performed by this documentation update.
+
+### 18.2 Pre-submission sequence — T07.1B → T07.1C → T07.1D → T07.2
+
+- **B audit:** Trace scanner input, barcode normalization, image request pairing, model prompt/output, validation, candidate staging, atomic publication, refresh/invalidation and public cache projection. Test barcode A/photos B; conflicting image identity; names/brands/variants/sizes; schema-valid but unverified content; overwrites; parallel submissions/retries; duplicate/reused barcodes/reformulations; missing evidence and repeat poisoning. Record actual paths, reproducible results, severity, affected records and unknowns without logging images or secrets. Deliver an evidence-based report and minimal mitigation plan, not a broad rebuild.
+- **C critical protection:** Implement only audited critical controls that can be completed and verified safely before submission. Reuse existing authorization, locks/idempotency and revision ownership; keep contributors unable to overwrite trusted records. Admission and publication must recheck applicable identity/conflict policy transactionally. Do not guess identity from model confidence or barcode syntax, or make every partial nutrition value a retake again. If critical safety cannot be verified, fail the release gate or restrict the affected path. An evidence-backed no-change disposition is valid if no critical fixes are needed.
+- **D release gate:** Verify affected cached/new/reuse/retake paths, auth/RLS, concurrency, quota settlement, cleanup and public projection. Compare with recorded T07.1 results; distinguish automated, live and owner/device evidence. Retain the owner-approved testing configuration explicitly; restore 30/3 before production public release or keep the deployment explicitly restricted as a testing environment. Billing remains disabled. No known unresolved P0 issue may be hidden by the deadline.
+
+### 18.3 Separate evidence dimensions
+
+Future contracts must distinguish: (a) schema/range/source-basis validation; (b) model extraction uncertainty; (c) cross-photo consistency; (d) barcode/package identity evidence and verification method; (e) publication/revision state. `ready` is a publication lifecycle state, not a certificate. Unknown identity remains unknown; “consistent” is not independent verification. No synthetic confidence score or unverifiable verified flag. Source text, model observations and independently checked evidence must be distinguishable; client flags remain untrusted. Proposed fields/states require reviewed contracts/migrations in the later task, not ad hoc schema edits here.
+
+### 18.4 Post-submission implementation contracts
+
+| Task and dependency | Planned contract | Validation gate |
+| --- | --- | --- |
+| T08.1 after T07.2 and trust gates | Extend current products/immutable analyses into a Product Passport with identity, nutrient/ingredient facts, provenance, validation state, model/rule/prompt/reference versions and revision history | Sanitized current and historical revision projections; unknown identity/values explicit; no contributor PII or image persistence; no AI on ordinary lookup. |
+| T08.2 after T08.1 | Compare two accepted revisions using deterministic unit conversion and a compatible per-serving/per-100g basis | Preserve originals; no conversion across mass/volume without justified density; missing serving mass or incompatible basis is non-comparable. Separate total/added sugar; no invented nutrient amounts or overall rank. |
+| T08.3 after T08.1 and audit findings | Conditional front-package evidence and identity cross-checks, dispute resolution and safe formulation changes | Server-validated evidence policy; no silent trusted-record replacement; explicit revision/conflict handling for barcode reuse, aliases and reformulation. Do not assume a barcode is a timeless formulation ID. |
+| T08.4 after T08.1 and T08.3 | Muse Spark emits allowlisted structured requests for specific evidence/clarification | Deterministic server checks action type, target field/photo, reason, user/job ownership, state, size and budget; cap rounds/time/provider spend, allow cancel/expiry. Model cannot execute arbitrary tools/URLs, change quotas or publish by itself. |
+
+T08.2 and T08.3 can proceed independently after T08.1; T08.4 requires the identity/evidence contract from T08.3. Do not implement a general chat interface. Before invoking a future model version, verify actual access/capabilities rather than assume the model name grants tool support.
+
+### 18.5 Safety, privacy and migration discipline
+
+CKD-related educational explanations must use reviewed, versioned sources with reference population/basis and limitations; do not translate generic traffic-light rules into personalized renal recommendations or safety certificates. No patient data, diagnosis or prescription flow is introduced. Undeclared nutrients are unknown, not absent.
+
+Maintain guest lookup and verified Email OTP for new analysis, deterministic classifications, server-only Meta and no inference on cache hits. Additional evidence is conditional future work, not a new mandatory capture step now. Delete original images after processing; private pending drafts keep the existing five-item/24-hour recovery bound. Preserve only justified non-image provenance, not permanent evidence photos, raw model logs or contributor emails. New data contracts must be versioned with least-privilege migrations and targeted tests when their implementation task begins. No migration, deployment or new runtime dependency is authorized by this revision. T06.3 stays deferred, `billing_enabled=false`; optional T06.4 is not started.
+
+**v1.3:** Added planned trust/release and Passport/comparison/identity/investigator contracts; preserved existing implementation and historical evidence.
