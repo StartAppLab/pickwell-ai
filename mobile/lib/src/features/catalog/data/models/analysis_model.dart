@@ -1,3 +1,4 @@
+import '../../domain/entities/retake_detail.dart';
 import '../../domain/entities/analysis_entity.dart';
 import '../../domain/entities/label_photo.dart';
 import 'catalog_model.dart';
@@ -21,8 +22,23 @@ class AnalysisModel {
           !targets.every((e) => ['nutrition', 'ingredients'].contains(e))) {
         throw const FormatException();
       }
+      final details = <RetakeDetail>[];
+      if (json['retake_details'] is List) {
+        for (final raw in (json['retake_details'] as List).take(12)) {
+          if (raw is! Map || !targets.contains(raw['photo'])) continue;
+          final photo = LabelKind.values.where((v) => v.name == raw['photo']).firstOrNull;
+          final origin = RetakeOrigin.values.where((v) => v.name == raw['source']).firstOrNull;
+          final cause = RetakeCause.values.where((v) => v.value == raw['code']).firstOrNull;
+          final field = RetakeField.values.where((v) => v.value == raw['field']).firstOrNull;
+          if (photo != null && origin != null && cause != null && field != null) {
+            details.add(RetakeDetail(photo: photo, origin: origin, cause: cause, field: field));
+          }
+        }
+      }
       return AnalysisResult(
         AnalysisPhase.retake,
+        retakeDetails: List.unmodifiable(details),
+        canReanalyzeSaved: json['allow_diagnostic_reanalysis'] == true,
         quota: quota,
         retake: targets
             .map((v) => v == 'nutrition' ? LabelKind.nutrition : LabelKind.ingredients)

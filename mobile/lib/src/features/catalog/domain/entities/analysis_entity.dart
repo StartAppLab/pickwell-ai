@@ -1,3 +1,4 @@
+import 'retake_detail.dart';
 import 'catalog_entity.dart';
 import 'quota_snapshot.dart';
 import 'label_photo.dart';
@@ -32,9 +33,11 @@ class AnalysisResult {
   final ProductRecord? product;
   final QuotaSnapshot? quota;
   final Set<LabelKind> retake;
+  final List<RetakeDetail> retakeDetails;
   final String? error;
   final bool retryable;
   final bool restartAllowed;
+  final bool canReanalyzeSaved;
   final int retryAfterSeconds;
   final DateTime? retryAt;
   const AnalysisResult(
@@ -42,9 +45,11 @@ class AnalysisResult {
     this.product,
     this.quota,
     this.retake = const {},
+    this.retakeDetails = const [],
     this.error,
     this.retryable = false,
     this.restartAllowed = false,
+    this.canReanalyzeSaved = false,
     this.retryAfterSeconds = 4,
     this.retryAt,
   });

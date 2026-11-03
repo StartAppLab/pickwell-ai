@@ -76,6 +76,9 @@ test('v2 adapter uses the approved endpoint and one bounded two-image request',a
  {nutrition_image:'private nutrition',ingredients_image:'private ingredients'},metadata,async(url,options)=>{
  calls++;assert.equal(url,META_URL);const body=JSON.parse(options.body);assert.equal(body.response_format.json_schema.name,'label_analysis_v2');
  assert.equal(body.messages[1].content.filter(v=>v.type==='image_url').length,2);assert.equal(body.max_completion_tokens,4096);
+ assert.ok(body.messages[0].content.includes('must proceed'));
+ assert.ok(!body.messages[0].content.includes('Use null/unknown and needs_retake for unreadable/mismatched labels.'));
+ assert.ok(body.response_format.json_schema.schema.properties.retake_reasons);
  return Response.json({model:'muse-spark-1.3',usage:{prompt_tokens:100,completion_tokens:200},choices:[{finish_reason:'stop',message:{content:JSON.stringify(c)}}]});
  },analysisProfile);assert.equal(calls,1);assert.equal(validate(r.candidate).status,'validated');assert.equal(metadata.usage.input_tokens,100);
 });
@@ -112,4 +115,24 @@ test('normalized unknown facts produce a stable revalidated publication handoff'
  const c=labelFixture();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Facts');c.nutrition.serving_size='90 g';
  const first=validate(c);c.nutrition=first.nutrition;c.ingredients=first.ingredients;
  const staged=validate(c),replay=validate(c);assert.deepEqual(staged,replay);assert.equal(staged.nutrition.basis,'unknown');assert.equal(staged.nutrition.nutrients[0].value,null);
+});
+
+test('model retake reasons identify the specific photo/field and remain separate from validation',()=>{
+ const c=labelFixture();c.status='needs_retake';c.retake=['nutrition'];
+ c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];
+ const r=validate(c);assert.deepEqual(r.retake,['nutrition']);
+ assert.deepEqual(r.reason_details,[{photo:'nutrition',source:'model',code:'blur_or_glare',field:'fat'}]);
+});
+test('backend evidence rejection records its own reason and nutrient rather than blaming photo quality',()=>{
+ const c=labelFixture();change(c,'Total Fat',103);const r=validate(c);
+ assert.equal(r.status,'needs_retake');assert.ok(r.reason_details.some(d=>d.source==='validation'&&d.code==='numeric_range'&&d.field==='fat'));
+ assert.ok(!r.reason_details.some(d=>d.code==='blur_or_glare'));
+ const all=labelFixture();for(const n of all.nutrition.nutrients)n.source='unmatched text';
+ const failed=validate(all);assert.ok(failed.reason_details.some(d=>d.code==='numeric_source'&&d.field==='protein'));
+ assert.ok(failed.reason_details.some(d=>d.code==='no_readable_values'&&d.source==='validation'));
+});
+test('missing legacy reason is explicit; malformed provider reason cannot become free-form UI text',()=>{
+ const c=labelFixture();c.status='needs_retake';c.retake=['ingredients'];delete c.retake_reasons;
+ assert.deepEqual(validate(c).reason_details,[{photo:'ingredients',source:'model',code:'model_requested',field:'other'}]);
+ c.retake_reasons=[{photo:'ingredients',code:'raw PRIVATE provider message',field:'other'}];assert.throws(()=>validate(c));
 });

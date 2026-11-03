@@ -4,7 +4,7 @@ export function labelFixture({basis='per_100g',fat=3,sugars=5,salt=0.3,portion='
   ['Carbohydrate',30,'g'],['Total Sugars',sugars,'g'],['Protein',8,'g'],['Salt',salt,'g']];
  const nutrients=entries.map(([name,value,unit])=>({name,value,unit,source:`${name} ${value} ${unit}`}));
  const ingredient='Oats, wheat flour, salt. Contains: wheat.';
- return {status:'extracted',retake:[],ingredients:{raw:ingredient,items:['Oats','wheat flour','salt'],declared_allergens:'Contains: wheat.'},
+ return {status:'extracted',retake:[],retake_reasons:[],ingredients:{raw:ingredient,items:['Oats','wheat flour','salt'],declared_allergens:'Contains: wheat.'},
   nutrition:{raw:`${basis==='per_serving'?'Per serving':'Per 100 g'}; serving size ${portion}. `+nutrients.map(v=>v.source).join('; '),
    basis,serving_size:portion,nutrients},
   identity:{nutrition_name:null,ingredients_name:null,consistency:'unknown',food_form:'solid'},

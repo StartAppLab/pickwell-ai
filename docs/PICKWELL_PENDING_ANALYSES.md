@@ -252,3 +252,13 @@ were preserved. No task's unverified live acceptance checkbox was advanced.
 **Rebuild/relaunch the app without uninstalling** to use multi-draft storage and
 migrate an existing draft. Hardware forced-close and live full-flow checks remain
 part of T07.1.
+
+## Retake diagnosis and historical saved photos
+
+The app now displays model-versus-validation retake reasons per photo/field.
+Old results without recorded details can explicitly reanalyze their saved photos,
+with a new persisted key and clear provider-attempt notice; no camera retake or
+automatic inference is required. See [retake evidence](PICKWELL_RETAKE_DIAGNOSTICS.md).
+The hackathon per-barcode cap is now ten within unchanged global 20/day and USD 30
+budget; earlier five-attempt descriptions are historical. Rebuild/restart without
+uninstalling; live image/device acceptance is still pending.

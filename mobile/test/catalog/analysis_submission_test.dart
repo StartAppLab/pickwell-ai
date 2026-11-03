@@ -70,6 +70,33 @@ void main() {
     await sender.retry();
     expect(repository.requests.last.requestId, next);
   });
+  test(
+    'legacy diagnostic reanalysis explicitly reuses saved photos with one fresh persisted key',
+    () async {
+      repository.result = const AnalysisResult(
+        AnalysisPhase.retake,
+        retake: {LabelKind.nutrition},
+        canReanalyzeSaved: true,
+      );
+      sender.beginAuthorization();
+      await sender.finishAuthorization(true);
+      final previous = repository.requests.single, photos = media.calls;
+      repository.result = const AnalysisResult(AnalysisPhase.retake, retake: {LabelKind.nutrition});
+      await sender.reanalyzeSaved();
+      expect(repository.requests.length, 2);
+      expect(repository.requests.last.requestId, isNot(previous.requestId));
+      expect(repository.requests.last.nutrition, same(previous.nutrition));
+      expect(repository.requests.last.ingredients, same(previous.ingredients));
+      expect(media.calls, photos);
+      expect(media.deleted, isEmpty);
+      await sender.reanalyzeSaved();
+      expect(
+        repository.requests.length,
+        2,
+        reason: 'Modern result does not permit another diagnostic restart',
+      );
+    },
+  );
   tearDown(() async {
     await sender.close();
     await draft.close();

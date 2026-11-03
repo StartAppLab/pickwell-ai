@@ -276,3 +276,11 @@ Changed source/test files: `supabase/functions/_shared/analysis_validation.mjs`,
 `mobile/test/catalog/catalog_repository_test.dart`. The activation addendum in
 `PICKWELL_QUOTA_UI.md` also remains an uncommitted documentation change from the
 preceding server activation. No task's real-image acceptance checkbox was advanced.
+
+## 2026-11-03 — Retake diagnostics follow-up
+
+[Retake evidence](PICKWELL_RETAKE_DIAGNOSTICS.md) records the reason-aware Meta
+schema, aligned shared prompt, separate model/validation photo-and-field reasons,
+atomic owner-only persistence/replay, historical fallback and explicit saved-photo
+diagnostic reanalysis. 106 client tests and 82 backend tests pass; real-image
+quality acceptance remains open. No new live model call is claimed.

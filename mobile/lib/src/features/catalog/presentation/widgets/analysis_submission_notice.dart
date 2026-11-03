@@ -1,3 +1,4 @@
+import 'retake_diagnostic.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
@@ -9,12 +10,13 @@ import '../blocs/catalog/analysis_submission_cubit.dart';
 class AnalysisSubmissionNotice extends StatelessWidget {
   final AnalysisSubmissionState state;
   final AppSession? session;
-  final VoidCallback? retry, cleanup;
+  final VoidCallback? retry, cleanup, reanalyzeSaved;
   const AnalysisSubmissionNotice({
     super.key,
     required this.state,
     this.retry,
     this.cleanup,
+    this.reanalyzeSaved,
     this.session,
   });
   @override
@@ -69,9 +71,24 @@ class AnalysisSubmissionNotice extends StatelessWidget {
               if (state.busy) ...[Gap(d.spacingSm), const LinearProgressIndicator()],
               if (state.phase == AnalysisPhase.retake)
                 for (final target in state.result?.retake ?? <LabelKind>{})
-                  Text(
-                    '${l.pkRetake}: ${target == LabelKind.nutrition ? l.pkNutrition : l.pkIngredients}',
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '${l.pkRetake}: ${target == LabelKind.nutrition ? l.pkNutrition : l.pkIngredients}',
+                      ),
+                      if (state.result!.retakeDetails.where((d) => d.photo == target).isEmpty)
+                        Text(l.pkRetakeCauseReasonUnavailable),
+                      for (final detail in state.result!.retakeDetails.where(
+                        (d) => d.photo == target,
+                      ))
+                        RetakeDiagnostic(detail: detail),
+                    ],
                   ),
+              if (reanalyzeSaved != null && state.result?.canReanalyzeSaved == true) ...[
+                Text(l.pkRetakeRecheckCost),
+                OutlinedButton(onPressed: reanalyzeSaved, child: Text(l.pkRetakeRecheckSaved)),
+              ],
               if (retry != null) ...[
                 Gap(d.spacingSm),
                 OutlinedButton(onPressed: retry, child: Text(l.pkAnalysisCheckAgain)),

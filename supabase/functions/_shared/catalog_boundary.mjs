@@ -1,3 +1,4 @@
+import { sanitizeRetakeDetails } from './retake_details.mjs';
 // T02.2 read boundaries. No Meta calls, quota mutation, purchases or public writes.
 const reply = (body, status = 200) => Response.json(body, {
   status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
@@ -72,13 +73,15 @@ export function createAnalysisStatusHandler(env, fetcher = fetch) {
     } catch { return reply({ error: 'invalid_input' }, 400); }
     try {
       const query = new URLSearchParams({ id: `eq.${body.job_id}`, user_id: `eq.${user.id}`,
-        select: 'id,barcode,state,retake_target,error_code,result_product_id,result_analysis_id,updated_at', limit: '1' });
+        select: 'id,barcode,state,retake_target,retake_details,error_code,result_product_id,result_analysis_id,updated_at', limit: '1' });
       const rows = await serverRead(env, 'analysis_jobs?' + query, fetcher);
       if (!Array.isArray(rows)) throw new Error('invalid_server_shape');
       if (!rows.length) return reply({ error: 'not_found' }, 404);
       const row = rows[0];
-      return reply({ job: pick(row, ['id', 'barcode', 'state', 'retake_target', 'error_code',
-        'result_product_id', 'result_analysis_id', 'updated_at']) });
+      const job=pick(row, ['id', 'barcode', 'state', 'retake_target', 'error_code',
+        'result_product_id', 'result_analysis_id', 'updated_at']);
+      if(row.state==='needs_retake')job.retake_details=sanitizeRetakeDetails(row.retake_details,row.retake_target==='both'?['nutrition','ingredients']:[row.retake_target]);
+      return reply({job});
     } catch { return reply({ error: 'service_unavailable' }, 503); }
   };
 }

@@ -232,3 +232,11 @@ Earlier three-attempt reports above are historical and superseded by this change
 Daily counters reset at 00:00 UTC (08:00 Manila); these configured caps remain in
 effect until an operator changes them. Restore conservative controls after the
 hackathon; do not erase the spend ledger or enable billing as part of that reset.
+
+## Retake diagnostic testing (control version 4)
+
+Five recorded attempts had reached the per-barcode cap. For the already-authorized
+hackathon testing, that cap is now ten; global 20 attempts/day, USD 30 conservative
+admission budget, Free 30/3 and concurrency one remain unchanged. Inference stays
+on, billing off, and the spend ledger was not reset. No model call was made for the
+change. See [retake diagnostics](PICKWELL_RETAKE_DIAGNOSTICS.md).

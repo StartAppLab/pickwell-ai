@@ -233,6 +233,8 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **User-approved policy follow-up (2026-11-03):** Recognizable nutrition panels may proceed with contextually resolved nutrient words and explicit unknown amounts/basis; individual uncertain fields no longer force retakes. Publication preserves missing information and avoids unsupported findings. See [updated validation evidence](PICKWELL_ANALYSIS_VALIDATION.md). 58 backend and 12 client tests pass, analyzer clean; additive storage compatibility migration and protected handler deployed. Real-image success remains unverified; the existing three-attempt test cap was not increased.
 
+**Retake diagnostics follow-up (2026-11-03):** [Retake evidence](PICKWELL_RETAKE_DIAGNOSTICS.md). Model and validator failures now return separate photo/field/reason codes with owner-only replay persistence. A conflicting shared prompt was aligned with the approved unknown-field policy. Legacy results do not invent reasons and can explicitly reanalyze saved photos to obtain diagnostics. 106 Flutter / 82 backend tests pass; additive migration and protected handler deployed. Full real-image success remains unverified.
+
 ### T05.3 Publish product and securely dispose photos
 
 - [x] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.

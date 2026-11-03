@@ -1621,6 +1621,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Saved drafts could not be loaded. Try again; existing files have been kept.'**
   String get pkPendingLoadError;
+
+  /// No description provided for @pkRetakeSourceModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta photo review'**
+  String get pkRetakeSourceModel;
+
+  /// No description provided for @pkRetakeSourceValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation check'**
+  String get pkRetakeSourceValidation;
+
+  /// No description provided for @pkRetakeSourceLegacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier result'**
+  String get pkRetakeSourceLegacy;
+
+  /// No description provided for @pkRetakeModelNoValues.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta could not read any numeric nutrition values from this panel.'**
+  String get pkRetakeModelNoValues;
+
+  /// No description provided for @pkRetakeCauseAllergenSource.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted allergen statement does not match the transcribed text.'**
+  String get pkRetakeCauseAllergenSource;
+
+  /// No description provided for @pkRetakeCauseBlurOrGlare.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta reported blur or glare here. Hold the camera steady and change the lighting angle.'**
+  String get pkRetakeCauseBlurOrGlare;
+
+  /// No description provided for @pkRetakeCauseContradictoryEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted kcal and kJ values disagree. Include both energy values and their headings.'**
+  String get pkRetakeCauseContradictoryEnergy;
+
+  /// No description provided for @pkRetakeCauseContradictoryMass.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted nutrient amounts exceed the stated serving amount. Check that the serving size and one complete column are visible.'**
+  String get pkRetakeCauseContradictoryMass;
+
+  /// No description provided for @pkRetakeCauseContradictoryTotals.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted values conflict: a component exceeds its total. Include the full row and column headings.'**
+  String get pkRetakeCauseContradictoryTotals;
+
+  /// No description provided for @pkRetakeCauseCroppedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta reported that this area is cropped. Include the complete panel and its headings.'**
+  String get pkRetakeCauseCroppedLabel;
+
+  /// No description provided for @pkRetakeCauseDuplicateNutrient.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflicting entries were extracted for the same nutrient. Include the column headings.'**
+  String get pkRetakeCauseDuplicateNutrient;
+
+  /// No description provided for @pkRetakeCauseIncompleteIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'The ingredient transcription contains a missing or unreadable section.'**
+  String get pkRetakeCauseIncompleteIngredients;
+
+  /// No description provided for @pkRetakeCauseIngredientOrderOrSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Extracted ingredients could not be matched to the transcribed text in printed order. This may be an extraction error.'**
+  String get pkRetakeCauseIngredientOrderOrSource;
+
+  /// No description provided for @pkRetakeCauseMissingIngredients.
+  ///
+  /// In en, this message translates to:
+  /// **'The extraction contains no ingredient list. Show the full ingredient panel.'**
+  String get pkRetakeCauseMissingIngredients;
+
+  /// No description provided for @pkRetakeCauseMissingNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'No nutrition panel text or nutrient entries were extracted.'**
+  String get pkRetakeCauseMissingNutrition;
+
+  /// No description provided for @pkRetakeCauseModelRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta requested a retake but did not provide a specific diagnosis. Retaking may not resolve it.'**
+  String get pkRetakeCauseModelRequested;
+
+  /// No description provided for @pkRetakeCauseNoReadableValues.
+  ///
+  /// In en, this message translates to:
+  /// **'None of the extracted numbers passed the source checks. This can be a transcription or validation issue, not necessarily a blurry photo.'**
+  String get pkRetakeCauseNoReadableValues;
+
+  /// No description provided for @pkRetakeCauseNumericRange.
+  ///
+  /// In en, this message translates to:
+  /// **'An extracted value is outside plausible ranges. This may be a reading error.'**
+  String get pkRetakeCauseNumericRange;
+
+  /// No description provided for @pkRetakeCauseNumericSource.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted number or unit could not be matched to the transcribed label text, so it was kept unknown.'**
+  String get pkRetakeCauseNumericSource;
+
+  /// No description provided for @pkRetakeCauseOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta requested another photo of this area without a more specific diagnosis.'**
+  String get pkRetakeCauseOther;
+
+  /// No description provided for @pkRetakeCauseProductMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The two photos were identified as different products. Check that both belong to the same package.'**
+  String get pkRetakeCauseProductMismatch;
+
+  /// No description provided for @pkRetakeCauseReasonUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No specific reason was stored for this earlier result. Retaking may not resolve it.'**
+  String get pkRetakeCauseReasonUnavailable;
+
+  /// No description provided for @pkRetakeCauseUnitMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'The extracted unit does not fit this nutrient. Include both the value and its unit.'**
+  String get pkRetakeCauseUnitMismatch;
+
+  /// No description provided for @pkRetakeCauseUnreadableText.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta could not read this area. Check that the text is sharp and fully visible.'**
+  String get pkRetakeCauseUnreadableText;
+
+  /// No description provided for @pkRetakeCauseUnspecifiedRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'A retake was requested without a specific diagnosis. Retaking may not resolve it; this result needs review.'**
+  String get pkRetakeCauseUnspecifiedRetake;
+
+  /// No description provided for @pkRetakeCauseWrongPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Meta did not recognize the expected label in this photo. Check that it shows the correct panel.'**
+  String get pkRetakeCauseWrongPhoto;
+
+  /// No description provided for @pkRetakeFieldNutritionPanel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition panel'**
+  String get pkRetakeFieldNutritionPanel;
+
+  /// No description provided for @pkRetakeFieldIngredientsList.
+  ///
+  /// In en, this message translates to:
+  /// **'Ingredient list'**
+  String get pkRetakeFieldIngredientsList;
+
+  /// No description provided for @pkRetakeFieldProductIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Product identity'**
+  String get pkRetakeFieldProductIdentity;
+
+  /// No description provided for @pkRetakeFieldServingBasis.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving basis'**
+  String get pkRetakeFieldServingBasis;
+
+  /// No description provided for @pkRetakeFieldServingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving size'**
+  String get pkRetakeFieldServingSize;
+
+  /// No description provided for @pkRetakeFieldAllergens.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared allergens'**
+  String get pkRetakeFieldAllergens;
+
+  /// No description provided for @pkRetakeFieldEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get pkRetakeFieldEnergy;
+
+  /// No description provided for @pkRetakeFieldFat.
+  ///
+  /// In en, this message translates to:
+  /// **'Fat'**
+  String get pkRetakeFieldFat;
+
+  /// No description provided for @pkRetakeFieldSaturates.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturated fat'**
+  String get pkRetakeFieldSaturates;
+
+  /// No description provided for @pkRetakeFieldCarbohydrate.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbohydrate'**
+  String get pkRetakeFieldCarbohydrate;
+
+  /// No description provided for @pkRetakeFieldSugars.
+  ///
+  /// In en, this message translates to:
+  /// **'Sugars'**
+  String get pkRetakeFieldSugars;
+
+  /// No description provided for @pkRetakeFieldAddedSugars.
+  ///
+  /// In en, this message translates to:
+  /// **'Added sugars'**
+  String get pkRetakeFieldAddedSugars;
+
+  /// No description provided for @pkRetakeFieldProtein.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get pkRetakeFieldProtein;
+
+  /// No description provided for @pkRetakeFieldSalt.
+  ///
+  /// In en, this message translates to:
+  /// **'Salt'**
+  String get pkRetakeFieldSalt;
+
+  /// No description provided for @pkRetakeFieldSodium.
+  ///
+  /// In en, this message translates to:
+  /// **'Sodium'**
+  String get pkRetakeFieldSodium;
+
+  /// No description provided for @pkRetakeFieldFibre.
+  ///
+  /// In en, this message translates to:
+  /// **'Fibre'**
+  String get pkRetakeFieldFibre;
+
+  /// No description provided for @pkRetakeFieldOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Label area'**
+  String get pkRetakeFieldOther;
+
+  /// No description provided for @pkRetakeRecheckSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Reanalyze saved photos'**
+  String get pkRetakeRecheckSaved;
+
+  /// No description provided for @pkRetakeRecheckCost.
+  ///
+  /// In en, this message translates to:
+  /// **'This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.'**
+  String get pkRetakeRecheckCost;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

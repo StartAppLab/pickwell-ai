@@ -63,7 +63,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='contradiction'){const c=candidate(),n=c.nutrition.nutrients[0];c.nutrition.raw=c.nutrition.raw.replace(n.source,'Energy 9000 kcal');n.value=9000;n.source='Energy 9000 kcal';return modelResult(c);}
    if(behavior==='normalized'){const c=candidate();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Nutrition facts');return modelResult(c);}
    if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
-   if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.nutrition.basis='unknown';return modelResult(c);}
+   if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.basis='unknown';return modelResult(c);}
    return modelResult(candidate());
   }
   assert.equal(new URL(url).origin,origin.origin,'Only native Supabase and mocked Meta are allowed');
@@ -154,7 +154,27 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    for(const mode of ['fail','malformed','retake']){
     behavior=mode;const key=crypto.randomUUID(),barcode=code(),before=providerCalls,r=await submit(alice,barcode,key);
     assert.equal(r.http,mode==='retake'?422:502);assert.equal(r.body.status,mode==='retake'?'needs_retake':'analysis_failed');
-    if(mode==='retake')assert.deepEqual(r.body.retake,['nutrition']);
+    if(mode==='retake'){
+     assert.deepEqual(r.body.retake,['nutrition']);
+     assert.ok(r.body.retake_details.some(d=>d.source==='model'&&d.code==='blur_or_glare'&&d.field==='fat'));
+     assert.deepEqual((await submit(alice,barcode,key)).body.retake_details,r.body.retake_details);
+     const job=(await rest('analysis_jobs?id=eq.'+r.body.job_id))[0];
+     assert.deepEqual(job.retake_details,r.body.retake_details);
+     assert.equal(r.body.allow_diagnostic_reanalysis,false);
+     await rest('analysis_jobs?id=eq.'+r.body.job_id,'PATCH',{retake_details:[]});
+     const legacy=(await submit(alice,barcode,key)).body;
+     assert.equal(legacy.allow_diagnostic_reanalysis,true);
+     assert.equal(legacy.retake_details[0].code,'reason_unavailable');
+     assert.equal(providerCalls-before,1);
+     await rest('analysis_jobs?id=eq.'+r.body.job_id,'PATCH',{retake_details:job.retake_details});
+     await assert.rejects(rpc('pickwell_analysis_reply',{p_user:bob.user.id,p_key:key}));
+     await assert.rejects(rpc('pickwell_record_analysis_retake',{p_user:alice.user.id,p_key:key,p_retake:'nutrition',
+       p_details:[{photo:'nutrition',source:'model',code:'bad arbitrary code',field:'fat'}]}));
+     const denied=await fetch(origin.origin+'/rest/v1/rpc/pickwell_record_analysis_retake',{method:'POST',
+       headers:{apikey:env.SUPABASE_ANON_KEY,Authorization:'Bearer '+alice.access_token,'content-type':'application/json'},
+       body:JSON.stringify({p_user:alice.user.id,p_key:key,p_retake:'nutrition',p_details:[]})});
+     assert.ok([401,403,404].includes(denied.status));
+    }
     assert.equal((await submit(alice,barcode,key)).body.status,r.body.status);assert.equal(providerCalls-before,1);
     const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});assert.equal(quota.used,0);assert.equal(quota.reserved,0);
    }

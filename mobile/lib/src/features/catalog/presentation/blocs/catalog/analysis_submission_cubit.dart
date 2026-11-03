@@ -148,6 +148,43 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
     if (state.canRetry) await submit();
   }
 
+  // Explicit one-off fresh inference for legacy retakes whose reasons were not recorded.
+  // Provider uncertainty never uses this path; server controls still admit every call.
+  Future<void> reanalyzeSaved() async {
+    if (isClosed ||
+        state.busy ||
+        state.phase != AnalysisPhase.retake ||
+        !current ||
+        !draft.state.ready ||
+        state.result?.canReanalyzeSaved != true) {
+      return;
+    }
+    final stamp = _fingerprint(draft.state), barcode = draft.state.barcode;
+    emit(AnalysisSubmissionState(phase: AnalysisPhase.submitting, barcode: barcode));
+    if (!await draft.renewRequest()) {
+      if (!isClosed) {
+        emit(
+          AnalysisSubmissionState(
+            phase: AnalysisPhase.error,
+            barcode: draft.state.barcode,
+            error: 'draft_save',
+            canRetry: true,
+          ),
+        );
+      }
+      return;
+    }
+    if (isClosed || _fingerprint(draft.state) != stamp) {
+      if (!isClosed) emit(AnalysisSubmissionState(barcode: barcode));
+      return;
+    }
+    _key = draft.requestId;
+    _attempts = 0;
+    _stamp = stamp;
+    emit(AnalysisSubmissionState(barcode: barcode));
+    await submit();
+  }
+
   Future<void> retryCleanup() async {
     if (isClosed || state.phase != AnalysisPhase.cleanupFailed || _submitted == null) return;
     final result = state.result, barcode = state.barcode;

@@ -847,4 +847,163 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pkPendingLoadError =>
       'Saved drafts could not be loaded. Try again; existing files have been kept.';
+
+  @override
+  String get pkRetakeSourceModel => 'Meta photo review';
+
+  @override
+  String get pkRetakeSourceValidation => 'Validation check';
+
+  @override
+  String get pkRetakeSourceLegacy => 'Earlier result';
+
+  @override
+  String get pkRetakeModelNoValues =>
+      'Meta could not read any numeric nutrition values from this panel.';
+
+  @override
+  String get pkRetakeCauseAllergenSource =>
+      'The extracted allergen statement does not match the transcribed text.';
+
+  @override
+  String get pkRetakeCauseBlurOrGlare =>
+      'Meta reported blur or glare here. Hold the camera steady and change the lighting angle.';
+
+  @override
+  String get pkRetakeCauseContradictoryEnergy =>
+      'The extracted kcal and kJ values disagree. Include both energy values and their headings.';
+
+  @override
+  String get pkRetakeCauseContradictoryMass =>
+      'The extracted nutrient amounts exceed the stated serving amount. Check that the serving size and one complete column are visible.';
+
+  @override
+  String get pkRetakeCauseContradictoryTotals =>
+      'The extracted values conflict: a component exceeds its total. Include the full row and column headings.';
+
+  @override
+  String get pkRetakeCauseCroppedLabel =>
+      'Meta reported that this area is cropped. Include the complete panel and its headings.';
+
+  @override
+  String get pkRetakeCauseDuplicateNutrient =>
+      'Conflicting entries were extracted for the same nutrient. Include the column headings.';
+
+  @override
+  String get pkRetakeCauseIncompleteIngredients =>
+      'The ingredient transcription contains a missing or unreadable section.';
+
+  @override
+  String get pkRetakeCauseIngredientOrderOrSource =>
+      'Extracted ingredients could not be matched to the transcribed text in printed order. This may be an extraction error.';
+
+  @override
+  String get pkRetakeCauseMissingIngredients =>
+      'The extraction contains no ingredient list. Show the full ingredient panel.';
+
+  @override
+  String get pkRetakeCauseMissingNutrition =>
+      'No nutrition panel text or nutrient entries were extracted.';
+
+  @override
+  String get pkRetakeCauseModelRequested =>
+      'Meta requested a retake but did not provide a specific diagnosis. Retaking may not resolve it.';
+
+  @override
+  String get pkRetakeCauseNoReadableValues =>
+      'None of the extracted numbers passed the source checks. This can be a transcription or validation issue, not necessarily a blurry photo.';
+
+  @override
+  String get pkRetakeCauseNumericRange =>
+      'An extracted value is outside plausible ranges. This may be a reading error.';
+
+  @override
+  String get pkRetakeCauseNumericSource =>
+      'The extracted number or unit could not be matched to the transcribed label text, so it was kept unknown.';
+
+  @override
+  String get pkRetakeCauseOther =>
+      'Meta requested another photo of this area without a more specific diagnosis.';
+
+  @override
+  String get pkRetakeCauseProductMismatch =>
+      'The two photos were identified as different products. Check that both belong to the same package.';
+
+  @override
+  String get pkRetakeCauseReasonUnavailable =>
+      'No specific reason was stored for this earlier result. Retaking may not resolve it.';
+
+  @override
+  String get pkRetakeCauseUnitMismatch =>
+      'The extracted unit does not fit this nutrient. Include both the value and its unit.';
+
+  @override
+  String get pkRetakeCauseUnreadableText =>
+      'Meta could not read this area. Check that the text is sharp and fully visible.';
+
+  @override
+  String get pkRetakeCauseUnspecifiedRetake =>
+      'A retake was requested without a specific diagnosis. Retaking may not resolve it; this result needs review.';
+
+  @override
+  String get pkRetakeCauseWrongPhoto =>
+      'Meta did not recognize the expected label in this photo. Check that it shows the correct panel.';
+
+  @override
+  String get pkRetakeFieldNutritionPanel => 'Nutrition panel';
+
+  @override
+  String get pkRetakeFieldIngredientsList => 'Ingredient list';
+
+  @override
+  String get pkRetakeFieldProductIdentity => 'Product identity';
+
+  @override
+  String get pkRetakeFieldServingBasis => 'Serving basis';
+
+  @override
+  String get pkRetakeFieldServingSize => 'Serving size';
+
+  @override
+  String get pkRetakeFieldAllergens => 'Declared allergens';
+
+  @override
+  String get pkRetakeFieldEnergy => 'Energy';
+
+  @override
+  String get pkRetakeFieldFat => 'Fat';
+
+  @override
+  String get pkRetakeFieldSaturates => 'Saturated fat';
+
+  @override
+  String get pkRetakeFieldCarbohydrate => 'Carbohydrate';
+
+  @override
+  String get pkRetakeFieldSugars => 'Sugars';
+
+  @override
+  String get pkRetakeFieldAddedSugars => 'Added sugars';
+
+  @override
+  String get pkRetakeFieldProtein => 'Protein';
+
+  @override
+  String get pkRetakeFieldSalt => 'Salt';
+
+  @override
+  String get pkRetakeFieldSodium => 'Sodium';
+
+  @override
+  String get pkRetakeFieldFibre => 'Fibre';
+
+  @override
+  String get pkRetakeFieldOther => 'Label area';
+
+  @override
+  String get pkRetakeRecheckSaved => 'Reanalyze saved photos';
+
+  @override
+  String get pkRetakeRecheckCost =>
+      'This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.';
 }

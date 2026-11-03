@@ -1,3 +1,4 @@
+import { sanitizeRetakeDetails } from './retake_details.mjs';
 import { attachAnalysisQuota } from './analysis_quota_response.mjs';
 import { requireVerifiedEmail, IdentityError } from './analysis_authorization.mjs';
 import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mjs';
@@ -47,8 +48,9 @@ function createAnalysisExecution(env,fetcher){
   }
   const identity={p_user:user,p_key:input.key};
   const current=()=>rpc('pickwell_analysis_reply',identity);
-  const settle=(outcome,error=null,retake=null)=>rpc('pickwell_settle_analysis',{
-   ...identity,p_outcome:outcome,p_error:error,p_retake:retake});
+  const settle=(outcome,error=null,retake=null,details=[])=>outcome==='retake'?
+   rpc('pickwell_record_analysis_retake',{...identity,p_retake:retake,p_details:details}):
+   rpc('pickwell_settle_analysis',{...identity,p_outcome:outcome,p_error:error,p_retake:retake});
   function safe(result,http=200){
    // A previous denial before provider admission stays retryable after restart.
    if(result.status==='analysis_failed'&&['service_budget_exceeded','concurrency_limited','inference_disabled'].includes(result.error))
@@ -57,7 +59,11 @@ function createAnalysisExecution(env,fetcher){
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.
    if(['ready','already_exists'].includes(result.status))body.product=sanitizePublishedProduct(result.product);
-   if(result.status==='needs_retake')body.retake=result.retake_target==='both'?['nutrition','ingredients']:[result.retake_target];
+   if(result.status==='needs_retake'){
+    body.retake=result.retake_target==='both'?['nutrition','ingredients']:[result.retake_target];
+    body.retake_details=sanitizeRetakeDetails(result.retake_details,body.retake);
+    body.allow_diagnostic_reanalysis=Array.isArray(result.retake_details)&&result.retake_details.length===0;
+   }
    if(result.status==='processing'){
     body.retry_after_seconds=4;
     if(['validation_pending','provider_reconciliation_required'].includes(result.stage))body.stage=result.stage;
@@ -118,7 +124,7 @@ function createAnalysisExecution(env,fetcher){
     metadata.usage?.output_tokens??null,metadata.duration_ms??null);
    if(extracted.validation.status==='needs_retake'){
     const targets=extracted.validation.retake;
-    return safe(await settle('retake',null,targets.length===1?targets[0]:'both'),422);
+    return safe(await settle('retake',null,targets.length===1?targets[0]:'both',extracted.validation.reason_details),422);
    }
    // Persist only normalized known/unknown facts; publication revalidates the same candidate.
    extracted.candidate.nutrition=extracted.validation.nutrition;
