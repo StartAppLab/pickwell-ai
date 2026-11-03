@@ -143,8 +143,8 @@ flutter:
 
 define_app_icon: &app_icon assets/images/app_icon_launcher.png
 define_app_icon_foreground: &app_icon_foreground assets/images/app_icon_foreground.png
-define_app_icon_background: &app_icon_background "#ffffff"
-define_color: &color "#fbfaff" # background and surface color
+define_app_icon_background: &app_icon_background "#FDF6EC"
+define_color: &color "#FDF6EC" # background and surface color
 define_color_dark: &color_dark "#181a1d" # background and surface color
 
 flutter_launcher_icons:
