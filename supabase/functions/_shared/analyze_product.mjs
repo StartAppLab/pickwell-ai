@@ -3,6 +3,7 @@ import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mj
 import { createQuotaService, networkBucket } from './quota_boundary.mjs';
 import { createOperationalEvents } from './operational_events.mjs';
 import { readAnalysisInput, AnalysisInputError } from './analysis_input.mjs';
+import { analysisProfile, validateAnalysis, PROMPT_VERSION } from './analysis_validation.mjs';
 import { invokeMetaLabels, META_URL } from '../../spikes/meta-vision/core.mjs';
 
 const reply=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
@@ -77,7 +78,8 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
    }
    const metadata={model:claim.model,usage:null};let extracted;
    try{
-    extracted=await invokeMetaLabels(env,input.images,metadata,fetcher);
+    extracted=await invokeMetaLabels(env,input.images,metadata,fetcher,analysisProfile);
+    extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model});
    }catch(error){
     const uncertain=['TimeoutError','AbortError','TypeError'].includes(error?.name)||!metadata.provider_status;
     await q.recordProvider(claim.attempt_id,uncertain?'unknown':'failed',null,
@@ -92,13 +94,13 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
    }
    await q.recordProvider(claim.attempt_id,'succeeded',null,metadata.usage?.input_tokens??null,
     metadata.usage?.output_tokens??null,metadata.duration_ms??null);
-   if(extracted.extraction.status==='needs_retake'){
-    const targets=extracted.extraction.retake;
+   if(extracted.validation.status==='needs_retake'){
+    const targets=extracted.validation.retake;
     return safe(await settle('retake',null,targets.length===1?targets[0]:'both'),422);
    }
-   // Private durable handoff only; rule validation/publication is T05.2/T05.3.
-   return safe(await rpc('pickwell_stage_analysis',{...identity,p_candidate:extracted.candidate,
-    p_model:claim.model,p_prompt:'label-extraction-v1'}),202);
+   // Validated private handoff only. Publication and successful credit remain T05.3.
+   return safe(await rpc('pickwell_stage_analysis',{...identity,p_candidate:{...extracted.candidate,validation:extracted.validation},
+    p_model:claim.model,p_prompt:PROMPT_VERSION}),202);
   }catch(error){
    return failure(error?.message==='idempotency_conflict'?'idempotency_conflict':'service_unavailable',
     error?.message==='idempotency_conflict'?409:503);

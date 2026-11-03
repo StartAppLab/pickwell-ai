@@ -1,0 +1,8 @@
+{
+  "_note": "Private manifest template for analysis-index.ts. Photos are ignored; filenames are placeholders for operator-supplied local real labels. Third case must truly be unreadable; do not mislabel a readable mismatch as that test.",
+  "cases": [
+    {"nutrition": "product_a_nutrition.jpeg", "ingredients": "product_a_ingredients.jpeg", "expected_status": "validated"},
+    {"nutrition": "product_b_nutrition.jpeg", "ingredients": "product_b_ingredients.jpeg", "expected_status": "validated"},
+    {"nutrition": "product_a_nutrition.jpeg", "ingredients": "unreadable_label.jpeg", "expected_status": "needs_retake"}
+  ]
+}

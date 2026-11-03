@@ -218,12 +218,14 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 - [ ] Extract ingredient raw text, ordered items, nutrition values with units and per-serving/per-100g basis, and declared allergens where visible.
 - [ ] Meta generates understandable explanations; deterministic backend rules assign green/yellow/red only with evidenced and threshold-backed reasons.
-- [ ] Represent ambiguous values as unknown; verify required fields, product consistency, numeric ranges and source basis.
-- [ ] If nutrition or ingredient image unclear, return `needs_retake` referencing **which photo** rather than publishing partial misleading results.
-- [ ] Record model version, prompt/rules version and evidence/provenance; no overall food score or blanket healthy/unhealthy certification.
+- [x] Represent ambiguous values as unknown; verify required fields, product consistency, numeric ranges and source basis.
+- [x] If nutrition or ingredient image unclear, return `needs_retake` referencing **which photo** rather than publishing partial misleading results.
+- [x] Record model version, prompt/rules version and evidence/provenance; no overall food score or blanket healthy/unhealthy certification.
 
 **Acceptance:** Two representative food labels produce readable validated result; a bad image produces actionable retake; traffic-light claims trace to label/rules.  
 **Targeted validation:** Fixture-based schema/rules tests; malformed and contradictory payload tests; real images from Phase 1.
+
+**2026-11-03 — PARTIAL:** [Validation and real-call evidence](PICKWELL_ANALYSIS_VALIDATION.md). V2 source/unit/basis/consistency validation, photo-specific retakes, constrained Meta fact explanations and versioned deterministic nutrient rules integrated into the private handoff; no publication. **43 targeted native/mock/schema tests pass.** Three fresh protected two-image Meta calls returned retakes; corrected source-spelling checks were rerun on the saved candidates without more paid calls. Product A still needs ingredients; Product B needs both photos; the readable cookie mismatch is not an unreadable test. Two complete real products, genuine unreadable-image evidence and substantive ingredient explanations remain unmet, so the first two checkboxes remain open. Protected analyze-product updated with inference/billing OFF; spike disabled/token rotated after use. No Flutter or migration changes.
 
 ### T05.3 Publish product and securely dispose photos
 

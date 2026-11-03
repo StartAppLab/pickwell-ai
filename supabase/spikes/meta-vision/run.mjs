@@ -15,8 +15,10 @@ async function main() {
   if (!process.argv[2]) throw new Error('HARD BLOCKED: supply a private three-case manifest');
   const file = resolve(process.argv[2]);
   const manifest = JSON.parse(await readFile(file, 'utf8'));
-  const expected = ['extracted', 'extracted', 'needs_retake'];
-  if (!Array.isArray(manifest.cases) || manifest.cases.length !== 3 ||
+  // Existing v1 manifests remain valid; v2 expects validated facts and rules.
+  const success = manifest.cases?.[0]?.expected_status;
+  const expected = [success, success, 'needs_retake'];
+  if (!['extracted', 'validated'].includes(success) || !Array.isArray(manifest.cases) || manifest.cases.length !== 3 ||
       manifest.cases.some((item, index) => item.expected_status !== expected[index])) {
     throw new Error('Manifest requires two product pairs and one unreadable case, in that order');
   }
@@ -58,7 +60,7 @@ async function main() {
         http_status: response.status, result }) + '\n');
       // Print an allowlisted receipt, not raw model content, images or credentials.
       console.log(JSON.stringify({ case: index + 1, http_status: response.status, passed: matches,
-        status: ['extracted', 'needs_retake'].includes(result.status) ? result.status : 'failed',
+        status: ['extracted', 'validated', 'needs_retake'].includes(result.status) ? result.status : 'failed',
         basis: result.nutrition?.basis ?? null, nutrient_count: result.nutrition?.nutrients?.length ?? 0,
         retake: result.retake, metadata: result.metadata }));
       if (!response.ok) break; // No automatic retry or continued spending after errors.

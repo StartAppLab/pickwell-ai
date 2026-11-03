@@ -309,3 +309,18 @@ must never be cleared by a client retry.
 See [orchestration evidence](../docs/PICKWELL_ANALYSIS_ORCHESTRATION.md). T05.2/T05.3
 and Flutter upload/result wiring remain separate; an auth preflight or private
 candidate is not a published product or a consumed successful-analysis credit.
+
+## Extraction and validation (T05.2)
+
+The protected analysis handler uses `analysis_validation.mjs` for a versioned strict
+Meta schema, literal fact checks, photo-specific retakes and source-backed nutrient
+rules. It stages accepted `candidate.validation` privately, without publishing or
+spending a successful-analysis credit. Model explanations are constrained factual
+restatements; colours come solely from backend rules. Unsupported contexts remain
+unclassified. See [validation/live evidence](../docs/PICKWELL_ANALYSIS_VALIDATION.md).
+
+T05.2 remains partial: existing real pairs still need retakes and the so-called
+unreadable fixture is a readable mismatch. Normal inference/billing are disabled.
+The optional operator-only `spikes/meta-vision/analysis-index.ts` reuses the existing
+guards; its three-case manifest/runner must not treat retakes as successful products.
+No publication or Flutter upload implementation is included.

@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {createServer} from 'node:http';
 import {deflateSync} from 'node:zlib';
 import {createAnalyzeProductHandler} from '../functions/_shared/analyze_product.mjs';
+import {labelFixture} from './fixtures/label_analysis.mjs';
 import {META_URL} from '../spikes/meta-vision/core.mjs';
 const crc=bytes=>{let n=0xffffffff;for(const v of bytes){n^=v;for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;}return (n^0xffffffff)>>>0;};
 function png(color=0,width=1){
@@ -18,8 +19,7 @@ function form(barcode,key=crypto.randomUUID(),overrides={}){
  f.set('ingredients_image',new Blob([png(20)],{type:'image/png'}),'ingredients.png');
  for(const [k,v]of Object.entries(overrides))f.set(k,v);return f;
 }
-const candidate=()=>({status:'extracted',retake:[],ingredients:{raw:'Oats, salt',items:['Oats','salt'],declared_allergens:null},
- nutrition:{raw:'Per 100 g Sodium 20 mg',basis:'per_100g',serving_size:null,nutrients:[{name:'Sodium',value:20,unit:'mg',source:'Sodium 20 mg'}]}});
+const candidate=labelFixture;
 const modelResult=value=>Response.json({model:'muse-spark-1.3',usage:{prompt_tokens:123,completion_tokens:42},
  choices:[{finish_reason:'stop',message:{content:JSON.stringify(value)}}]});
 
@@ -57,6 +57,8 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='timeout')throw new DOMException('PRIVATE upstream','TimeoutError');
    if(behavior==='fail')return new Response('PRIVATE upstream',{status:429});
    if(behavior==='malformed')return modelResult({...candidate(),extra:'PRIVATE'});
+   if(behavior==='contradiction'){const c=candidate();c.nutrition.nutrients[0].value=9000;return modelResult(c);}
+   if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
    if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.nutrition.basis='unknown';return modelResult(c);}
    return modelResult(candidate());
   }
@@ -119,7 +121,9 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    for(let i=0;i<out.length;i++)if(i%2!==winner%2)assert.equal(out[i].body.job_id,undefined);
    const jobs=await rest(`analysis_jobs?barcode=eq.${barcode.padStart(14,'0')}`);assert.equal(jobs.length,1);
    assert.equal((await rest(`products?barcode=eq.${barcode.padStart(14,'0')}`)).length,0,'No premature publication');
-   assert.equal((await rest('analysis_candidates?job_id=eq.'+jobs[0].id)).length,1);
+   const stored=await rest('analysis_candidates?job_id=eq.'+jobs[0].id);assert.equal(stored.length,1);
+   assert.equal(stored[0].candidate.validation.status,'validated');assert.equal(stored[0].prompt_version,'label-analysis-v2');
+   assert.equal(stored[0].candidate.validation.provenance.rules_version,'uk-fop-2016-conservative-v1');
    await cleanup(owner,keys[winner]);
    const shared=await submit(winner%2?alice:bob,barcode,keys[winner%2?0:1]);assert.equal(shared.body.status,'analysis_failed');
   });
@@ -146,6 +150,15 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
     const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});assert.equal(quota.used,0);assert.equal(quota.reserved,0);
    }
    behavior='success';
+  });
+  await t.test('evidence validation failures release successful-use credit and target only the bad photo',async()=>{
+   for(const [mode,target] of [['contradiction','nutrition'],['ingredient-order','ingredients']]){
+    behavior=mode;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+    const r=await submit(alice,barcode,key);assert.equal(r.http,422);assert.deepEqual(r.body.retake,[target]);
+    assert.equal((await submit(alice,barcode,key)).body.status,'needs_retake');assert.equal(providerCalls-before,1);
+    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+    assert.equal(quota.used,0);assert.equal(quota.reserved,0);
+   }behavior='success';
   });
   await t.test('new request keys cannot evade the per-barcode daily provider-attempt cap',async()=>{
    behavior='fail';const barcode=code(),before=providerCalls;
