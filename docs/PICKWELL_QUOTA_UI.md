@@ -240,3 +240,58 @@ hackathon testing, that cap is now ten; global 20 attempts/day, USD 30 conservat
 admission budget, Free 30/3 and concurrency one remain unchanged. Inference stays
 on, billing off, and the spend ledger was not reset. No model call was made for the
 change. See [retake diagnostics](PICKWELL_RETAKE_DIAGNOSTICS.md).
+
+## Temporary broad testing capacity (control version 5, 2026-11-03)
+
+User requested removal of testing limits after another denial. Hosted inspection
+confirmed ten calls on one barcode and two recent `provider_attempt_limit` jobs,
+with no inflight/unknown calls. Ten existing provider ledger rows were preserved;
+no quota counters or cost records were erased.
+
+The user-authorized temporary shared configuration is now:
+
+| Setting | Previous | Testing |
+| --- | ---: | ---: |
+| Free barcode lookups/day | 30 | 1000 |
+| Free successful analyses/day | 3 | 100 |
+| Provider attempts/barcode/day | 10 | 100 |
+| Provider attempts/user/day | 20 | 100 |
+| Provider attempts/network/day | 40 | 500 |
+| Provider attempts/global/day | 20 | 500 |
+| Conservative daily spend ceiling, USD | 30 | 100 |
+| Global/user/network concurrency | 1/1/1 | 5/2/5 |
+| User/network attempts/minute | 20/60 | 200/1000 |
+| Guest requests/minute and day | 10/30 | 100/1000 |
+
+These are generous finite testing allowances, not unlimited provider access.
+The USD 1.34 per-call worst-case hold remains, so the spend ceiling may bind before
+the nominal 500 global attempts. Provider-side rate limits remain outside app
+control. This applies to the shared Free configuration, not only one test user.
+Inference remains on; billing/purchases remain off. JWT/verified-email checks,
+RLS, duplicate-barcode locks, same-key idempotency and unknown-outcome holds remain.
+
+Migration `20261103000500_pickwell_test_barcode_capacity.sql` extends only the
+configurable per-barcode bound from 10 to 1000; existing defaults are unchanged.
+Dry run showed exactly this one pending migration, and cloud push applied it.
+The audited runtime change advanced controls to version 5 and Free rows to version 2.
+
+Previously denied jobs retain their outcome. The deployed handler now explicitly
+permits manual fresh-key retry after `provider_attempt_limit`, including replay,
+as it already does for confirmed pre-provider budget/concurrency denials. No model
+request happened for that denied job, and every new request repeats all admission
+checks. Unknown provider outcomes never get this permission. The existing app
+understands this flag; no rebuild or recapture is required.
+
+Validation: one focused handler test passed, covering initial/replayed budget and
+attempt-cap rejection with zero provider calls. Hosted transaction assertions
+verified all allowance values, rejected barcode bounds 0 and 1001, and confirmed
+anonymous/authenticated clients cannot update controls; assertion mutations rolled
+back. Handler deployment succeeded. No live model inference was used for this
+capacity change. Full-flow tests remain deferred.
+
+**Before release, restore explicitly (not an automatic midnight rollback):**
+Free barcode/analysis 30/3; global/user/network/barcode attempts 20/20/40/10;
+USD30 daily budget; concurrency 1/1/1; user/network per-minute 20/60;
+guest per-minute/day 10/30. Set a fresh audit change_reason when restoring.
+The widened schema bound can remain; it grants no client privilege and changes no
+runtime default by itself. Do not reset usage records as part of restoration.
