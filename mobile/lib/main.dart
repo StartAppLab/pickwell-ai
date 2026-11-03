@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
@@ -43,6 +44,9 @@ Future<void> main() async {
 
   Future<void> launch() async {
     try {
+      // Keep both system bars visible while rendering behind them on Android,
+      // including devices older than Android 15's edge-to-edge default.
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
       await _bootstrapApplication();
       runApp(const PickwellApp());
     } catch (error, stackTrace) {
@@ -207,6 +211,10 @@ class _PickwellAppState extends State<PickwellApp> with WidgetsBindingObserver {
             theme: state.themeState?.lightTheme ?? defaultLightTheme,
             darkTheme: state.themeState?.darkTheme ?? defaultDarkTheme,
             themeMode: state.themeMode ?? defaultThemeMode,
+            builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+              value: AppTheme.systemOverlayStyle(Theme.of(context).brightness),
+              child: child ?? const SizedBox.shrink(),
+            ),
             routerConfig: AppRouter.routerConfig,
           );
         },

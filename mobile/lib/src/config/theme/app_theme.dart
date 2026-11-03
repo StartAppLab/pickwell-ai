@@ -166,11 +166,24 @@ class AppTheme {
     );
   }
 
+  /// Explicit values avoid the black navigation-bar default in Flutter's
+  /// SystemUiOverlayStyle.light/dark, including pages without an AppBar.
+  static SystemUiOverlayStyle systemOverlayStyle(Brightness brightness) =>
+      (brightness == Brightness.light ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light)
+          .copyWith(
+            statusBarColor: Colors.transparent,
+            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarDividerColor: Colors.transparent,
+            systemNavigationBarIconBrightness: brightness == Brightness.light
+                ? Brightness.dark
+                : Brightness.light,
+            systemStatusBarContrastEnforced: false,
+            systemNavigationBarContrastEnforced: false,
+          );
+
   static AppBarTheme _getAppBarTheme(AppThemeData base, ColorScheme colorScheme) {
     return AppBarTheme(
-      systemOverlayStyle: colorScheme.brightness == Brightness.light
-          ? SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent)
-          : SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent),
+      systemOverlayStyle: systemOverlayStyle(colorScheme.brightness),
       backgroundColor: colorScheme.surface,
       elevation: 0,
       centerTitle: true,

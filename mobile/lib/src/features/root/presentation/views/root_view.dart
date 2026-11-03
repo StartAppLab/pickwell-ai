@@ -244,12 +244,13 @@ class _RootViewState extends State<RootView> {
                   AnimatedPositioned(
                     duration: MediaQuery.disableAnimationsOf(context)
                         ? Duration.zero
-                        : const Duration(milliseconds: 200),
-                    curve: Curves.easeInOut,
+                        : const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
                     left: selectedIndex * itemWidth,
                     top: 0,
                     bottom: 0,
                     child: Container(
+                      key: const ValueKey('navigation-selector'),
                       width: itemWidth,
                       decoration: BoxDecoration(
                         color: context.colorScheme.primaryContainer,

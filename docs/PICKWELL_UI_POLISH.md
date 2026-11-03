@@ -2,6 +2,20 @@
 
 Date: 2026-11-04 (Asia/Manila). Scope: presentation-only polish after T07.1; no backend, database, quota, provider, auth policy or persistence changes. T06.4 was not started.
 
+## Dock inset, animation and Android system bars (2026-11-04)
+
+Owner-requested follow-up after the separate UI-polish and Home-reference commits:
+
+- Trialed 8dp internal dock padding, then **reverted it at the owner's request before committing**. The original dock height and edge-aligned selector are restored; the animation and Android fixes remain. The Scan circle remains independent.
+- The slide animation had not been removed: the previous polish shortened it from 300ms to 200ms and softened its appearance. Restored a **300ms ease-out slide**. New tests sample its intermediate position in both directions through real ShellRoute navigation and verify that RootView state survives the route change. Reduced-motion settings still select immediately.
+- Located the Android black-bar regression in the shared app-bar overlay style: Flutter's light/dark presets retain a black navigation-bar color unless explicitly overridden (confirmed in the installed SDK). Home has no app bar to establish a fresh style. Added one explicit light/dark transparent system-bar style, reused by the theme and a full-route AnnotatedRegion so pages without app bars retain it. Set navigation icons for light/dark backgrounds, removed the divider/contrast scrim and explicitly enabled edge-to-edge at startup, including pre-Android-15 devices.
+
+This follows Flutter's [system overlay guidance](https://api.flutter.dev/flutter/services/SystemChrome/setSystemUIOverlayStyle.html) and [edge-to-edge guidance](https://docs.flutter.dev/release/breaking-changes/default-systemuimode-edge-to-edge). OS navigation controls remain visible; content stays behind the transparent bars while interactive UI retains safe-area padding. A full app restart is required to run the new startup mode setting; hot reload alone does not rerun main.
+
+**Files:** `mobile/lib/main.dart`, `mobile/lib/src/config/theme/app_theme.dart`, `mobile/lib/src/features/root/presentation/views/root_view.dart`, new `mobile/test/catalog/navigation_shell_test.dart`, and this report. No backend, authentication, quota, data or native resource changes.
+
+**Observed validation:** `fvm flutter test --no-pub test/catalog/navigation_shell_test.dart test/catalog/home_widget_test.dart test/catalog/ui_polish_test.dart` — **18 passed**. Four new tests cover edge-aligned selector/animation with and without reduced motion, and emitted transparent system styles in light/dark across AppBar/no-AppBar transitions and keyboard focus recovery. Existing compact/tablet/large-text/layout checks pass. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Reviewed updated Home widget render; final selector padding was reverted before commit. These are framework/widget checks; no new Android install, actual IME/gesture-vs-three-button visual test or device screenshot is claimed.
+
 ## Latest scope — Home reference follow-up (2026-11-04)
 
 The owner subsequently supplied **`docs/reference/home.png`** and requested Home first, setting further logo work aside. Inspected that image directly before this revision. Earlier paragraphs describing absent mockups record the initial pass; Home now has an actual visual reference. Other supplied reference files are available but have not been applied in this Home-only follow-up.
@@ -58,6 +72,7 @@ Private render evidence: `.secrets/ui-polish/home-390.png`, `details-light.png`,
 
 ## Exact files changed
 
+- `mobile/lib/main.dart`
 - `mobile/lib/src/config/theme/app_base_theme.dart`
 - `mobile/lib/src/config/theme/app_color_scheme.dart`
 - `mobile/lib/src/config/theme/app_theme.dart`
@@ -80,6 +95,7 @@ Private render evidence: `.secrets/ui-polish/home-390.png`, `details-light.png`,
 - `mobile/test/catalog/email_otp_test.dart`
 - `mobile/test/catalog/home_widget_test.dart`
 - `mobile/assets/images/pickwell_lemon.png` (unchanged copy of supplied `assets/pickwell-raw.png`)
+- `mobile/test/catalog/navigation_shell_test.dart`
 - `mobile/test/catalog/ui_polish_test.dart`
 - `docs/PICKWELL_UI_POLISH.md`
 - `docs/PICKWELL_TASKS.md`
