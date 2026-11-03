@@ -32,7 +32,21 @@ class CatalogModel {
       for (final value in nutrition['nutrients'] as List) {
         if (value is! Map ||
             value['name'] is! String ||
-            !{'g', 'mg', 'ug', 'kcal', 'kJ', 'unknown'}.contains(value['unit'])) {
+            !{
+              'g',
+              'mg',
+              'ug',
+              'kcal',
+              'kJ',
+              'IU',
+              'ug RAE',
+              'ug DFE',
+              'mg NE',
+              'mg α-TE',
+              '%',
+              '%DV',
+              'unknown',
+            }.contains(value['unit'])) {
           throw const FormatException();
         }
         final number = value['value'];

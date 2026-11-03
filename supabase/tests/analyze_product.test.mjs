@@ -68,6 +68,11 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
     return modelResult(c);
    }
    if(behavior==='text-only'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.nutrients=[];return modelResult(c);}
+   if(behavior==='extended-units'){
+    const c=candidate();for(const [name,value,unit]of [['Vitamin D',71,'IU'],['Folate',120,'ug DFE'],['Total Fat',8,'%DV']]){
+     const source=name+' '+value+' '+unit;c.nutrition.raw+='; '+source;c.nutrition.nutrients.push({name,value,unit,source});
+    }return modelResult(c);
+   }
    if(behavior==='source-mismatch'){const c=candidate();for(const n of c.nutrition.nutrients)n.source='unmatched transcription';return modelResult(c);}
    if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
    if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.basis='unknown';c.nutrition.raw=null;return modelResult(c);}
@@ -305,6 +310,18 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal(result.body.product.findings.length,4);
    assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
    assert.equal(providerCalls-before,1);
+  });
+  await t.test('IU and qualified units publish and remain readable to a guest without another model call',async()=>{
+   behavior='extended-units';const barcode=code(),key=crypto.randomUUID(),before=providerCalls;
+   const r=await submit(alice,barcode,key);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+   const vitamin=r.body.product.nutrition.nutrients.find(n=>n.name==='Vitamin D');
+   assert.deepEqual(vitamin,{name:'Vitamin D',value:71,unit:'IU',source:'Vitamin D 71 IU'});
+   const lookup=createGetProductHandler(env,fetcher);
+   const response=await lookup(new Request('http://127.0.0.1/get-product',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})}));
+   const body=await response.json();assert.equal(body.status,'ready');
+   assert.deepEqual(body.product.nutrition.nutrients.find(n=>n.name==='Vitamin D'),vitamin);
+   assert.equal(providerCalls-before,1);
+   assert.equal(body.product.findings.filter(f=>f.title.includes(' fat ')).length,1);
   });
   await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
    deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;

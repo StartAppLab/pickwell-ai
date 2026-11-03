@@ -149,6 +149,19 @@ void main() {
     expect(result.product!.nutrition['basis'], 'unknown');
     expect((result.product!.nutrition['nutrients'] as List).first['value'], isNull);
   });
+  test('printed vitamin and daily-value units survive catalog parsing', () async {
+    final json = await FakeApi().lookup('00000096385074', 'test');
+    final nutrition = (json['product'] as Map)['nutrition'] as Map;
+    for (final unit in ['IU', 'ug RAE', 'ug DFE', 'mg NE', 'mg α-TE', '%', '%DV']) {
+      nutrition['nutrients'] = [
+        {'name': 'Vitamin D', 'value': 71, 'unit': unit, 'source': 'Printed fixture'},
+      ];
+      final result = CatalogModel.parse(json, '00000096385074');
+      final nutrient = (result.product!.nutrition['nutrients'] as List).single;
+      expect(nutrient['value'], 71);
+      expect(nutrient['unit'], unit);
+    }
+  });
   test('DTO parser rejects unknown/mismatched products and preserves denial/reset metadata', () {
     expect(
       () => CatalogModel.parse({'status': 'invented'}, '00000096385074'),

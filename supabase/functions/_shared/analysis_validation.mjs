@@ -20,6 +20,7 @@ export const ANALYSIS_INSTRUCTIONS =
  'Extract first, then write short plain-language explanations using ONLY the literal extracted label facts. '+
  'Transcribe readable ingredient text and items in printed order. Include the declared allergen statement if visible. Partial text may proceed: mark unreadable spans [unknown] rather than demanding a complete label. '+
  'Return null for an unprinted allergen declaration; never infer allergen absence. '+
+ 'Preserve printed nutrient units: IU for international units, ug for mcg/µg, ug RAE, ug DFE, mg NE, mg α-TE, and %DV for explicitly labeled percent Daily Value. Keep an ordinary percent as %. Never convert IU to mass or percent daily value to nutrient mass. If an unsupported unit is printed, retain the complete amount/unit in source with unit=unknown rather than dropping the row. Prefer actual nutrient amounts; a percent daily value is a separate measure if also recorded. '+
  'Use one unambiguous nutrition column, with literal basis and serving text in nutrition.raw. '+
  'Recognize a nutrition facts panel from its layout and context. Resolve partially obscured letters in familiar nutrient names (protein, fats, carbohydrate, etc.) using that context; use standard nutrient names. Minor OCR spelling, spacing and punctuation differences are not reasons to retake. Preserve printed numbers and units in source spans. '+
  'Never guess a numeric amount, decimal point, unit or serving basis. Use value=null for any uncertain nutrient amount, including core nutrients; use basis=unknown when unclear. Proceed with readable text and unknown fields even when no numeric amounts are certain. '+
@@ -42,7 +43,14 @@ const canonical = name => ({'total fat':'fat','fat':'fat','saturated fat':'satur
 const gram = item => item.value * ({g:1,mg:0.001,ug:0.000001}[item.unit]??NaN);
 const norm = value => value.normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim();
 const sourceNorm = value => norm(value).replace(/[^\p{L}\p{N}]+/gu,' ').trim();
-export const EXTRACTION_POLICY = 'model-transcription-v4';
+export const EXTRACTION_POLICY = 'model-transcription-units-v5';
+const massUnits=['g','mg','ug'];
+const percentUnits=['%','%DV'];
+const primaryNutrients=new Set(['fat','saturates','carbohydrate','sugars','added_sugars','protein','salt','sodium','fibre']);
+const measureKey=item=>{
+ const key=canonical(item.name);
+ return key==='energy'||!primaryNutrients.has(key)||percentUnits.includes(item.unit)?key+':'+item.unit:key;
+};
 // Formatting equivalence only; this never repairs/guesses digits or converts amounts.
 const nutritionText = value => norm(value)
  .replace(/([\p{L}])(\d)/gu,'$1 $2').replace(/(\d)([\p{L}])/gu,'$1 $2')
@@ -146,17 +154,19 @@ export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) 
  const evidenced=new Set();
  n.nutrients=n.nutrients.filter(item=>item.name.trim());
  const duplicates=new Set();
- for(const item of n.nutrients){const key=canonical(item.name)+(canonical(item.name)==='energy'?':'+item.unit:'');if(seen.has(key))duplicates.add(key);seen.add(key);}
- n.nutrients=n.nutrients.filter((item,index,all)=>all.findIndex(other=>canonical(other.name)===canonical(item.name)&&(canonical(item.name)!=='energy'||other.unit===item.unit))===index);
+ for(const item of n.nutrients){const key=measureKey(item);if(seen.has(key))duplicates.add(key);seen.add(key);}
+ n.nutrients=n.nutrients.filter((item,index,all)=>all.findIndex(other=>measureKey(other)===measureKey(item))===index);
  for(const item of n.nutrients){
-  const key=canonical(item.name), unique=key+(key==='energy'?':'+item.unit:'');
+  const key=canonical(item.name), unique=measureKey(item);
   if(duplicates.has(unique))item.value=null;
   if(item.value===null){missing.push(item.name);continue;}
   const sourceInPanel=item.source?.trim()&&nutritionSourceNorm(n.raw??'').includes(nutritionSourceNorm(item.source));
   const energy=key==='energy';
-  if(!item.source?.trim()||(energy?!['kcal','kJ'].includes(item.unit):!['g','mg','ug'].includes(item.unit))){item.value=null;missing.push(item.name);continue;}
+  const percent=percentUnits.includes(item.unit),mass=massUnits.includes(item.unit);
+  const unitAllowed=percent||(energy?['kcal','kJ'].includes(item.unit):primaryNutrients.has(key)?mass:!['unknown','kcal','kJ'].includes(item.unit));
+  if(!item.source?.trim()||!unitAllowed){item.value=null;missing.push(item.name);continue;}
   // Loose physical bounds are rejection guards, never nutrition classifications.
-  if(item.value>100000 || (massLimit!==null && (energy ? item.value>massLimit*(item.unit==='kcal'?10:42) : gram(item)>massLimit*1.02)))
+  if(item.value>100000 || (!percent&&massLimit!==null && (energy ? item.value>massLimit*(item.unit==='kcal'?10:42) : mass&&gram(item)>massLimit*1.02)))
    {item.value=null;missing.push(item.name);continue;}
   known.set(unique,item);
   if((sourceInPanel||namedNutrientSource(item,n))&&valueInSource(item))evidenced.add(unique);

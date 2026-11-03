@@ -312,3 +312,10 @@ only for colour claims. Usable partial/text-only results can publish; only empty
 text or explicitly wrong/mismatched photos require replacement. Two new real calls
 passed, and 68 targeted native/schema/adapter tests passed. This is a deliberate
 user-approved relaxation, not a claim of independent OCR or perfect extraction.
+
+### Printed vitamin and daily-value units
+
+[Unit support evidence](PICKWELL_NUTRIENT_UNITS.md) records the confirmed Vitamin D
+71 IU representation gap, expanded label units, distinct percent/mass measures and
+historical-source display. 71 targeted native/backend and 14 Flutter tests passed;
+no new live inference or immutable product rewrite. Mobile rebuild is required.

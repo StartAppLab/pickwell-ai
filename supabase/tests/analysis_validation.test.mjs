@@ -114,7 +114,7 @@ test('contextually resolved nutrient names, punctuation and abbreviated identity
  c.ingredients.items[0]='OATS';
  const protein=c.nutrition.nutrients.find(v=>v.name==='Protein');c.nutrition.raw=c.nutrition.raw.replace(protein.source,'Prot..n 5 g');protein.source='Prot..n 5 g';protein.value=5;
  const before=structuredClone(c),r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.nutrients.find(v=>v.name==='Protein').value,5);
- assert.deepEqual(c,before);assert.equal(r.provenance.extraction_policy,'model-transcription-v4');
+ assert.deepEqual(c,before);assert.equal(r.provenance.extraction_policy,'model-transcription-units-v5');
 });
 test('readable text with unknown or absent numeric fields can proceed',()=>{
  const c=labelFixture();for(const n of c.nutrition.nutrients)n.value=null;
@@ -248,4 +248,29 @@ test('bilingual Calories/Calorías row retains its selected energy amount',()=>{
  n.source='Calories/Calorías 180';
  assert.equal(validate(c).nutrition.nutrients[0].value,180);
  n.value=260;assert.equal(validate(c).nutrition.nutrients[0].value,260);
+});
+
+test('IU and qualified vitamin units survive extraction unchanged, without nutrient colours',()=>{
+ const c=labelFixture();
+ for(const [name,value,unit]of [['Vitamin D',71,'IU'],['Vitamin A',90,'ug RAE'],['Folate',120,'ug DFE'],['Niacin',6.2,'mg NE'],['Vitamin E',2,'mg α-TE']]){
+  const source=name+' '+value+' '+unit;c.nutrition.raw+='; '+source;
+  c.nutrition.nutrients.push({name,value,unit,source});
+ }
+ const r=validate(c);assert.equal(r.status,'validated');
+ assert.deepEqual(r.nutrition.nutrients.slice(-5),c.nutrition.nutrients.slice(-5));
+ assert.ok(!r.missing_information.includes('Vitamin D'));assert.equal(r.findings.length,4);
+ const staged={...c,nutrition:r.nutrition,ingredients:r.ingredients};
+ assert.deepEqual(validate(staged),r);
+});
+
+test('daily-value percentages never replace nutrient mass or produce a mass-based colour',()=>{
+ const c=labelFixture();
+ c.nutrition.nutrients.push({name:'Total Fat',value:8,unit:'%DV',source:'Total Fat 8% Daily Value'});
+ c.nutrition.raw+='; Total Fat 8% Daily Value';
+ const r=validate(c);assert.equal(r.nutrition.nutrients[1].value,3);
+ assert.equal(r.nutrition.nutrients.at(-1).value,8);assert.equal(r.nutrition.nutrients.at(-1).unit,'%DV');
+ assert.equal(r.findings.filter(f=>f.title.includes(' fat ')).length,1);
+ const onlyPercent=labelFixture();for(const n of onlyPercent.nutrition.nutrients){n.unit='%';n.source=n.name+' '+n.value+'%';}
+ const result=validate(onlyPercent);assert.equal(result.status,'validated');assert.deepEqual(result.findings,[]);
+ assert.ok(result.nutrition.nutrients.every(n=>n.value!==null));
 });

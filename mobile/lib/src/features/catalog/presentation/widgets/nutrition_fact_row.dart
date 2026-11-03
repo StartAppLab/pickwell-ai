@@ -15,7 +15,8 @@ class NutritionFactRow extends StatelessWidget {
     )..maximumFractionDigits = 12;
     final label = unknown
         ? context.l10n.pkUnknownValue
-        : '${(value != 0 && value.abs() < 1e-12 ? value.toString() : numberFormat.format(value))} ${unit == 'ug' ? 'µg' : unit}';
+        : '${(value != 0 && value.abs() < 1e-12 ? value.toString() : numberFormat.format(value))} ${unit.toString().replaceFirst(RegExp(r'^ug\b'), 'µg').replaceFirst('%DV', '% DV')}';
+    final source = nutrient['source'];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,7 +26,18 @@ class NutritionFactRow extends StatelessWidget {
           flex: 2,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text(label, textAlign: TextAlign.end),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(label, textAlign: TextAlign.end),
+                if (unknown && source is String && source.trim().isNotEmpty)
+                  Text(
+                    '“${source.trim()}”',
+                    textAlign: TextAlign.end,
+                    style: context.textTheme.bodySmall,
+                  ),
+              ],
+            ),
           ),
         ),
       ],

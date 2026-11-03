@@ -8,6 +8,10 @@ const object = properties => ({
 const text = { type: 'string', maxLength: 12000 };
 const nullableText = { type: ['string', 'null'], maxLength: 12000 };
 const list = items => ({ type: 'array', items, maxItems: 100 });
+// Preserve printed nutrient measures. Qualified vitamin units and daily-value
+// percentages are display units, never silently converted to grams or each other.
+export const NUTRIENT_UNITS = ['g', 'mg', 'ug', 'kcal', 'kJ', 'IU',
+  'ug RAE', 'ug DFE', 'mg NE', 'mg α-TE', '%', '%DV', 'unknown'];
 export const extractionSchema = object({
   status: { type: 'string', enum: ['extracted', 'needs_retake'] },
   retake: list({ type: 'string', enum: ['nutrition', 'ingredients'] }),
@@ -18,7 +22,7 @@ export const extractionSchema = object({
     serving_size: nullableText,
     nutrients: list(object({
       name: text, value: { type: ['number', 'null'], minimum: 0 },
-      unit: { type: 'string', enum: ['g', 'mg', 'ug', 'kcal', 'kJ', 'unknown'] },
+      unit: { type: 'string', enum: NUTRIENT_UNITS },
       source: nullableText,
     })),
   }),

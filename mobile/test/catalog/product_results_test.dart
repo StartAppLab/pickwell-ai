@@ -15,6 +15,7 @@ import '../../lib/src/features/catalog/presentation/blocs/catalog/analysis_submi
 import '../../lib/src/features/catalog/presentation/views/product_detail_view.dart';
 import '../../lib/src/features/catalog/presentation/views/capture_entry_view.dart';
 import '../../lib/src/features/catalog/presentation/widgets/product_result_content.dart';
+import '../../lib/src/features/catalog/presentation/widgets/nutrition_fact_row.dart';
 import '../../lib/src/features/catalog/presentation/widgets/analysis_submission_notice.dart';
 import '../../lib/src/localization/l10n/app_localizations.dart';
 import 'analysis_fixtures.dart';
@@ -35,6 +36,50 @@ Widget host(Widget child, {bool dark = false, double scale = 1}) => MaterialApp(
 );
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('printed units and historical unknown source remain visible', (tester) async {
+    for (final entry in [
+      ['IU', '71 IU'],
+      ['ug RAE', '71 µg RAE'],
+      ['ug DFE', '71 µg DFE'],
+      ['mg NE', '71 mg NE'],
+      ['mg α-TE', '71 mg α-TE'],
+      ['%DV', '71 % DV'],
+    ]) {
+      await tester.pumpWidget(
+        host(
+          Scaffold(
+            body: NutritionFactRow(
+              nutrient: {
+                'name': 'Vitamin D',
+                'value': 71,
+                'unit': entry[0],
+                'source': 'Vitamin D 71 IU',
+              },
+            ),
+          ),
+        ),
+      );
+      expect(find.text(entry[1]), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
+    await tester.pumpWidget(
+      host(
+        const Scaffold(
+          body: NutritionFactRow(
+            nutrient: {
+              'name': 'Vitamin D',
+              'value': null,
+              'unit': 'unknown',
+              'source': 'Vitamin D 71 IU',
+            },
+          ),
+        ),
+      ),
+    );
+    expect(find.text('“Vitamin D 71 IU”'), findsOneWidget);
+    expect(find.text('71 IU'), findsNothing); // Source quote, not a fabricated parsed amount.
+    expect(tester.takeException(), isNull);
+  });
   setUpAll(() async {
     await (FontLoader(
       'Manrope',

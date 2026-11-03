@@ -358,3 +358,9 @@ become unknown; empty/wrong/mismatched photos still need replacement. Two real
 fixture pairs validated and 68 targeted native/schema/adapter tests passed.
 Independent field-accuracy review, genuine unreadable-image testing and device
 full-flow acceptance remain unverified; no additional completion checkbox marked.
+
+**2026-11-03 — T05.2/T06.1 nutrient-unit follow-up:** [Unit evidence](PICKWELL_NUTRIENT_UNITS.md).
+Added IU, qualified vitamin and percent/DV units throughout extraction, storage and
+Flutter display; historical unknown amounts expose their source. No conversions
+or new health classifications. 71 backend/native and 14 Flutter tests passed;
+mobile rebuild/device confirmation remains outstanding. No task checkbox changed.
