@@ -371,3 +371,14 @@ Maintain a separate future `ROADMAP.md` when needed; roadmap items are **not** P
 - **v1.3 (Nov 2, 2026):** Added server-controlled initial 30 barcode/3 AI daily limits, future RevenueCat entitlement/webhook schema, quota semantics and explicit paywall-disabled hackathon policy.
 
 - **v1.4 (Nov 2, 2026):** Locked lemon 60/30/10 visual identity, recent-products Home, expandable search, rounded photo cards, separate Scan action and minimalist nested Product Details. Local recents explicitly distinct from deferred cloud history; Chat/cosmetics/score/Add to List remain deferred.
+
+## Evidence-aware implementation clarification (2026-11-03)
+
+F05/F08 now use reviewed ingredient-function and nutrition-reference statements
+selected/composed by Meta in the existing server-only analysis request. Backend
+checks reject unsupported prose/references and own all quantities/classifications.
+General ingredient background is distinguished from label facts and from individual
+risk; unfamiliar ingredients are not automatically harmful. Coverage and missing
+information stay explicit. No new product scope, overall health score or clinical
+recommendations. Cached reference refresh is operator-only, immutable/versioned and
+never an ordinary barcode-lookup inference. See [interpretation evidence](PICKWELL_INTERPRETATION.md).

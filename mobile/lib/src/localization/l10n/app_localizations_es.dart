@@ -1008,4 +1008,24 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get pkRetakeRecheckCost =>
       'This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.';
+
+  @override
+  String get pkIngredientContext => 'Common food function and context';
+
+  @override
+  String get pkReferences => 'Reviewed references';
+
+  @override
+  String get pkInterpretationVersion => 'Interpretation version';
+
+  @override
+  String get pkReferenceVersion => 'Reference review';
+
+  @override
+  String get pkLegacyInterpretation =>
+      'This cached result contains label facts and earlier explanations. It has not received the current reference review.';
+
+  @override
+  String get pkTranscriptionCaveat =>
+      'AI-read label amounts can contain errors. Check the package, especially allergen information.';
 }

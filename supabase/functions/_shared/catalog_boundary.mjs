@@ -101,15 +101,19 @@ export function sanitizePublishedProduct(row) {
     ...pick(finding, ['severity', 'title', 'explanation', 'sort_order']),
     source_details: {
       ...pick(finding.source_details, ['rule_id','reference','section']),
-      thresholds:pick(finding.source_details?.thresholds,['low_max_g','high_above_g','large_portion_high_above_g']),
+      thresholds:pick(finding.source_details?.thresholds,['low_max_g','high_above_g','large_portion_high_above_g','low_max_percent','high_min_percent','daily_value','daily_value_unit']),
       portion:finding.source_details?.portion?pick(finding.source_details.portion,['value','unit','source','triggered']):null,
       evidence: (finding.source_details?.evidence ?? []).map(evidence =>
         pick(evidence, ['source', 'field', 'label_text', 'reference', 'is_demo','photo','value','unit','basis'])),
     },
   }));
-  result.explanations=(row.explanations??[]).map(e=>pick(e,['photo','source','text']));
+  result.explanations=(row.explanations??[]).map(e=>({
+    ...pick(e,['photo','source','text','ingredient','topic','kind','reference_id','limitations','origin']),
+    ...(Array.isArray(e.references)?{references:e.references.map(r=>pick(r,['id','title','url','reviewed_at']))}:{}),
+  }));
   result.missing_information=(row.missing_information??[]).filter(v=>typeof v==='string');
-  result.provenance=pick(row.provenance,['model_version','prompt_version','rules_version','validated_at','extraction_source','explanation_source']);
+  result.provenance=pick(row.provenance,['model_version','prompt_version','rules_version','validated_at','extraction_source','explanation_source',
+    'interpretation_version','reference_version','interpretation_method','interpretation_reviewed_at','nutrition_context_rules_version']);
   return result;
 }
 

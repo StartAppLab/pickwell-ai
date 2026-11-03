@@ -1891,6 +1891,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.'**
   String get pkRetakeRecheckCost;
+
+  /// No description provided for @pkIngredientContext.
+  ///
+  /// In en, this message translates to:
+  /// **'Common food function and context'**
+  String get pkIngredientContext;
+
+  /// No description provided for @pkReferences.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewed references'**
+  String get pkReferences;
+
+  /// No description provided for @pkInterpretationVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Interpretation version'**
+  String get pkInterpretationVersion;
+
+  /// No description provided for @pkReferenceVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference review'**
+  String get pkReferenceVersion;
+
+  /// No description provided for @pkLegacyInterpretation.
+  ///
+  /// In en, this message translates to:
+  /// **'This cached result contains label facts and earlier explanations. It has not received the current reference review.'**
+  String get pkLegacyInterpretation;
+
+  /// No description provided for @pkTranscriptionCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'AI-read label amounts can contain errors. Check the package, especially allergen information.'**
+  String get pkTranscriptionCaveat;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

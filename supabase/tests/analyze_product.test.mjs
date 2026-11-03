@@ -7,6 +7,7 @@ import {createAnalyzeProductHandler} from '../functions/_shared/analyze_product.
 import {labelFixture} from './fixtures/label_analysis.mjs';
 import {createGetProductHandler} from '../functions/_shared/get_product.mjs';
 import {META_URL} from '../spikes/meta-vision/core.mjs';
+import {INGREDIENT_REFERENCES,NUTRITION_TOPICS,emptyInterpretationPlan,refreshInterpretationRecord} from '../functions/_shared/interpretation.mjs';
 const crc=bytes=>{let n=0xffffffff;for(const v of bytes){n^=v;for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;}return (n^0xffffffff)>>>0;};
 function png(color=0,width=1){
  const chunk=(name,data)=>{const t=Buffer.from(name),a=Buffer.alloc(4),b=Buffer.alloc(4);a.writeUInt32BE(data.length);b.writeUInt32BE(crc(Buffer.concat([t,data])));return Buffer.concat([a,t,data,b]);};
@@ -60,6 +61,15 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='fail')return new Response('PRIVATE upstream',{status:429});
    if(behavior==='malformed')return modelResult({...candidate(),extra:'PRIVATE'});
    if(behavior==='unclassified')return modelResult(labelFixture({basis:'per_serving',portion:'100 g'}));
+   if(behavior==='interpreted'){
+    const c=labelFixture({basis:'per_serving',portion:'100 g'});
+    c.ingredients={raw:'Soy Lecithin, Sugar.',items:['Soy Lecithin','Sugar'],declared_allergens:null};
+    c.nutrition.nutrients.push({name:'Sodium',value:1280,unit:'mg',source:'Sodium 1280 mg'},{name:'Dietary Fiber',value:6,unit:'g',source:'Dietary Fiber 6 g'});
+    c.nutrition.raw+='; Sodium 1280 mg; Dietary Fiber 6 g';
+    c.interpretation={...emptyInterpretationPlan(),ingredients:[{index:0,reference_id:'emulsifier',text:INGREDIENT_REFERENCES.emulsifier.text}],
+     nutrition:[{topic:'sodium',text:NUTRITION_TOPICS.sodium.text},{topic:'fibre',text:NUTRITION_TOPICS.fibre.text}],summary_nutrients:['sodium','fibre']};
+    return modelResult(c);
+   }
    if(behavior==='contradiction'){const c=candidate(),n=c.nutrition.nutrients[0];c.nutrition.raw=c.nutrition.raw.replace(n.source,'Energy 9000 kcal');n.value=9000;n.source='Energy 9000 kcal';return modelResult(c);}
    if(behavior==='normalized'){const c=candidate();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Nutrition facts');return modelResult(c);}
    if(behavior==='formatted'){
@@ -322,6 +332,35 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.deepEqual(body.product.nutrition.nutrients.find(n=>n.name==='Vitamin D'),vitamin);
    assert.equal(providerCalls-before,1);
    assert.equal(body.product.findings.filter(f=>f.title.includes(' fat ')).length,1);
+  });
+  await t.test('grounded interpretation publishes, caches references and requires no model on guest lookup',async()=>{
+   behavior='interpreted';const barcode=code(),before=providerCalls;
+   const r=await submit(alice,barcode);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+   assert.ok(r.body.product.summary.includes('other food contributes'));assert.ok(r.body.product.provenance.interpretation_version);
+   assert.ok(r.body.product.explanations.some(e=>e.references?.[0]?.id==='fda-ingredients'&&e.text.includes('reduce separation')));
+   const lookup=createGetProductHandler(env,fetcher);
+   const response=await lookup(new Request('http://127.0.0.1/get-product',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})}));
+   const cached=await response.json();assert.equal(cached.status,'ready');assert.deepEqual(cached.product.explanations,r.body.product.explanations);
+   assert.equal(providerCalls-before,1);
+  });
+  await t.test('operator refresh is immutable, atomic, idempotent and denied to clients without spending credits',async()=>{
+   behavior='success';const r=await submit(alice,code());assert.equal(r.body.status,'ready');
+   const product=(await rest('published_products?id=eq.'+r.body.product.id))[0];
+   const payload=refreshInterpretationRecord(product),args={p_product:product.id,p_expected_analysis:product.analysis_id,p_expected_version:null,p_payload:payload};
+   const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'}),before=providerCalls;
+   const forged=structuredClone(args);forged.p_payload.nutrition.raw='Forged label';await assert.rejects(rpc('pickwell_refresh_interpretation',forged));
+   await assert.rejects(rpc('pickwell_refresh_interpretation',{...args,p_expected_analysis:crypto.randomUUID()}));
+   for(const token of [null,alice.access_token]){
+    const response=await fetch(origin.origin+'/rest/v1/rpc/pickwell_refresh_interpretation',{method:'POST',headers:{apikey:env.SUPABASE_ANON_KEY,...(token?{Authorization:'Bearer '+token}:{}),'content-type':'application/json'},body:JSON.stringify(args)});
+    assert.ok([401,403,404].includes(response.status));
+   }
+   const [first,second]=await Promise.all([rpc('pickwell_refresh_interpretation',args),rpc('pickwell_refresh_interpretation',args)]);
+   assert.deepEqual(new Set([first.status,second.status]),new Set(['refreshed','already_current']));
+   const current=(await rest('published_products?id=eq.'+product.id))[0];assert.notEqual(current.analysis_id,product.analysis_id);
+   assert.deepEqual(current.nutrition,product.nutrition);assert.deepEqual(current.ingredients,product.ingredients);assert.deepEqual(current.findings,product.findings);
+   assert.equal((await rest('product_analyses?product_id=eq.'+product.id)).length,2);
+   assert.equal((await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'})).used,quota.used);assert.equal(providerCalls,before);
+   assert.ok(current.provenance.interpretation_method.includes('no new Meta'));
   });
   await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
    deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;

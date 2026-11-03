@@ -162,6 +162,29 @@ void main() {
       expect(nutrient['unit'], unit);
     }
   });
+  test('interpretation metadata parses while malformed reference URLs are rejected', () async {
+    final json = await FakeApi().lookup('00000096385074', 'test');
+    final product = json['product'] as Map;
+    product['explanations'] = [
+      {
+        'photo': 'ingredients',
+        'source': 'Lecithin',
+        'text': 'Keeps ingredients mixed.',
+        'ingredient': 'Lecithin',
+        'kind': 'background',
+        'references': [
+          {'id': 'fda-ingredients', 'title': 'FDA reference', 'url': 'https://www.fda.gov/food/'},
+        ],
+      },
+    ];
+    product['provenance'] = {'interpretation_version': 'evidence-composition-v1'};
+    final parsed = CatalogModel.parse(json, '00000096385074');
+    expect(parsed.product!.explanations.single['kind'], 'background');
+    expect(parsed.product!.provenance['interpretation_version'], 'evidence-composition-v1');
+    ((product['explanations'] as List).single['references'] as List).single['url'] =
+        'javascript:bad';
+    expect(() => CatalogModel.parse(json, '00000096385074'), throwsFormatException);
+  });
   test('DTO parser rejects unknown/mismatched products and preserves denial/reset metadata', () {
     expect(
       () => CatalogModel.parse({'status': 'invented'}, '00000096385074'),

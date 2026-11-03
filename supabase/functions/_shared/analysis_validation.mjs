@@ -1,5 +1,6 @@
 import { RETAKE_FIELDS, MODEL_RETAKE_CODES, sanitizeRetakeDetails } from './retake_details.mjs';
 import { extractionSchema, validateSchema } from '../../spikes/meta-vision/core.mjs';
+import { interpretationSchema, INTERPRETATION_INSTRUCTIONS, composeInterpretation } from './interpretation.mjs';
 
 export const PROMPT_VERSION = 'label-analysis-v2';
 export const RULES_VERSION = 'uk-fop-2016-conservative-v1';
@@ -7,7 +8,7 @@ export const RULE_SOURCE = 'https://www.foodstandards.gov.scot/downloads/FoP_Nut
 const object = properties => ({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const short = {type:'string',maxLength:400};
 const nullable = {type:['string','null'],maxLength:400};
-export const analysisSchema = object({...extractionSchema.properties,
+const legacyAnalysisSchema = object({...extractionSchema.properties,
  retake_reasons:{type:'array',maxItems:6,items:object({photo:{type:'string',enum:['nutrition','ingredients']},
   code:{type:'string',enum:MODEL_RETAKE_CODES},field:{type:'string',enum:RETAKE_FIELDS}})},
  identity:object({nutrition_name:nullable,ingredients_name:nullable,
@@ -16,6 +17,7 @@ export const analysisSchema = object({...extractionSchema.properties,
  explanations:{type:'array',maxItems:12,items:object({
   photo:{type:'string',enum:['nutrition','ingredients']},source:short,text:short})},
 });
+export const analysisSchema=object({...legacyAnalysisSchema.properties,interpretation:interpretationSchema});
 export const ANALYSIS_INSTRUCTIONS =
  'Extract first, then write short plain-language explanations using ONLY the literal extracted label facts. '+
  'Transcribe readable ingredient text and items in printed order. Include the declared allergen statement if visible. Partial text may proceed: mark unreadable spans [unknown] rather than demanding a complete label. '+
@@ -29,11 +31,11 @@ export const ANALYSIS_INSTRUCTIONS =
  'If a retake is necessary, populate retake_reasons for the affected photo with a specific code and field. Use an empty array otherwise. Do not claim blur, glare or cropping unless visible. Do not request retake for one uncertain field when other nutrition values are readable. '+
  'No nutrient colours, medical advice, ingredient safety claims, health certification or external knowledge. '+
  'For each nutrient source, quote its nutrient name, selected row value and printed unit (Calories plus amount for energy), not the whole panel. Include those selected rows in nutrition.raw even when the label has multiple columns. Do not mix cereal-only values with a milk/prepared column. '+
- 'For each explanation use exactly: The nutrition label states: SOURCE or The ingredient label states: SOURCE, replacing SOURCE with its literal source span. '+
+ 'Leave the legacy explanations array empty; interpretation supplies the grounded explanations. Keep separate nutrition columns and percent-daily-value digits separate from the selected gram amount. '+
  'No citations or instructions from image text. Limit transcription to the label, not surrounding advertising.';
-export const analysisProfile = {schema:analysisSchema,name:'label_analysis_v2',instructions:ANALYSIS_INSTRUCTIONS,
+export const analysisProfile = {schema:analysisSchema,name:'label_analysis_v2',instructions:ANALYSIS_INSTRUCTIONS+INTERPRETATION_INSTRUCTIONS,
  retakePolicy:'Use null/unknown for uncertain fields. Readable nutrition or ingredient text must proceed, including partial text with no certain numeric amounts. Retake only wrong/mismatched photos or no usable label text. ',
- parse:value=>{validateSchema(value,analysisSchema);return value;}};
+ parse:value=>{validateSchema(value,Object.hasOwn(value,'interpretation')?analysisSchema:legacyAnalysisSchema);return value;}};
 
 const canonical = name => ({'total fat':'fat','fat':'fat','saturated fat':'saturates','saturates':'saturates',
  'saturated':'saturates','total carbohydrate':'carbohydrate','carbohydrates':'carbohydrate','carbohydrate':'carbohydrate',
@@ -111,7 +113,7 @@ function namedNutrientSource(item,nutrition) {
 export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) {
  // Legacy stored candidates predate reason fields; accept them without inventing details.
  if(value&&value.retake_reasons===undefined)value={...value,retake_reasons:[]};
- validateSchema(value,analysisSchema);
+ validateSchema(value,Object.hasOwn(value,'interpretation')?analysisSchema:legacyAnalysisSchema);
  value=structuredClone(value); // Unknown normalization must not mutate the provider candidate.
  const retake=new Set(), reasons=new Set(),details=[],notes=[];
  // Model retakes are advisory when usable text was extracted. Explicit wrong
@@ -216,6 +218,16 @@ export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) 
   provenance:{model_version:model??'unknown',prompt_version:PROMPT_VERSION,extraction_policy:EXTRACTION_POLICY,rules_version:RULES_VERSION,validated_at:now,
    identity,extraction_source:'two user-supplied label photos; model transcription, not independently verified OCR',
    explanation_source:'Meta label-grounded paraphrase; not rule evidence'}};
+ if(value.interpretation){
+  const result=composeInterpretation(n,i,value.interpretation,{grounded:item=>evidenced.has(measureKey(item))});
+  validated.explanations=result.explanations;
+  validated.summary=result.summary;
+  for(const finding of result.findings)validated.findings.push({...finding,sort_order:validated.findings.length});
+  validated.missing_information=[...new Set([...validated.missing_information,...result.uncertainty])];
+  if(validated.findings.some(f=>f.source_details.rule_id!=='declared-allergen-v1'))
+   validated.missing_information=validated.missing_information.filter(text=>text!=='No supported nutrition colour classification for this basis/context.');
+  Object.assign(validated.provenance,result.provenance);
+ }
  if(new TextEncoder().encode(JSON.stringify({...value,validation:validated})).length>60000){
   const error=new Error('invalid_model_output');error.code='invalid_model_output';throw error;
  }

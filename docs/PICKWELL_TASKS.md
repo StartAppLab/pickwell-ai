@@ -221,7 +221,7 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 ### T05.2 Extract, interpret and validate
 
 - [ ] Extract ingredient raw text, ordered items, nutrition values with units and per-serving/per-100g basis, and declared allergens where visible.
-- [ ] Meta generates understandable explanations; deterministic backend rules assign green/yellow/red only with evidenced and threshold-backed reasons.
+- [x] Meta generates understandable explanations; deterministic backend rules assign green/yellow/red only with evidenced and threshold-backed reasons.
 - [x] Represent ambiguous values as unknown; verify required fields, product consistency, numeric ranges and source basis.
 - [x] If nutrition or ingredient image unclear, return `needs_retake` referencing **which photo** rather than publishing partial misleading results.
 - [x] Record model version, prompt/rules version and evidence/provenance; no overall food score or blanket healthy/unhealthy certification.
@@ -364,3 +364,12 @@ Added IU, qualified vitamin and percent/DV units throughout extraction, storage 
 Flutter display; historical unknown amounts expose their source. No conversions
 or new health classifications. 71 backend/native and 14 Flutter tests passed;
 mobile rebuild/device confirmation remains outstanding. No task checkbox changed.
+
+**2026-11-03 — T05.2/T06.1 evidence-aware interpretation:** [Implementation and evidence](PICKWELL_INTERPRETATION.md).
+Reviewed ingredient functions, contextual nutrition, source-backed serving-reference
+findings, model-selected bounded composition and meaningful summaries now replace
+literal fact restatements for new analyses. Expandable details show references,
+limitations and uncertainty. Versioned operator refresh preserves immutable facts
+and performs no model call on lookup. The understandable-explanations checkbox is
+verified; no broader task completion is implied. The low-resolution cereal fixture
+has inconsistent OCR and further product/accuracy testing is deferred at user request.

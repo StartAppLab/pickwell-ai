@@ -16,6 +16,7 @@ import '../../lib/src/features/catalog/presentation/views/product_detail_view.da
 import '../../lib/src/features/catalog/presentation/views/capture_entry_view.dart';
 import '../../lib/src/features/catalog/presentation/widgets/product_result_content.dart';
 import '../../lib/src/features/catalog/presentation/widgets/nutrition_fact_row.dart';
+import '../../lib/src/features/catalog/presentation/widgets/interpretation_explanation.dart';
 import '../../lib/src/features/catalog/presentation/widgets/analysis_submission_notice.dart';
 import '../../lib/src/localization/l10n/app_localizations.dart';
 import 'analysis_fixtures.dart';
@@ -36,6 +37,87 @@ Widget host(Widget child, {bool dark = false, double scale = 1}) => MaterialApp(
 );
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('reviewed ingredient explanations expand with sources, limitations and uncertainty', (
+    tester,
+  ) async {
+    final fixture = resultFixture();
+    final product = ProductRecord(
+      barcode: fixture.barcode,
+      name: fixture.name,
+      summary: 'This serving contributes sodium. Lecithin helps keep ingredients mixed.',
+      nutrition: fixture.nutrition,
+      ingredients: fixture.ingredients,
+      findings: fixture.findings,
+      explanations: [
+        {
+          'photo': 'ingredients',
+          'source': 'Soy Lecithin',
+          'ingredient': 'Soy Lecithin',
+          'kind': 'background',
+          'text': 'Commonly used to keep ingredients mixed and reduce separation.',
+          'limitations': 'Common function only; exact dose is unknown.',
+          'references': [
+            {
+              'id': 'fda-ingredients',
+              'title': 'FDA: Types of Food Ingredients',
+              'url':
+                  'https://www.fda.gov/food/food-additives-and-gras-ingredients-information-consumers/types-food-ingredients',
+            },
+          ],
+        },
+      ],
+      missingInformation: ['An unfamiliar ingredient has no matched reviewed reference.'],
+      provenance: {
+        'interpretation_version': 'evidence-composition-v1',
+        'reference_version': '2026-11-03',
+      },
+    );
+    final key = GlobalKey();
+    await tester.pumpWidget(
+      host(
+        RepaintBoundary(
+          key: key,
+          child: Scaffold(body: ProductResultContent(product: product)),
+        ),
+      ),
+    );
+    await tester.scrollUntilVisible(
+      find.byType(InterpretationExplanation),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Soy Lecithin'), findsOneWidget);
+    await tester.tap(find.text('Soy Lecithin'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Commonly used to keep ingredients mixed and reduce separation.'),
+      findsOneWidget,
+    );
+    expect(find.text('Common function only; exact dose is unknown.'), findsOneWidget);
+    expect(find.textContaining('FDA: Types of Food Ingredients'), findsOneWidget);
+    expect(find.textContaining('https://www.fda.gov'), findsOneWidget);
+    expect(find.text('Add to List'), findsNothing);
+    expect(find.byType(BottomNavigationBar), findsNothing);
+    expect(tester.takeException(), isNull);
+    final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    await tester.runAsync(() async {
+      final image = await boundary.toImage(pixelRatio: 1);
+      final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+      await File(
+        '../.secrets/interpretation-results.png',
+      ).writeAsBytes(bytes!.buffer.asUint8List());
+      image.dispose();
+    });
+    await tester.scrollUntilVisible(
+      find.text('An unfamiliar ingredient has no matched reviewed reference.'),
+      250,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.text('An unfamiliar ingredient has no matched reviewed reference.'),
+      findsOneWidget,
+    );
+  });
   testWidgets('printed units and historical unknown source remain visible', (tester) async {
     for (final entry in [
       ['IU', '71 IU'],

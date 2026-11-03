@@ -92,6 +92,25 @@ class CatalogModel {
       )) {
         throw const FormatException();
       }
+      for (final explanation in explanations) {
+        if (explanation['kind'] != null &&
+            !{'background', 'positive', 'caution', 'context'}.contains(explanation['kind'])) {
+          throw const FormatException();
+        }
+        final references = explanation['references'];
+        if (references != null &&
+            (references is! List ||
+                !references.every(
+                  (r) =>
+                      r is Map &&
+                      r['id'] is String &&
+                      r['title'] is String &&
+                      r['url'] is String &&
+                      Uri.tryParse(r['url'] as String)?.scheme == 'https',
+                ))) {
+          throw const FormatException();
+        }
+      }
       final missing = p['missing_information'] as List? ?? [];
       if (!missing.every((v) => v is String)) throw const FormatException();
       product = ProductRecord(

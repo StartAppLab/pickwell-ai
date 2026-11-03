@@ -6,6 +6,7 @@ import '../../domain/entities/catalog_entity.dart';
 import 'product_section.dart';
 import 'product_finding_card.dart';
 import 'nutrition_fact_row.dart';
+import 'interpretation_explanation.dart';
 
 class ProductResultContent extends StatelessWidget {
   final ProductRecord product;
@@ -28,6 +29,7 @@ class ProductResultContent extends StatelessWidget {
     };
     final nutrients = p.nutrition['nutrients'] as List? ?? [];
     final ingredients = p.ingredients['items'] as List? ?? [];
+    final hasInterpretation = p.provenance['interpretation_version'] is String;
     final date = p.analyzedAt?.toLocal();
     return Center(
       child: ConstrainedBox(
@@ -65,6 +67,10 @@ class ProductResultContent extends StatelessWidget {
               children: [
                 Text(p.summary),
                 Text(l.pkCaveat, style: context.textTheme.bodySmall),
+                if (hasInterpretation)
+                  Text(l.pkTranscriptionCaveat, style: context.textTheme.bodySmall),
+                if (!hasInterpretation)
+                  Text(l.pkLegacyInterpretation, style: context.textTheme.bodySmall),
               ],
             ),
             ProductSection(
@@ -77,14 +83,36 @@ class ProductResultContent extends StatelessWidget {
             ProductSection(
               title: l.pkIngredients,
               children: [
-                for (var index = 0; index < ingredients.length; index++)
-                  Text('${index + 1}. ${ingredients[index]}'),
+                for (final explanation in p.explanations.where(
+                  (e) => e['photo'] == 'ingredients' && e['kind'] != null,
+                ))
+                  InterpretationExplanation(explanation: explanation),
+                if (hasInterpretation)
+                  ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(l.pkRawLabel),
+                    children: [
+                      for (var index = 0; index < ingredients.length; index++)
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text('${index + 1}. ${ingredients[index]}'),
+                        ),
+                      Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
+                    ],
+                  ),
+                if (!hasInterpretation)
+                  for (var index = 0; index < ingredients.length; index++)
+                    Text('${index + 1}. ${ingredients[index]}'),
                 if (ingredients.isEmpty) Text(l.pkUnknownValue),
-                Text(l.pkRawLabel, style: context.textTheme.titleSmall),
-                Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
+                if (!hasInterpretation) ...[
+                  Text(l.pkRawLabel, style: context.textTheme.titleSmall),
+                  Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
+                ],
                 Text(l.pkDeclaredAllergens, style: context.textTheme.titleMedium),
                 Text(p.ingredients['declared_allergens']?.toString() ?? l.pkUnknownAllergens),
-                for (final explanation in p.explanations.where((e) => e['photo'] == 'ingredients'))
+                for (final explanation in p.explanations.where(
+                  (e) => e['photo'] == 'ingredients' && e['kind'] == null,
+                ))
                   Text(explanation['text']?.toString() ?? l.pkUnknownValue),
               ],
             ),
@@ -99,7 +127,10 @@ class ProductResultContent extends StatelessWidget {
                   if (nutrient is Map)
                     NutritionFactRow(nutrient: Map<String, dynamic>.from(nutrient)),
                 for (final explanation in p.explanations.where((e) => e['photo'] == 'nutrition'))
-                  Text(explanation['text']?.toString() ?? l.pkUnknownValue),
+                  if (explanation['kind'] != null)
+                    InterpretationExplanation(explanation: explanation)
+                  else
+                    Text(explanation['text']?.toString() ?? l.pkUnknownValue),
               ],
             ),
             ProductSection(
@@ -117,7 +148,15 @@ class ProductResultContent extends StatelessWidget {
                 ),
                 Text('${l.pkModelVersion}: ${p.modelVersion ?? l.pkUnknownValue}'),
                 Text('${l.pkRulesVersion}: ${p.rulesVersion ?? l.pkUnknownValue}'),
+                if (p.provenance['nutrition_context_rules_version'] is String)
+                  Text('${l.pkRulesVersion}: ${p.provenance['nutrition_context_rules_version']}'),
                 Text('${l.pkPromptVersion}: ${p.provenance['prompt_version'] ?? l.pkUnknownValue}'),
+                if (hasInterpretation) ...[
+                  Text('${l.pkInterpretationVersion}: ${p.provenance['interpretation_version']}'),
+                  Text(
+                    '${l.pkReferenceVersion}: ${p.provenance['reference_version'] ?? l.pkUnknownValue}',
+                  ),
+                ],
               ],
             ),
             Gap(d.spacingLg),

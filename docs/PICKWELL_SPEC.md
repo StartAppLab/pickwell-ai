@@ -339,3 +339,31 @@ Verified Supabase documentation (accessed 2026-11-02):
 - Test portrait safe insets/dynamic text, keyboard and expanded search, genuine camera rendering and photo capture, compact device height, real scroll/nav bottom insets, and Android fallback blur/translucency. Do not use static generated screenshots as functioning UIs.
 - Unit/widget tests: home record index dedupe/newest persistence; filter/search empty; root bar visibility vs nested routes; scan action; product card factual placeholder; details omission of score/Add to List; Chat hidden; auth capture-draft survival.
 
+
+## Evidence-aware interpretation implementation addendum (2026-11-03)
+
+The extraction and explanation passes above are logical stages within the existing
+single bounded Meta request. `interpretation.mjs` supplies reviewed reference
+statements and a structured selection/composition schema. Meta selects ingredient
+indices, matching reference IDs, nutrition topics and summary priorities. Backend
+validation checks every index/reference pairing and each selected statement against
+the reviewed text, then combines it with accepted label quantities. Unsupported
+prose/links are omitted with uncertainty; no new medical claim is accepted. This
+constrained composition supplies ingredient functions and meaningful nutrition
+context rather than label restatements, without an unaccounted second paid call.
+
+Original UK per-100g rules remain. `fda-dv-5-20-v1` additionally supports explicit
+US FDA reference classifications for source-backed per-serving sodium, saturated
+fat, added sugars and fibre (<=5% low; >=20% high; high fibre favorable). Daily
+Values 2300mg sodium, 20g saturated fat, 50g added sugars and 28g fibre apply to the
+stated US adults/children-4+ reference population, not personal dietary targets or
+Philippine legal claims. Unknown portions/bases, percent-only facts, IU and
+uncorroborated quantities do not receive those classifications. Total and added
+sugars remain separate; no added-sugar amount is inferred from ingredients.
+
+Interpretation/reference/context-rule versions are explicit provenance. Ordinary
+get-product is unchanged and never calls Meta. Operator-only reference refresh uses
+existing facts, an immutable revision and compare-and-swap; it does not rescan,
+rerate old findings, spend a user credit or call Meta. See
+[PICKWELL_INTERPRETATION.md](PICKWELL_INTERPRETATION.md) for coverage, evidence,
+operator commands and limitations. Future source changes require review/versioning.

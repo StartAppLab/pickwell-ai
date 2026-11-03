@@ -382,3 +382,22 @@ See [lookup contract and validation](PICKWELL_PRODUCT_LOOKUP.md) for replay expi
 original-revision checks, transport ambiguity and deployment prerequisites. The
 handler is verified through local HTTP/native Auth/REST; actual Deno gateway and
 hosted migration/deployment remain unverified. Guest usage remains best effort.
+
+## Evidence-aware interpretation storage and refresh (2026-11-03)
+
+Existing explanations/provenance JSON stores validated contextual entries with
+photo/source/text, ingredient or nutrition topic, kind, approved reference IDs,
+reference titles/URLs/review date, origin and limitations. Summary is generated from
+accepted entries; no new image storage or client write grant. Public projection
+explicitly allowlists these nested fields. Original model/label facts and versions
+remain distinguishable from interpretation/reference/context-rule versions.
+
+Migration 20261103000800 adds service-role-only
+`pickwell_refresh_interpretation(uuid,uuid,text,jsonb)`. It requires a ready product,
+expected current analysis/version, unchanged nutrition/ingredients/findings and a
+versioned payload. It creates/seals a new immutable revision and switches the
+current pointer under a shared admission lock. Same-version repeated/concurrent
+refresh is a no-op; stale different-version writes fail. Invalidated products cannot
+be silently refreshed. No usage reservation, provider call, user allowance or old
+revision is modified. The operator CLI defaults to dry run. This is intentionally
+not a public refresh endpoint. See [interpretation evidence](PICKWELL_INTERPRETATION.md).
