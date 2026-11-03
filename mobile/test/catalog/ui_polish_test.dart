@@ -49,7 +49,7 @@ Widget host(Widget child, {bool dark = false, double scale = 1, double keyboard 
     );
 Future<void> snapshot(WidgetTester tester, GlobalKey key, String name) async {
   await tester.runAsync(
-    () => precacheImage(const AssetImage('assets/images/pickwell_lemon.png'), key.currentContext!),
+    () => precacheImage(const AssetImage('assets/images/app_icon.png'), key.currentContext!),
   );
   await tester.pump();
   await tester.runAsync(() async {

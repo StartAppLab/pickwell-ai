@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import '../../../../core/_core.dart';
 import '../../../../config/_config.dart';
+import '../../../../resources/_resources.dart';
 import '../../../app/app.dart';
 import 'home_control_metrics.dart';
 
@@ -67,12 +68,7 @@ class HomeHeader extends StatelessWidget {
       height: homeHeaderHeight(context),
       child: Row(
         children: [
-          Image.asset(
-            'assets/images/pickwell_lemon.png',
-            width: 40,
-            height: 40,
-            excludeFromSemantics: true,
-          ),
+          AppAssets.images.appIcon.image(width: 40, height: 40, excludeFromSemantics: true),
           Gap(d.spacingXs),
           Expanded(
             child: Text(

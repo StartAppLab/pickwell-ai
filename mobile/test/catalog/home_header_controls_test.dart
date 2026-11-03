@@ -22,7 +22,7 @@ import 'home_widget_test.dart' show config;
 Future<void> render(WidgetTester tester, GlobalKey key, String name) async {
   await tester.runAsync(() async {
     await precacheImage(
-      const AssetImage('assets/images/pickwell_lemon.png'),
+      const AssetImage('assets/images/app_icon.png'),
       tester.element(find.byType(HomeView)),
     );
   });

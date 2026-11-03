@@ -180,7 +180,7 @@ void main() {
         find.byWidgetPredicate(
           (widget) =>
               widget is Image &&
-              widget.image != const AssetImage('assets/images/pickwell_lemon.png'),
+              widget.image != const AssetImage('assets/images/app_icon.png'),
         ),
         findsNothing,
         reason: 'Only supplied brand art is allowed; no invented product images',
