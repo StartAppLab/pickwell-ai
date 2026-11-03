@@ -2,6 +2,85 @@
 
 Date: 2026-11-04 (Asia/Manila). Scope: presentation-only polish after T07.1; no backend, database, quota, provider, auth policy or persistence changes. T06.4 was not started.
 
+## Final commit validation — 2026-11-04
+
+Reviewed the complete pending Home/control/card/spacing/localization changes and supplied original logo/reference images before committing. The reference images are design concepts, not real catalogue records; deferred scores, collections, Chat/cosmetics and fake media are not implemented to match them.
+
+- `fvm flutter test --no-pub test/catalog test/app_config_security_test.dart`: **138 passed**.
+- `fvm flutter analyze --no-pub`: **no issues**.
+- `python3 tool/check_environment.py`: known-secret pattern scan passed for tracked/nonignored files; not a Git-history audit.
+- `git diff --check`: passed. Populated `.secrets/`, mobile configuration and Supabase server environment files remain ignored and excluded.
+
+Logs remain private in `.secrets/final-home-commit-tests.log` and `.secrets/final-home-commit-analyze.log`. Earlier dated “uncommitted” notes below describe their original work stage; this final validation covers the complete commit candidate. No new backend deployment, provider call, device installation or live photo trial occurred during this commit review.
+
+## Aligned Home control heights and neutral placeholder (2026-11-04)
+
+Latest owner-requested refinement:
+
+- Removed the down-chevron from the Sort trigger; its HugeIcons sort symbol and selected-order label still open the custom popover.
+- Photo placeholder now uses a neutral gray derived from existing theme surface/secondary-ink colors. Package icon and fallback label use secondary ink; light/dark support and image ratio remain unchanged.
+- Category chips and Sort share a measured control height: 48dp at normal text size, expanding consistently for larger text. The chip's visible capsule now matches its full tap height instead of having a shorter painted fill inside a larger target.
+- Normal logo/search header and inline search share one measured height (56dp normally). Larger text expands both consistently; the brand label can ellipsize instead of wrapping and changing row height. The search field remains centered, with independent Back and clear actions.
+
+Added `home_control_metrics.dart` under existing Home presentation widgets to share those actual text/inset measurements, not a parallel design system. Changed Home chip/sort/filter/header widgets, `product_card_thumbnail.dart`, geometry tests and this report. No backend, native navigation/dock-padding, quota or persistence changes.
+
+**Observed validation:** `fvm flutter test --no-pub test/catalog/home_header_controls_test.dart test/catalog/home_sort_test.dart test/catalog/home_product_card_test.dart test/catalog/home_widget_test.dart test/catalog/ui_polish_test.dart` — **28 passed**. New geometry assertions compare chip/Sort heights and normal/search field/header heights at 0.8×, 1×, 1.6× and 2× text scaling, and confirm the Sort trigger contains only its sort symbol. Existing narrow/landscape/tablet/dark/RTL/search/popover checks pass. `fvm flutter analyze --no-pub` — no issues; `git diff --check` — passed. Reviewed updated normal/search Home renders. Logs: `.secrets/home-matched-heights.log`, `.secrets/home-matched-heights-analyze.log`. Changes remain uncommitted; no new device or live API test claimed.
+
+## Reduced page gutters and title-only cards (2026-11-04)
+
+Latest owner request overrides the earlier 20dp page gutter and descriptive card subtitle:
+
+- Shared app page padding reduced to **16dp**. Home now consumes that shared inset instead of its own 20dp token; the root dock aligns to the same gutter. Existing safe-area/keyboard protection and maximum reading width remain.
+- Recent-product cards are now **title-only**, with no brand, serving or barcode subtitle. The data remains available for search and Product Details; no backend fields were deleted. Unresolved cards keep the connection/load explanation in accessibility semantics without adding a visible subtitle.
+- Card padding is **8dp on all sides**, making vertical and horizontal insets equal. Image area enlarged from 84dp to **100×80dp**, preserving the requested 5:4 ratio and honest placeholder behavior.
+- Header search Back now uses **CupertinoIcons.chevron_back**. Clear-search behavior and the separate product-card Cupertino chevron remain unchanged.
+
+**Files in this follow-up:** `app_base_theme.dart`, `home_view.dart`, `root_view.dart`, `home_header.dart`, `catalog_widget.dart`, `product_card_thumbnail.dart`, related Home/card widget assertions and this report. No backend, provider, persistence, authentication or billing change.
+
+**Observed validation:** `fvm flutter test --no-pub test/catalog test/app_config_security_test.dart` — **137 passed**. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Reviewed the updated Home render with shared 16dp gutters and title-only cards. Existing large-text/keyboard/RTL/filter/sort/capture/OTP/submission/recovery checks remain passing. Logs: `.secrets/compact-spacing-tests.log`, `.secrets/compact-spacing-analyze.log`. No fresh device install or live Meta call; changes remain uncommitted.
+
+## Inline search, custom sort and compact cards (2026-11-04)
+
+Latest owner-directed Home refinements supersede the earlier expanded-below-header search and Material popup design:
+
+- Extracted `HomeHeader`: search replaces the logo/wordmark in the **same header row**. Its back button exits search and restores the brand/search icon and unfiltered list. The X inside the field only clears the text/query, retaining search mode and keyboard focus. The controller/focus node are owned and disposed by Home; reopening starts with an empty query.
+- Replaced `PopupMenuButton`/Material menu entries with a custom anchored, rounded floating popover using Cupertino controls, a subtle fade, explicit selected state and the existing four sort choices. It fits safe-area/keyboard bounds, can scroll on constrained displays, follows RTL alignment, respects reduced motion, and closes on selection, outside tap, system back or Escape. Sorting semantics and local-only behavior are unchanged.
+- Inactive category capsules, the search icon surface, search field and sort trigger now share the light neutral `surfaceContainerLowest` background instead of letting the yellowish canvas show through. Dark mode uses the corresponding neutral theme surface.
+- Product image area is now **5:4 width:height** (geometry tested). Placeholder text remains accessible and adapts at larger scales; no photos are fabricated. Card inset reduced from 16dp to **12dp**. The card's forward chevron explicitly uses **CupertinoIcons**, as requested, overriding the earlier all-HugeIcons preference only for this indicator.
+
+**Files added:** `home_header.dart`, `home_sort_popover.dart`, `home_sort_label.dart`, `home_header_controls_test.dart`. Changed `home_view.dart`, Home filter/sort widgets and barrel, `catalog_widget.dart`, `product_card_thumbnail.dart`, the relevant Home/card/layout tests, and localized clear-search wording in all 12 supported ARB resources plus regenerated outputs. No backend, new dependencies, artwork, quota/auth changes or T06.4 implementation.
+
+**Observed validation:** 47 targeted Flutter tests passed across header/card/sort/Home/recents/layout/pending-draft suites. They cover the separate back/clear behavior, same-row header geometry, restored results/focus after clearing, custom popover selection/Escape/outside dismissal, 5:4 thumbnail bounds, narrow/large-text/dark/RTL layouts, working sorting/filtering/search and saved-draft recovery. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Render-helper checks were rerun after loading the actual Cupertino font and hiding the test-only debug banner.
+
+Visually reviewed `.secrets/ui-polish/home-inline-search.png`, `home-custom-sort.png`, and `home-390.png` (actual widget renders with synthetic fixtures, not live catalogue evidence). Logs: `.secrets/home-controls-validation.log`, `.secrets/home-controls-render-tests.log`, `.secrets/home-controls-analyze.log`. This pass has no fresh device install or live provider test. Changes remain uncommitted pending owner review.
+
+## Home HugeIcons and product-card identity (2026-11-04)
+
+Owner requested HugeIcons throughout Home and product cards with a title/image area and no barcode subtitle. Confirmed that the published product contract has **no package-photo/media field**; the owner explicitly chose **placeholders for now**. No image service, schema, package-media scraping, fabricated package photo or reuse of private label captures was introduced.
+
+- Home search/close/search-field icons, sort/caret/selection mark, product chevron/thumbnail and saved-draft warning now use the existing `AppIcon` + HugeIcons wrapper. The custom sort menu retains selected semantics; it no longer introduces a Material checkmark internally. Dock icons were already HugeIcons.
+- Every recent-product card has a trimmed nonempty title, with an honest localized “Food product” fallback when no name is available. Subtitle uses available brand and explicitly labeled serving size, otherwise “Nutrition & ingredients”. Unresolved records say “Connect to load product details”. No barcode is used as the recent card subtitle; barcodes remain usable in search and Product Details. Saved-draft identifiers remain available for differentiating pending submissions.
+- Added an 84dp-wide, at-least-96dp-tall rounded image placeholder with HugeIcons package symbol, visible “No photo” and accessible “Product photo unavailable” wording. It grows for larger text instead of overflowing. This is a labeled image-area placeholder, not a claim that a product photograph exists.
+- Card padding is 16dp, title/subtitle have distinct weights, and source serving-size words/units stay together when wrapping. Whole-card tap navigation remains intact. Stable barcode-based widget keys preserve row identity without printing identifiers as subtitles.
+
+**Files in this follow-up:** `home_view.dart`, `home_sort_menu.dart`, `catalog_widget.dart`, new `product_card_thumbnail.dart` and the catalog widget barrel, `pending_capture_card.dart`; Home/card/sort/pending widget tests; three new card-fallback labels across all 12 supported ARB resources and regenerated Dart outputs; this report. Earlier working-sort changes remain separate uncommitted work after commit `e2f11d5`.
+
+**Validation:** `fvm flutter test --no-pub test/catalog/home_product_card_test.dart test/catalog/home_sort_test.dart test/catalog/home_widget_test.dart test/catalog/recent_products_test.dart test/catalog/ui_polish_test.dart test/catalog/pending_capture_test.dart` — **45 passed**. Covers missing/whitespace name/brand, no barcode subtitles, explicit image fallback, serving metadata, thumbnail tap navigation, long names/large text, Home/search/menu HugeIcons, all sort modes, filters, recents, keyboard layouts and saved-draft resume/delete. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Render evidence remains `.secrets/ui-polish/home-390.png`, with synthetic fixture content; logs `.secrets/home-cards-validation.log`, `.secrets/home-cards-analyze.log`. No live backend/provider calls or fresh device install.
+
+## Working Home sort and reference-style filters (2026-11-04)
+
+The owner requested reverting the dock padding and committing the prior fixes **before** this Home update. Commit `e2f11d5` contains the edge-aligned dock selector, restored animation and transparent Android system-bar fixes; the temporary inset padding is not retained.
+
+Read `APP_DESIGN_GUIDELINES.md` alongside the supplied `docs/reference/home.png`. Replaced Home's duplicated small filter controls with feature widgets that reuse existing spacing, typography, color, 48dp target and capsule-shape conventions. The selected category is forest filled; inactive categories have restrained outlines, with no checkmark clutter. Only actual All/Food filters are displayed. Measured translated/scaled labels keep the controls in one aligned row when possible; otherwise categories stay left and sort moves to a right-aligned second row. No font shrinking or clipped labels.
+
+The previously static Newest indicator is now a real selected-state popup menu: **Newest, Oldest, Name A–Z, Name Z–A**. Newest/Oldest use the device-local last-opened timestamp; name ordering is case-insensitive lexical order, with unnamed/unresolved entries after named products and deterministic timestamp/barcode ties. This is not locale-specific dictionary collation. The bounded source index is never mutated or rewritten by sort. Search, category and ordering compose without additional lookup/AI calls. Refresh and opening/closing search retain the screen's selection; dismissing the menu changes nothing. Default Newest returns when the Home screen is recreated; sort is not a new persisted preference or cloud history feature. Saved pending drafts retain their existing separate queue behavior.
+
+**Files for this Home update:** `mobile/lib/src/features/catalog/domain/entities/catalog_entity.dart`; `mobile/lib/src/features/home/presentation/views/home_view.dart`; `mobile/lib/src/features/home/presentation/widgets/{home_filter_bar.dart,home_filter_chip.dart,home_sort_menu.dart,_widgets.dart}`; `mobile/test/catalog/home_sort_test.dart`; four sort labels in each of the 12 supported `app_*.arb` resources and their regenerated Dart localization outputs; this report. No backend/schema/package/asset or T06.4 changes.
+
+**Observed validation:** `fvm flutter gen-l10n` completed; added labels are translated in all 12 supported locales (the generator still reports six existing untranslated messages per non-English locale outside this change). `fvm flutter test --no-pub test/catalog/home_sort_test.dart test/catalog/home_widget_test.dart test/catalog/recent_products_test.dart test/catalog/ui_polish_test.dart` — **29 passed**. The seven new sorting tests also passed independently after adding menu-dismissal coverage and targeting the actual popup entries for hit testing. Tests cover all four orders, stable ties, unknown names, index immutability, real menu selection, refresh, combined search/Food filtering, no lookup calls, 320dp/large text, dark and Arabic RTL/German controls. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Reviewed the updated `.secrets/ui-polish/home-390.png` against the reference; renders contain clearly synthetic fixture data, not a fabricated product catalogue.
+
+Logs: `.secrets/home-sort-validation.log`, `.secrets/home-sort-final-tests.log`, `.secrets/home-sort-analyze.log`. No live API requests, paid model calls, fresh device install or broader Settings work were performed.
+
 ## Dock inset, animation and Android system bars (2026-11-04)
 
 Owner-requested follow-up after the separate UI-polish and Home-reference commits:

@@ -1026,4 +1026,28 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => 'Сортировка продуктов';
+
+  @override
+  String get pkOldest => 'Сначала старые';
+
+  @override
+  String get pkNameAscending => 'Название А–Я';
+
+  @override
+  String get pkNameDescending => 'Название Я–А';
+
+  @override
+  String get pkCardDetails => 'Питание и состав';
+
+  @override
+  String get pkCardUnavailable => 'Подключитесь для загрузки сведений';
+
+  @override
+  String get pkNoPhoto => 'Нет фото';
+
+  @override
+  String get pkClearSearch => 'Очистить поиск';
 }

@@ -33,6 +33,8 @@ class ProductRecord {
   });
 }
 
+enum RecentProductSort { newest, oldest, nameAscending, nameDescending }
+
 class RecentProduct {
   final String barcode;
   final DateTime openedAt;
@@ -98,6 +100,7 @@ List<RecentProduct> filterRecentProducts(
   List<RecentProduct> items, {
   String query = '',
   bool foodOnly = false,
+  RecentProductSort sort = RecentProductSort.newest,
 }) {
   final needle = query.trim().toLowerCase();
   final visible = items.where((entry) {
@@ -107,6 +110,22 @@ List<RecentProduct> filterRecentProducts(
     final text = '${entry.product?.name ?? ''} ${entry.product?.brand ?? ''} ${entry.barcode}';
     return needle.isEmpty || text.toLowerCase().contains(needle);
   }).toList();
-  visible.sort((a, b) => b.openedAt.compareTo(a.openedAt));
+  visible.sort((a, b) {
+    int order;
+    if (sort == RecentProductSort.nameAscending || sort == RecentProductSort.nameDescending) {
+      final aName = a.product?.name?.trim().toLowerCase() ?? '';
+      final bName = b.product?.name?.trim().toLowerCase() ?? '';
+      // Unresolved/unnamed references remain available, after named products.
+      if (aName.isEmpty != bName.isEmpty) return aName.isEmpty ? 1 : -1;
+      order = aName.compareTo(bName);
+      if (sort == RecentProductSort.nameDescending) order = -order;
+      if (order == 0) order = b.openedAt.compareTo(a.openedAt);
+    } else {
+      order = sort == RecentProductSort.oldest
+          ? a.openedAt.compareTo(b.openedAt)
+          : b.openedAt.compareTo(a.openedAt);
+    }
+    return order != 0 ? order : a.barcode.compareTo(b.barcode);
+  });
   return visible;
 }

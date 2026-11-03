@@ -1030,4 +1030,28 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => 'Trier les produits';
+
+  @override
+  String get pkOldest => 'Plus anciens';
+
+  @override
+  String get pkNameAscending => 'Nom A–Z';
+
+  @override
+  String get pkNameDescending => 'Nom Z–A';
+
+  @override
+  String get pkCardDetails => 'Nutrition et ingrédients';
+
+  @override
+  String get pkCardUnavailable => 'Connectez-vous pour charger les détails';
+
+  @override
+  String get pkNoPhoto => 'Sans photo';
+
+  @override
+  String get pkClearSearch => 'Effacer la recherche';
 }

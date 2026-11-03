@@ -1026,4 +1026,28 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => '商品排序';
+
+  @override
+  String get pkOldest => '最早';
+
+  @override
+  String get pkNameAscending => '名称升序';
+
+  @override
+  String get pkNameDescending => '名称降序';
+
+  @override
+  String get pkCardDetails => '营养与配料';
+
+  @override
+  String get pkCardUnavailable => '联网以加载商品详情';
+
+  @override
+  String get pkNoPhoto => '暂无照片';
+
+  @override
+  String get pkClearSearch => '清空搜索';
 }

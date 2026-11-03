@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
+import '../../lib/src/features/app/app.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -211,7 +213,12 @@ void main() {
         ),
       );
       expect(find.text('Needs analysis'), findsOneWidget);
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is AppIcon && widget.icon == HugeIcons.strokeRoundedAlert02,
+        ),
+        findsOneWidget,
+      );
       await tester.tap(find.text('Continue analysis'));
       await tester.pumpAndSettle();
       expect(find.text('RESUMED 00000096385074'), findsOneWidget);

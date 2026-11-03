@@ -23,7 +23,7 @@ class AppBaseTheme {
         indicatorSpacing: 16,
       ),
       edgeInsetsData: const EdgeInsetsData(
-        pagePadding: EdgeInsets.all(20),
+        pagePadding: EdgeInsets.all(16),
         containerPadding: EdgeInsets.all(12),
         dialogPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         contentPadding: EdgeInsets.all(14),

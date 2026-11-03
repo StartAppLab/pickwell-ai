@@ -168,7 +168,7 @@ class _RootViewState extends State<RootView> {
                 constraints: BoxConstraints(maxWidth: d.maxWidth),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: d.paddingComfortable,
+                    horizontal: context.themeData.edgeInsetsData.pagePadding.left,
                     vertical: d.paddingXs,
                   ),
                   child: Row(

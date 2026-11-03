@@ -5,12 +5,13 @@ import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
-import '../../../../config/_config.dart';
 import '../../../app/app.dart';
 import '../../../catalog/catalog.dart';
 import '../../../catalog/presentation/widgets/pending_capture_card.dart';
 import '../blocs/home/home_cubit.dart';
 import '../widgets/home_backdrop.dart';
+import '../widgets/home_filter_bar.dart';
+import '../widgets/home_header.dart';
 
 class HomeView extends StatefulWidget {
   final LabelCaptureCubit? drafts;
@@ -22,11 +23,21 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   bool search = false, food = false;
   String query = '';
+  final _searchController = TextEditingController();
+  final _searchFocus = FocusNode();
+  RecentProductSort sort = RecentProductSort.newest;
   @override
   void initState() {
     super.initState();
     context.read<HomeCubit>().load();
     if (widget.drafts != null) unawaited(widget.drafts!.restore());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchFocus.dispose();
+    super.dispose();
   }
 
   Future<void> _open(String barcode) async {
@@ -54,7 +65,12 @@ class _HomeViewState extends State<HomeView> {
                       ready: (items) => items,
                       orElse: () => <RecentProduct>[],
                     );
-                    final visible = filterRecentProducts(items, query: query, foodOnly: food);
+                    final visible = filterRecentProducts(
+                      items,
+                      query: query,
+                      foodOnly: food,
+                      sort: sort,
+                    );
                     final loading = state.maybeWhen(loading: () => true, orElse: () => false);
                     return RefreshIndicator(
                       onRefresh: () => context.read<HomeCubit>().load(),
@@ -63,159 +79,33 @@ class _HomeViewState extends State<HomeView> {
                         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         slivers: [
                           SliverPadding(
-                            padding: EdgeInsets.all(d.paddingComfortable),
+                            padding: context.themeData.edgeInsetsData.pagePadding,
                             sliver: SliverList.list(
                               children: [
-                                Row(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/pickwell_lemon.png',
-                                      width: 40,
-                                      height: 40,
-                                      excludeFromSemantics: true,
-                                    ),
-                                    Gap(d.spacingXs),
-                                    Expanded(
-                                      child: Text(
-                                        getIt<AppConfig>().appName,
-                                        style: context.textTheme.headlineSmall?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 30,
-                                          color: context.colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                    Material(
-                                      color: context.colorScheme.surfaceContainerLowest,
-                                      elevation: 3,
-                                      shadowColor: context.colorScheme.shadow.withValues(
-                                        alpha: 0.14,
-                                      ),
-                                      shape: const CircleBorder(),
-                                      child: IconButton(
-                                        style: IconButton.styleFrom(
-                                          minimumSize: const Size(56, 56),
-                                          iconSize: 28,
-                                        ),
-                                        tooltip: search ? l.pkCloseSearch : l.pkSearch,
-                                        onPressed: () => setState(() {
-                                          search = !search;
-                                          if (!search) {
-                                            query = '';
-                                            FocusManager.instance.primaryFocus?.unfocus();
-                                          }
-                                        }),
-                                        icon: AppIcon(
-                                          icon: search ? Icons.close : Icons.search,
-                                          size: 28,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                HomeHeader(
+                                  searching: search,
+                                  controller: _searchController,
+                                  focusNode: _searchFocus,
+                                  onOpen: () => setState(() => search = true),
+                                  onBack: () => setState(() {
+                                    search = false;
+                                    query = '';
+                                    _searchController.clear();
+                                    _searchFocus.unfocus();
+                                  }),
+                                  onClear: () => setState(() {
+                                    query = '';
+                                    _searchController.clear();
+                                    _searchFocus.requestFocus();
+                                  }),
+                                  onChanged: (value) => setState(() => query = value),
                                 ),
-                                if (search) ...[
-                                  Gap(d.spacingMd),
-                                  TextField(
-                                    autofocus: true,
-                                    textInputAction: TextInputAction.search,
-                                    decoration: InputDecoration(
-                                      labelText: l.pkSearch,
-                                      prefixIcon: const AppIcon(icon: Icons.search),
-                                    ),
-                                    onChanged: (value) => setState(() => query = value),
-                                  ),
-                                ],
                                 Gap(d.spacingLg),
-                                Wrap(
-                                  alignment: WrapAlignment.spaceBetween,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
-                                  spacing: d.spacingMd,
-                                  runSpacing: d.spacingXs,
-                                  children: [
-                                    Wrap(
-                                      spacing: d.spacingXs,
-                                      runSpacing: d.spacingXs,
-                                      children: [
-                                        ChoiceChip(
-                                          label: Text(l.pkAll),
-                                          showCheckmark: false,
-                                          selectedColor: context.colorScheme.primary,
-                                          backgroundColor: Colors.transparent,
-                                          side: BorderSide(
-                                            color: !food
-                                                ? context.colorScheme.primary
-                                                : context.colorScheme.outlineVariant,
-                                          ),
-                                          labelStyle: context.textTheme.titleMedium?.copyWith(
-                                            color: !food
-                                                ? context.colorScheme.onPrimary
-                                                : context.colorScheme.primary,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: d.paddingXs,
-                                            vertical: d.paddingXxs,
-                                          ),
-                                          selected: !food,
-                                          onSelected: (_) => setState(() => food = false),
-                                        ),
-                                        ChoiceChip(
-                                          label: Text(l.pkFood),
-                                          showCheckmark: false,
-                                          selectedColor: context.colorScheme.primary,
-                                          backgroundColor: Colors.transparent,
-                                          side: BorderSide(
-                                            color: food
-                                                ? context.colorScheme.primary
-                                                : context.colorScheme.outlineVariant,
-                                          ),
-                                          labelStyle: context.textTheme.titleMedium?.copyWith(
-                                            color: food
-                                                ? context.colorScheme.onPrimary
-                                                : context.colorScheme.primary,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: d.paddingXs,
-                                            vertical: d.paddingXxs,
-                                          ),
-                                          selected: food,
-                                          onSelected: (_) => setState(() => food = true),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: d.paddingSm,
-                                        vertical: d.paddingXs,
-                                      ),
-                                      decoration: ShapeDecoration(
-                                        shape: StadiumBorder(
-                                          side: BorderSide(
-                                            color: context.colorScheme.outlineVariant,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          AppIcon(
-                                            icon: Icons.swap_vert,
-                                            size: d.iconMedium,
-                                            color: context.colorScheme.primary,
-                                          ),
-                                          Gap(d.spacingXxs),
-                                          Text(
-                                            l.pkNewest,
-                                            style: context.textTheme.labelLarge?.copyWith(
-                                              color: context.colorScheme.primary,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                HomeFilterBar(
+                                  foodOnly: food,
+                                  onFoodChanged: (value) => setState(() => food = value),
+                                  sort: sort,
+                                  onSortChanged: (value) => setState(() => sort = value),
                                 ),
                                 Gap(d.spacingLg),
                                 if (state.maybeWhen(error: (_) => true, orElse: () => false)) ...[
@@ -253,7 +143,11 @@ class _HomeViewState extends State<HomeView> {
                                     ),
                                 ],
                                 for (final entry in visible) ...[
-                                  CatalogWidget(entry: entry, onTap: () => _open(entry.barcode)),
+                                  CatalogWidget(
+                                    key: ValueKey('recent-${entry.barcode}'),
+                                    entry: entry,
+                                    onTap: () => _open(entry.barcode),
+                                  ),
                                   Gap(d.spacingSm),
                                 ],
                                 const Gap(120),

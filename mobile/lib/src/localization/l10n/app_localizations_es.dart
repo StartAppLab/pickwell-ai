@@ -1028,4 +1028,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => 'Ordenar productos';
+
+  @override
+  String get pkOldest => 'Más antiguos';
+
+  @override
+  String get pkNameAscending => 'Nombre A–Z';
+
+  @override
+  String get pkNameDescending => 'Nombre Z–A';
+
+  @override
+  String get pkCardDetails => 'Nutrición e ingredientes';
+
+  @override
+  String get pkCardUnavailable => 'Conéctate para cargar los detalles';
+
+  @override
+  String get pkNoPhoto => 'Sin foto';
+
+  @override
+  String get pkClearSearch => 'Borrar búsqueda';
 }

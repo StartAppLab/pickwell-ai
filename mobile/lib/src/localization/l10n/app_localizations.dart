@@ -1927,6 +1927,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI-read label amounts can contain errors. Check the package, especially allergen information.'**
   String get pkTranscriptionCaveat;
+
+  /// No description provided for @pkSortProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort products'**
+  String get pkSortProducts;
+
+  /// No description provided for @pkOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get pkOldest;
+
+  /// No description provided for @pkNameAscending.
+  ///
+  /// In en, this message translates to:
+  /// **'Name A–Z'**
+  String get pkNameAscending;
+
+  /// No description provided for @pkNameDescending.
+  ///
+  /// In en, this message translates to:
+  /// **'Name Z–A'**
+  String get pkNameDescending;
+
+  /// No description provided for @pkCardDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Nutrition & ingredients'**
+  String get pkCardDetails;
+
+  /// No description provided for @pkCardUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to load product details'**
+  String get pkCardUnavailable;
+
+  /// No description provided for @pkNoPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo'**
+  String get pkNoPhoto;
+
+  /// No description provided for @pkClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get pkClearSearch;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

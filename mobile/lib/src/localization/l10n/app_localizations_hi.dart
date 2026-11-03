@@ -1026,4 +1026,28 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => 'उत्पाद क्रमबद्ध करें';
+
+  @override
+  String get pkOldest => 'सबसे पुराने';
+
+  @override
+  String get pkNameAscending => 'नाम A–Z';
+
+  @override
+  String get pkNameDescending => 'नाम Z–A';
+
+  @override
+  String get pkCardDetails => 'पोषण और सामग्री';
+
+  @override
+  String get pkCardUnavailable => 'उत्पाद विवरण लोड करने के लिए कनेक्ट करें';
+
+  @override
+  String get pkNoPhoto => 'फ़ोटो नहीं';
+
+  @override
+  String get pkClearSearch => 'खोज साफ़ करें';
 }

@@ -8,3 +8,4 @@ export 'nutrition_fact_row.dart';
 export 'interpretation_explanation.dart';
 export 'product_result_content.dart';
 export 'quota_status.dart';
+export 'product_card_thumbnail.dart';

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:hugeicons/hugeicons.dart';
+import '../../../app/app.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
@@ -38,8 +41,11 @@ class PendingCaptureCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, color: Colors.amber.shade800),
-                        const SizedBox(width: 8),
+                        AppIcon(
+                          icon: HugeIcons.strokeRoundedAlert02,
+                          color: context.colorScheme.tertiary,
+                        ),
+                        Gap(context.themeData.dimensionsData.spacingXs),
                         Expanded(
                           child: Text(l.pkPendingTitle, style: context.textTheme.titleMedium),
                         ),

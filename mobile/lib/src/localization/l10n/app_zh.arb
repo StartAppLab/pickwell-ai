@@ -408,5 +408,13 @@
   "pkRetakeFieldFibre": "Fibre",
   "pkRetakeFieldOther": "Label area",
   "pkRetakeRecheckSaved": "Reanalyze saved photos",
-  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake."
+  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.",
+  "pkSortProducts": "商品排序",
+  "pkOldest": "最早",
+  "pkNameAscending": "名称升序",
+  "pkNameDescending": "名称降序",
+  "pkCardDetails": "营养与配料",
+  "pkCardUnavailable": "联网以加载商品详情",
+  "pkNoPhoto": "暂无照片",
+  "pkClearSearch": "清空搜索"
 }

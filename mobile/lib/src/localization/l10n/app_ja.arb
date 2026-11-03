@@ -408,5 +408,13 @@
   "pkRetakeFieldFibre": "Fibre",
   "pkRetakeFieldOther": "Label area",
   "pkRetakeRecheckSaved": "Reanalyze saved photos",
-  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake."
+  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.",
+  "pkSortProducts": "商品の並べ替え",
+  "pkOldest": "古い順",
+  "pkNameAscending": "名前の昇順",
+  "pkNameDescending": "名前の降順",
+  "pkCardDetails": "栄養と原材料",
+  "pkCardUnavailable": "接続して商品詳細を読み込む",
+  "pkNoPhoto": "写真なし",
+  "pkClearSearch": "検索をクリア"
 }

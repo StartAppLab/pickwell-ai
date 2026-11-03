@@ -1026,4 +1026,28 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => '제품 정렬';
+
+  @override
+  String get pkOldest => '오래된 순';
+
+  @override
+  String get pkNameAscending => '이름 오름차순';
+
+  @override
+  String get pkNameDescending => '이름 내림차순';
+
+  @override
+  String get pkCardDetails => '영양 및 원재료';
+
+  @override
+  String get pkCardUnavailable => '연결하여 제품 정보 불러오기';
+
+  @override
+  String get pkNoPhoto => '사진 없음';
+
+  @override
+  String get pkClearSearch => '검색 지우기';
 }

@@ -168,11 +168,12 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('00000096385074'), findsOneWidget);
-      expect(find.textContaining('Check your connection'), findsOneWidget);
+      expect(find.byKey(const ValueKey('recent-00000096385074')), findsOneWidget);
+      expect(find.text('00000096385074'), findsNothing);
+      expect(find.bySemanticsLabel(RegExp('Connect to load product details')), findsOneWidget);
       expect(find.text('Loaded cereal'), findsOneWidget);
       expect(
-        tester.getTopLeft(find.text('00000096385074')).dy,
+        tester.getTopLeft(find.byKey(const ValueKey('recent-00000096385074'))).dy,
         lessThan(tester.getTopLeft(find.text('Loaded cereal')).dy),
       );
       expect(
@@ -186,11 +187,12 @@ void main() {
       );
       await tester.tap(find.text('Food'));
       await tester.pumpAndSettle();
-      expect(find.text('00000096385074'), findsNothing);
+      expect(find.byKey(const ValueKey('recent-00000096385074')), findsNothing);
       expect(find.text('Loaded cereal'), findsOneWidget);
       await tester.tap(find.text('All'));
       await tester.pumpAndSettle();
-      expect(find.text('00000096385074'), findsOneWidget);
+      expect(find.byKey(const ValueKey('recent-00000096385074')), findsOneWidget);
+      expect(find.text('00000096385074'), findsNothing);
       repo.recentItems = [];
       final refresh = tester.state<RefreshIndicatorState>(find.byType(RefreshIndicator));
       final pending = refresh.show();

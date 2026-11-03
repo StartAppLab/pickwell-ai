@@ -408,5 +408,13 @@
   "pkRetakeFieldFibre": "Fibre",
   "pkRetakeFieldOther": "Label area",
   "pkRetakeRecheckSaved": "Reanalyze saved photos",
-  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake."
+  "pkRetakeRecheckCost": "This starts a new Meta analysis using your saved photos and counts as another provider attempt. It may still request a retake.",
+  "pkSortProducts": "Ordina prodotti",
+  "pkOldest": "Meno recenti",
+  "pkNameAscending": "Nome A–Z",
+  "pkNameDescending": "Nome Z–A",
+  "pkCardDetails": "Nutrizione e ingredienti",
+  "pkCardUnavailable": "Connettiti per caricare i dettagli",
+  "pkNoPhoto": "Nessuna foto",
+  "pkClearSearch": "Cancella ricerca"
 }

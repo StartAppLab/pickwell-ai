@@ -444,5 +444,13 @@
   "pkInterpretationVersion": "Interpretation version",
   "pkReferenceVersion": "Reference review",
   "pkLegacyInterpretation": "This cached result contains label facts and earlier explanations. It has not received the current reference review.",
-  "pkTranscriptionCaveat": "AI-read label amounts can contain errors. Check the package, especially allergen information."
+  "pkTranscriptionCaveat": "AI-read label amounts can contain errors. Check the package, especially allergen information.",
+  "pkSortProducts": "Sort products",
+  "pkOldest": "Oldest",
+  "pkNameAscending": "Name A–Z",
+  "pkNameDescending": "Name Z–A",
+  "pkCardDetails": "Nutrition & ingredients",
+  "pkCardUnavailable": "Connect to load product details",
+  "pkNoPhoto": "No photo",
+  "pkClearSearch": "Clear search"
 }

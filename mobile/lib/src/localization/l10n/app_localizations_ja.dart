@@ -1026,4 +1026,28 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => '商品の並べ替え';
+
+  @override
+  String get pkOldest => '古い順';
+
+  @override
+  String get pkNameAscending => '名前の昇順';
+
+  @override
+  String get pkNameDescending => '名前の降順';
+
+  @override
+  String get pkCardDetails => '栄養と原材料';
+
+  @override
+  String get pkCardUnavailable => '接続して商品詳細を読み込む';
+
+  @override
+  String get pkNoPhoto => '写真なし';
+
+  @override
+  String get pkClearSearch => '検索をクリア';
 }

@@ -1026,4 +1026,28 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pkTranscriptionCaveat =>
       'AI-read label amounts can contain errors. Check the package, especially allergen information.';
+
+  @override
+  String get pkSortProducts => 'ترتيب المنتجات';
+
+  @override
+  String get pkOldest => 'الأقدم';
+
+  @override
+  String get pkNameAscending => 'الاسم تصاعديًا';
+
+  @override
+  String get pkNameDescending => 'الاسم تنازليًا';
+
+  @override
+  String get pkCardDetails => 'التغذية والمكونات';
+
+  @override
+  String get pkCardUnavailable => 'اتصل لتحميل تفاصيل المنتج';
+
+  @override
+  String get pkNoPhoto => 'لا توجد صورة';
+
+  @override
+  String get pkClearSearch => 'مسح البحث';
 }
