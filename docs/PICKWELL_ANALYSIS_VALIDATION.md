@@ -284,3 +284,31 @@ schema, aligned shared prompt, separate model/validation photo-and-field reasons
 atomic owner-only persistence/replay, historical fallback and explicit saved-photo
 diagnostic reanalysis. 106 client tests and 82 backend tests pass; real-image
 quality acceptance remains open. No new live model call is claimed.
+
+## Numeric source formatting follow-up
+
+[Source-matching evidence](PICKWELL_NUMERIC_SOURCE_MATCHING.md) records reproduced
+false rejections for capitalization/spacing and the corrected numeric comparison.
+Explicit units, decimal meaning and exact amounts remain required; common printed
+formatting no longer erases valid facts. Saved-photo reanalysis can also be offered
+for completed numeric_source validation failures. No live-image success is inferred.
+
+### Real-fixture follow-up: redundant raw/source matching
+
+The latest [numeric-source evidence](PICKWELL_NUMERIC_SOURCE_MATCHING.md#real-fixture-reproduction-and-correction--2026-11-03)
+records three actual Meta calls on the supplied pairs. A passed immediately; B
+reproduced the backend rejecting named numeric rows omitted from separate raw
+transcription. Policy v3 fixes that omission and bilingual Calories/Calorías.
+Both pairs now validate (fresh B call included); 41 minimal tests pass. Extraction
+accuracy, a genuine unreadable fixture and device/publication acceptance remain
+separate unresolved checks. Earlier retake findings above remain historical evidence.
+
+### User-approved OCR-first policy
+
+[OCR-first evidence](PICKWELL_OCR_FIRST_POLICY.md) supersedes the strict whole-label
+source/order/partial-text rejection rules above. Display model-transcribed values,
+mark unavailable/impossible/contradictory values unknown, and use source verification
+only for colour claims. Usable partial/text-only results can publish; only empty
+text or explicitly wrong/mismatched photos require replacement. Two new real calls
+passed, and 68 targeted native/schema/adapter tests passed. This is a deliberate
+user-approved relaxation, not a claim of independent OCR or perfect extraction.

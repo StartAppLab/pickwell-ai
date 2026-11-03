@@ -235,6 +235,8 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **Retake diagnostics follow-up (2026-11-03):** [Retake evidence](PICKWELL_RETAKE_DIAGNOSTICS.md). Model and validator failures now return separate photo/field/reason codes with owner-only replay persistence. A conflicting shared prompt was aligned with the approved unknown-field policy. Legacy results do not invent reasons and can explicitly reanalyze saved photos to obtain diagnostics. 106 Flutter / 82 backend tests pass; additive migration and protected handler deployed. Full real-image success remains unverified.
 
+**Numeric-source regression follow-up (2026-11-03):** [Matching evidence](PICKWELL_NUMERIC_SOURCE_MATCHING.md). Uppercase/compact/word-unit and explicit parenthesized formats now match their equivalent transcription; amounts and decimal meanings are not guessed. Completed source-check retakes may explicitly reanalyze saved photos under unchanged server controls. Real-photo/full-flow acceptance remains open.
+
 ### T05.3 Publish product and securely dispose photos
 
 - [x] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.
@@ -341,3 +343,18 @@ If timeline threatens completion, narrow in this order **without changing approv
 - If any requirement contradicts approved PRD/SPEC/DATABASE, stop only that conflicting implementation step and document the conflict; do not silently change the product.
 
 **Prepared documents:** `PICKWELL_PRD.md` v1.4; `PICKWELL_DESIGN.md` v1.2; `PICKWELL_SPEC.md` v1.2; `PICKWELL_DATABASE.md` v1.0; this `PICKWELL_TASKS.md` v1.1.
+
+**2026-11-03 — T05.2 real-fixture follow-up:** Three real Meta calls reproduced
+Product B's redundant raw/source rejection. Both supplied pairs now validate after
+the named-row/bilingual-calories fix; 41 minimal tests pass. See
+[numeric-source evidence](PICKWELL_NUMERIC_SOURCE_MATCHING.md#real-fixture-reproduction-and-correction--2026-11-03).
+No checkbox changed: per-field accuracy, genuine unreadable sample and full device
+publication flow are still unverified.
+
+**2026-11-03 — User-approved OCR-first policy:** [Evidence](PICKWELL_OCR_FIRST_POLICY.md).
+Readable partial/text-only label information proceeds; duplicate transcription
+checks gate colour claims rather than extraction. Invalid/contradictory amounts
+become unknown; empty/wrong/mismatched photos still need replacement. Two real
+fixture pairs validated and 68 targeted native/schema/adapter tests passed.
+Independent field-accuracy review, genuine unreadable-image testing and device
+full-flow acceptance remain unverified; no additional completion checkbox marked.

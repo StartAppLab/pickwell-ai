@@ -12,7 +12,7 @@ import { invokeMetaLabels, META_URL } from '../../spikes/meta-vision/core.mjs';
 const reply=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const failure=(error,status=503)=>{
  const body={status:'error',error};
- if(['service_budget_exceeded','concurrency_limited','inference_disabled'].includes(error))body.retry_with_new_request=true;
+ if(['service_budget_exceeded','provider_attempt_limit','concurrency_limited','inference_disabled'].includes(error))body.retry_with_new_request=true;
  if(error==='service_budget_exceeded'){
   const now=new Date(),reset=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));
   body.retry_at=reset.toISOString();body.retry_after_seconds=Math.ceil((reset-now)/1000);
@@ -53,7 +53,7 @@ function createAnalysisExecution(env,fetcher){
    rpc('pickwell_settle_analysis',{...identity,p_outcome:outcome,p_error:error,p_retake:retake});
   function safe(result,http=200){
    // A previous denial before provider admission stays retryable after restart.
-   if(result.status==='analysis_failed'&&['service_budget_exceeded','concurrency_limited','inference_disabled'].includes(result.error))
+   if(result.status==='analysis_failed'&&['service_budget_exceeded','provider_attempt_limit','concurrency_limited','inference_disabled'].includes(result.error))
     return failure(result.error,result.error==='inference_disabled'?503:429);
    if(!['ready','already_exists','processing','analysis_failed','needs_retake'].includes(result.status))throw Error();
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
@@ -62,7 +62,8 @@ function createAnalysisExecution(env,fetcher){
    if(result.status==='needs_retake'){
     body.retake=result.retake_target==='both'?['nutrition','ingredients']:[result.retake_target];
     body.retake_details=sanitizeRetakeDetails(result.retake_details,body.retake);
-    body.allow_diagnostic_reanalysis=Array.isArray(result.retake_details)&&result.retake_details.length===0;
+    body.allow_diagnostic_reanalysis=Array.isArray(result.retake_details)&&(
+     result.retake_details.length===0||body.retake_details.some(d=>d.source==='validation'&&d.code==='numeric_source'));
    }
    if(result.status==='processing'){
     body.retry_after_seconds=4;
@@ -127,6 +128,11 @@ function createAnalysisExecution(env,fetcher){
     return safe(await settle('retake',null,targets.length===1?targets[0]:'both',extracted.validation.reason_details),422);
    }
    // Persist only normalized known/unknown facts; publication revalidates the same candidate.
+   // Advisory model retakes with usable text were accepted by the OCR-first
+   // policy. Store the accepted handoff state required by the private DB contract.
+   extracted.candidate.status='extracted';
+   extracted.candidate.retake=[];
+   extracted.candidate.retake_reasons=[];
    extracted.candidate.nutrition=extracted.validation.nutrition;
    extracted.candidate.ingredients=extracted.validation.ingredients;
    extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,now:extracted.validation.provenance.validated_at});

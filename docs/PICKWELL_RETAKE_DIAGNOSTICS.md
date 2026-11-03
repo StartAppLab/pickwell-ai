@@ -104,3 +104,22 @@ retake diagnostic and submission notice widgets, localized/generated messages;
 targeted backend fixtures/validation/diagnostic/handler tests and client diagnostic/
 submission tests. Prior uncommitted work was preserved. No live acceptance checkbox
 was advanced based on mocked responses.
+
+## Source-matcher correction
+
+The explicit saved-photo action is also available for completed numeric_source
+validation rejections. This supersedes the earlier legacy-only restriction; it
+does not apply to unknown provider outcomes or auto-start another call. See
+[numeric matching evidence](PICKWELL_NUMERIC_SOURCE_MATCHING.md) for reproduced
+formatting bugs, exact-value safeguards and validation. Restart the app to refresh
+an already loaded result. No new camera capture is required for the retry action.
+
+## Superseding OCR-first policy
+
+The 13:47 UTC job again recorded backend numeric_source failures across nutrition.
+The user requested removal of those extraction restrictions. See
+[OCR-first policy and results](PICKWELL_OCR_FIRST_POLICY.md): source mismatches and
+partial OCR no longer request a retake, and source checks only gate colour claims.
+Historical reason codes remain valid for replay. The saved-photo diagnostic retry
+already offered for those numeric_source jobs starts a fresh request under the new
+policy; it does not mutate the historical outcome or require new photos.

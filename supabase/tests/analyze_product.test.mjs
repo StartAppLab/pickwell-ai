@@ -62,8 +62,15 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='unclassified')return modelResult(labelFixture({basis:'per_serving',portion:'100 g'}));
    if(behavior==='contradiction'){const c=candidate(),n=c.nutrition.nutrients[0];c.nutrition.raw=c.nutrition.raw.replace(n.source,'Energy 9000 kcal');n.value=9000;n.source='Energy 9000 kcal';return modelResult(c);}
    if(behavior==='normalized'){const c=candidate();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Nutrition facts');return modelResult(c);}
+   if(behavior==='formatted'){
+    const c=candidate();c.nutrition.raw=c.nutrition.raw.replace(/\bg\b/g,'G').replace(/\bkcal\b/g,'KCAL');
+    for(const n of c.nutrition.nutrients)n.source=n.source.replace(/(\d)\s+([a-z]+)/g,'$1$2');
+    return modelResult(c);
+   }
+   if(behavior==='text-only'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.nutrients=[];return modelResult(c);}
+   if(behavior==='source-mismatch'){const c=candidate();for(const n of c.nutrition.nutrients)n.source='unmatched transcription';return modelResult(c);}
    if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
-   if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.basis='unknown';return modelResult(c);}
+   if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.retake_reasons=[{photo:'nutrition',code:'blur_or_glare',field:'fat'}];c.nutrition.basis='unknown';c.nutrition.raw=null;return modelResult(c);}
    return modelResult(candidate());
   }
   assert.equal(new URL(url).origin,origin.origin,'Only native Supabase and mocked Meta are allowed');
@@ -180,15 +187,6 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    }
    behavior='success';
   });
-  await t.test('evidence validation failures release successful-use credit and target only the bad photo',async()=>{
-   for(const [mode,target] of [['contradiction','nutrition'],['ingredient-order','ingredients']]){
-    behavior=mode;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
-    const r=await submit(alice,barcode,key);assert.equal(r.http,422);assert.deepEqual(r.body.retake,[target]);
-    assert.equal((await submit(alice,barcode,key)).body.status,'needs_retake');assert.equal(providerCalls-before,1);
-    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
-    assert.equal(quota.used,0);assert.equal(quota.reserved,0);
-   }behavior='success';
-  });
   await t.test('new request keys cannot evade the per-barcode daily provider-attempt cap',async()=>{
    behavior='fail';const barcode=code(),before=providerCalls;
    for(let n=0;n<3;n++)assert.equal((await submit(alice,barcode)).http,502);
@@ -273,6 +271,19 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal((await rest('product_analyses?product_id=eq.'+product.id)).length,1);
    assert.equal((await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'})).used,quotaAfter.used);
   });
+  await t.test('OCR source/order inconsistencies publish once; impossible amounts stay unknown',async()=>{
+   for(const [mode,target] of [['contradiction','nutrition'],['ingredient-order','ingredients'],['source-mismatch','nutrition'],['text-only','nutrition']]){
+    behavior=mode;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+    const initial=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+    const r=await submit(alice,barcode,key);assert.equal(r.http,200,mode+': '+JSON.stringify(r.body));assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+    if(mode==='contradiction')assert.equal(r.body.product.nutrition.nutrients[0].value,null);
+    if(mode==='text-only')assert.deepEqual(r.body.product.nutrition.nutrients,[]);
+    if(mode==='source-mismatch'){assert.ok(r.body.product.nutrition.nutrients.every(n=>n.value!==null));assert.deepEqual(r.body.product.findings,[]);}
+    assert.equal((await submit(alice,barcode,key)).body.status,'already_exists');assert.equal(providerCalls-before,1);
+    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+    assert.equal(quota.used,initial.used+1);assert.equal(quota.reserved,0);
+   }behavior='success';
+  });
   await t.test('a valid per-serving label publishes without inventing any colour finding',async()=>{
    behavior='unclassified';const result=await submit(alice,code());behavior='success';
    assert.equal(result.body.status,'ready');assert.deepEqual(result.body.product.findings,[]);
@@ -283,8 +294,17 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    behavior='normalized';const barcode=code(),key=crypto.randomUUID();
    const r=await submit(alice,barcode,key);behavior='success';
    assert.equal(r.body.status,'ready',JSON.stringify(r.body));assert.equal(r.body.product.nutrition.basis,'unknown');
-   assert.equal(r.body.product.nutrition.nutrients[0].value,null);assert.deepEqual(r.body.product.findings,[]);
+   assert.equal(r.body.product.nutrition.nutrients[0].value,19);assert.deepEqual(r.body.product.findings,[]);
    assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
+  });
+  await t.test('format-equivalent numeric sources publish and replay without another model call',async()=>{
+   behavior='formatted';const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+   const result=await submit(alice,barcode,key);behavior='success';
+   assert.equal(result.body.status,'ready');
+   assert.ok(result.body.product.nutrition.nutrients.every(n=>n.value!==null));
+   assert.equal(result.body.product.findings.length,4);
+   assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
+   assert.equal(providerCalls-before,1);
   });
   await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
    deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
@@ -362,6 +382,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
 });
 
 test('daily service admission denial reports UTC reset and explicit safe restart without provider invocation',async()=>{
+ for(const denial of ['service_budget_exceeded','provider_attempt_limit']){
  const user='10000000-0000-4000-8000-000000000001',now=new Date();let provider=0,denied=false;
  const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_ANON_KEY:'fixture-public',SUPABASE_SERVICE_ROLE_KEY:'fixture-server',
   PICKWELL_NETWORK_HASH_SECRET:'fixture-network-secret-'.repeat(3),META_API_URL:META_URL,META_API_KEY:'fixture-provider',META_MODEL:'muse-spark-1.3'};
@@ -369,15 +390,18 @@ test('daily service admission denial reports UTC reset and explicit safe restart
   if(url===META_URL){provider++;throw Error('Forbidden model call');}
   if(url.endsWith('/auth/v1/user'))return Response.json({id:user,is_anonymous:false,email:'test@example.invalid',email_confirmed_at:'2026-01-01T00:00:00Z'});
   if(url.endsWith('/pickwell_lookup_throttle'))return Response.json({allowed:true});
-  if(url.endsWith('/pickwell_admit_analysis'))return Response.json(denied?{status:'analysis_failed',error:'service_budget_exceeded'}:{status:'reserved',reservation_id:crypto.randomUUID()});
-  if(url.endsWith('/pickwell_begin_provider'))return Response.json({call_allowed:false,status:'service_budget_exceeded'});
+  if(url.endsWith('/pickwell_admit_analysis'))return Response.json(denied?{status:'analysis_failed',error:denial}:{status:'reserved',reservation_id:crypto.randomUUID()});
+  if(url.endsWith('/pickwell_begin_provider'))return Response.json({call_allowed:false,status:denial});
   if(url.endsWith('/pickwell_settle_analysis')){denied=true;return Response.json({status:'analysis_failed'});}
   if(url.endsWith('/pickwell_quota_snapshot'))return Response.json({plan:'free',limit:3,used:0,reserved:0,remaining:3,version:1,reset_at:'2026-11-04T00:00:00Z'});
   return Response.json({});
  });
  const r=await h(new Request('https://fixture.invalid',{method:'POST',headers:{Authorization:'Bearer fixture.header.signature'},body:form('96385074')})),body=await r.json();
- assert.equal(r.status,429);assert.equal(body.error,'service_budget_exceeded');assert.equal(body.retry_with_new_request,true);
- const reset=new Date(body.retry_at);assert.equal(reset.getUTCHours(),0);assert.ok(reset>now);assert.ok(body.retry_after_seconds>0&&body.retry_after_seconds<=86400);assert.equal(provider,0);
+ assert.equal(r.status,429);assert.equal(body.error,denial);assert.equal(body.retry_with_new_request,true);
+ if(denial==='service_budget_exceeded'){
+ const reset=new Date(body.retry_at);assert.equal(reset.getUTCHours(),0);assert.ok(reset>now);assert.ok(body.retry_after_seconds>0&&body.retry_after_seconds<=86400);
+ }assert.equal(provider,0);
  const again=await h(new Request('https://fixture.invalid',{method:'POST',headers:{Authorization:'Bearer fixture.header.signature'},body:form('96385074')}));
- const replay=await again.json();assert.equal(again.status,429);assert.equal(replay.retry_with_new_request,true);assert.equal(replay.error,'service_budget_exceeded');assert.equal(provider,0);
+ const replay=await again.json();assert.equal(again.status,429);assert.equal(replay.retry_with_new_request,true);assert.equal(replay.error,denial);assert.equal(provider,0);
+ }
 });

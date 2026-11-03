@@ -148,7 +148,7 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
     if (state.canRetry) await submit();
   }
 
-  // Explicit one-off fresh inference for legacy retakes whose reasons were not recorded.
+  // Explicit fresh inference for server-approved legacy or source-validation retakes.
   // Provider uncertainty never uses this path; server controls still admit every call.
   Future<void> reanalyzeSaved() async {
     if (isClosed ||
