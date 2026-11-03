@@ -34,7 +34,9 @@ class AnalysisResult {
   final Set<LabelKind> retake;
   final String? error;
   final bool retryable;
+  final bool restartAllowed;
   final int retryAfterSeconds;
+  final DateTime? retryAt;
   const AnalysisResult(
     this.phase, {
     this.product,
@@ -42,6 +44,8 @@ class AnalysisResult {
     this.retake = const {},
     this.error,
     this.retryable = false,
+    this.restartAllowed = false,
     this.retryAfterSeconds = 4,
+    this.retryAt,
   });
 }

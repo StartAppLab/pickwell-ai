@@ -133,7 +133,10 @@ class AppRouter {
               local: true,
               entryQuota: state.extra is QuotaSnapshot ? state.extra as QuotaSnapshot : null,
             ),
-          child: ProductDetailView(session: getIt<AppSession>()),
+          child: ProductDetailView(
+            session: getIt<AppSession>(),
+            drafts: getIt<LabelCaptureCubit>(),
+          ),
         ),
       ),
       GoRoute(
@@ -163,6 +166,17 @@ class AppRouter {
       ),
       GoRoute(
         path: '/capture/:barcode',
+        redirect: (context, state) async {
+          final draft = getIt<LabelCaptureCubit>();
+          try {
+            final code = normalizeGtin(state.pathParameters['barcode'] ?? '');
+            await draft.begin(code);
+            if (draft.state.barcode != code) return '/home';
+          } catch (_) {
+            return '/scan';
+          }
+          return null;
+        },
         builder: (context, state) {
           try {
             final barcode = normalizeGtin(state.pathParameters['barcode'] ?? '');
@@ -197,7 +211,10 @@ class AppRouter {
             path: homeRoute,
             parentNavigatorKey: _shellNavigatorKey,
             pageBuilder: (context, state) => NoTransitionPage(
-              child: BlocProvider.value(value: getIt<HomeCubit>(), child: const HomeView()),
+              child: BlocProvider.value(
+                value: getIt<HomeCubit>(),
+                child: HomeView(drafts: getIt<LabelCaptureCubit>()),
+              ),
             ),
           ),
           GoRoute(

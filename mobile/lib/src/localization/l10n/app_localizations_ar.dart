@@ -804,4 +804,47 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pkQuotaHeld =>
       'All slots are used or reserved. Processing may release a slot before the next reset.';
+
+  @override
+  String get pkPendingTitle => 'Needs analysis';
+
+  @override
+  String get pkPendingSaved =>
+      'Photos are saved privately on this device. This draft expires after 24 hours; device cleanup may remove it sooner. Other products can be saved separately.';
+
+  @override
+  String get pkPendingResume => 'Continue analysis';
+
+  @override
+  String get pkPendingDelete => 'Delete saved draft';
+
+  @override
+  String get pkPendingSaveError =>
+      'Your photos are still open, but could not be saved for restart. Check device storage and try again before closing the app.';
+
+  @override
+  String get pkAnalysisServiceDaily =>
+      'The service’s daily analysis test capacity has been reached. Your photos are kept; this does not spend a successful-analysis credit.';
+
+  @override
+  String pkAnalysisRetryAt(String time) {
+    return 'Try again after $time.';
+  }
+
+  @override
+  String pkAnalysisTryAfter(int seconds) {
+    return 'Wait at least $seconds seconds, then check again. Your photos are kept.';
+  }
+
+  @override
+  String get pkPendingSaving => 'Saving photos on this device…';
+
+  @override
+  String pkPendingLimit(int limit) {
+    return 'You have $limit saved drafts. Finish or delete one before capturing another product.';
+  }
+
+  @override
+  String get pkPendingLoadError =>
+      'Saved drafts could not be loaded. Try again; existing files have been kept.';
 }

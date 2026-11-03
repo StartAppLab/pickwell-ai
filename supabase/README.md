@@ -348,3 +348,10 @@ quota snapshot after authorization, with a bounded one-second read. Metadata
 failure never changes admission/publication/accounting. No new RPC, migration or
 model invocation is introduced. See [T06.2 evidence](../docs/PICKWELL_QUOTA_UI.md)
 for native and hosted checks; inference and billing remain disabled.
+
+## Retryable service-cap responses
+
+Daily analysis service limits return a UTC retry/reset time. Only confirmed
+pre-provider denials explicitly permit a fresh persisted request key; uncertain
+provider outcomes retain their key. Manual retries still enforce all rate/spend
+controls. See [pending analysis evidence](../docs/PICKWELL_PENDING_ANALYSES.md).

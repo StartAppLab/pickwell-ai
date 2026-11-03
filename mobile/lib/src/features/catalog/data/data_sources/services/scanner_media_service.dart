@@ -15,8 +15,9 @@ class ScannerMediaService {
   static const maxLabelDimension = 2400;
   static const _prefix = 'pickwell_label_draft_';
   final ImagePicker picker;
-  ScannerMediaService() : picker = ImagePicker();
-  ScannerMediaService.withPicker(this.picker);
+  final Directory? _workingRoot;
+  ScannerMediaService() : picker = ImagePicker(), _workingRoot = null;
+  ScannerMediaService.withPicker(this.picker, [this._workingRoot]);
   Future<Directory>? _directory;
   int _serial = 0;
   Future<String?> galleryBarcode() async =>
@@ -33,8 +34,9 @@ class ScannerMediaService {
 
   Future<Directory> _prepare() async {
     // systemTemp is app-private cache on supported iOS/Android targets. Remove
-    // prior-process drafts; no draft is restored after process death.
-    final root = Directory.systemTemp;
+    // prior-process working copies. The bounded pending repository restores its
+    // separate cache files after process death.
+    final root = _workingRoot ?? Directory.systemTemp;
     await for (final entry in root.list(followLinks: false)) {
       if (entry is Directory && entry.path.split(Platform.pathSeparator).last.startsWith(_prefix)) {
         await entry.delete(recursive: true);

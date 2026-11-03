@@ -49,6 +49,27 @@ void main() {
     sender = AnalysisSubmissionCubit(AnalyzeProductUseCase(repository), draft);
     await capture();
   });
+  test('definitive no-provider denial renews key; uncertain retries preserve it', () async {
+    final original = draft.requestId;
+    repository.result = const AnalysisResult(
+      AnalysisPhase.denied,
+      error: 'service_budget_exceeded',
+      retryable: true,
+      restartAllowed: true,
+    );
+    expect(sender.beginAuthorization(), true);
+    await sender.finishAuthorization(true);
+    expect(sender.retryAvailable, true);
+    expect(draft.requestId, isNot(original));
+    expect(draft.attempts, 0);
+    final next = draft.requestId;
+    repository.transportError = true;
+    await sender.retry();
+    expect(repository.requests.last.requestId, next);
+    expect(draft.requestId, next);
+    await sender.retry();
+    expect(repository.requests.last.requestId, next);
+  });
   tearDown(() async {
     await sender.close();
     await draft.close();
@@ -85,7 +106,9 @@ void main() {
     expect(sender.beginAuthorization(), true);
     expect(sender.beginAuthorization(), false);
     await sender.finishAuthorization(false);
-    expect(identical(draft.state, before), true);
+    expect(draft.state.barcode, before.barcode);
+    expect(draft.state.nutrition, same(before.nutrition));
+    expect(draft.state.ingredients, same(before.ingredients));
     expect(repository.requests, isEmpty);
   });
   test(
@@ -180,7 +203,9 @@ void main() {
       sender.beginAuthorization();
       final before = draft.state;
       await sender.finishAuthorization(true);
-      expect(identical(draft.state, before), true);
+      expect(draft.state.barcode, before.barcode);
+      expect(draft.state.nutrition, same(before.nutrition));
+      expect(draft.state.ingredients, same(before.ingredients));
       expect(sender.state.phase, result.phase);
     }
   });

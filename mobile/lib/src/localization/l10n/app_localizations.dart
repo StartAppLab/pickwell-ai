@@ -1555,6 +1555,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All slots are used or reserved. Processing may release a slot before the next reset.'**
   String get pkQuotaHeld;
+
+  /// No description provided for @pkPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs analysis'**
+  String get pkPendingTitle;
+
+  /// No description provided for @pkPendingSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are saved privately on this device. This draft expires after 24 hours; device cleanup may remove it sooner. Other products can be saved separately.'**
+  String get pkPendingSaved;
+
+  /// No description provided for @pkPendingResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue analysis'**
+  String get pkPendingResume;
+
+  /// No description provided for @pkPendingDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete saved draft'**
+  String get pkPendingDelete;
+
+  /// No description provided for @pkPendingSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Your photos are still open, but could not be saved for restart. Check device storage and try again before closing the app.'**
+  String get pkPendingSaveError;
+
+  /// No description provided for @pkAnalysisServiceDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'The service’s daily analysis test capacity has been reached. Your photos are kept; this does not spend a successful-analysis credit.'**
+  String get pkAnalysisServiceDaily;
+
+  /// No description provided for @pkAnalysisRetryAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again after {time}.'**
+  String pkAnalysisRetryAt(String time);
+
+  /// No description provided for @pkAnalysisTryAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait at least {seconds} seconds, then check again. Your photos are kept.'**
+  String pkAnalysisTryAfter(int seconds);
+
+  /// No description provided for @pkPendingSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving photos on this device…'**
+  String get pkPendingSaving;
+
+  /// No description provided for @pkPendingLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {limit} saved drafts. Finish or delete one before capturing another product.'**
+  String pkPendingLimit(int limit);
+
+  /// No description provided for @pkPendingLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved drafts could not be loaded. Try again; existing files have been kept.'**
+  String get pkPendingLoadError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

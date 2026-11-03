@@ -9,7 +9,16 @@ import { analysisProfile, validateAnalysis, PROMPT_VERSION } from './analysis_va
 import { invokeMetaLabels, META_URL } from '../../spikes/meta-vision/core.mjs';
 
 const reply=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
-const failure=(error,status=503)=>reply({status:'error',error},status);
+const failure=(error,status=503)=>{
+ const body={status:'error',error};
+ if(['service_budget_exceeded','concurrency_limited','inference_disabled'].includes(error))body.retry_with_new_request=true;
+ if(error==='service_budget_exceeded'){
+  const now=new Date(),reset=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));
+  body.retry_at=reset.toISOString();body.retry_after_seconds=Math.ceil((reset-now)/1000);
+ }else if(error==='concurrency_limited')body.retry_after_seconds=5;
+ else if(error==='rate_limited')body.retry_after_seconds=60;
+ return reply(body,status);
+};
 function createAnalysisExecution(env,fetcher){
  return async (request,context)=>{
   if(request.method!=='POST')return failure('method_not_allowed',405);
@@ -20,7 +29,7 @@ function createAnalysisExecution(env,fetcher){
    bucket=await networkBucket(request,{secret:env.PICKWELL_NETWORK_HASH_SECRET,
     trustedHeader:env.PICKWELL_TRUSTED_IP_HEADER||undefined,
     trustedProxyHops:env.PICKWELL_TRUSTED_PROXY_HOPS?Number(env.PICKWELL_TRUSTED_PROXY_HOPS):undefined});
-   if((await q.throttle(bucket,user)).allowed!==true)return reply({status:'rate_limited',error:'rate_limited'},429);
+   if((await q.throttle(bucket,user)).allowed!==true)return reply({status:'rate_limited',error:'rate_limited',retry_after_seconds:60},429);
    context.user=user; // Set only after trusted Auth and successful throttle admission.
    input=await readAnalysisInput(request);
   }catch(error){
@@ -41,6 +50,9 @@ function createAnalysisExecution(env,fetcher){
   const settle=(outcome,error=null,retake=null)=>rpc('pickwell_settle_analysis',{
    ...identity,p_outcome:outcome,p_error:error,p_retake:retake});
   function safe(result,http=200){
+   // A previous denial before provider admission stays retryable after restart.
+   if(result.status==='analysis_failed'&&['service_budget_exceeded','concurrency_limited','inference_disabled'].includes(result.error))
+    return failure(result.error,result.error==='inference_disabled'?503:429);
    if(!['ready','already_exists','processing','analysis_failed','needs_retake'].includes(result.status))throw Error();
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.

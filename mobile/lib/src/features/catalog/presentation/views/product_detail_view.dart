@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
 import '../../../../config/app_session.dart';
 import '../widgets/quota_status.dart';
+import '../widgets/pending_capture_card.dart';
+import '../blocs/catalog/label_capture_cubit.dart';
 import '../../domain/_domain.dart';
 import '../blocs/catalog/catalog_cubit.dart';
 import '../widgets/lookup_notice.dart';
@@ -12,7 +14,8 @@ import '../widgets/product_result_content.dart';
 
 class ProductDetailView extends StatelessWidget {
   final AppSession? session;
-  const ProductDetailView({super.key, this.session});
+  final LabelCaptureCubit? drafts;
+  const ProductDetailView({super.key, this.session, this.drafts});
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
@@ -63,27 +66,39 @@ class ProductDetailView extends StatelessWidget {
             );
           }
           if (p == null) {
-            return LookupNotice(
-              status: state.status,
-              error: state.error,
-              quota: state.quota,
-              session: session,
-              retry: () => context.read<CatalogCubit>().retry(),
+            return Column(
+              children: [
+                if (drafts != null) PendingCaptureCard(draft: drafts!, barcode: state.barcode),
+                Expanded(
+                  child: LookupNotice(
+                    status: state.status,
+                    error: state.error,
+                    quota: state.quota,
+                    session: session,
+                    retry: () => context.read<CatalogCubit>().retry(),
+                  ),
+                ),
+              ],
             );
           }
           return ProductResultContent(
             product: p,
             recentSaved: state.recentSaved,
-            statusNotice: QuotaStatus(
-              snapshot: state.quota,
-              session: session,
-              metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
-              unavailable: state.status == LookupStatus.error,
-              rateLimited: state.error == 'rate_limited',
-              loadedResult:
-                  state.status == LookupStatus.error ||
-                  state.status == LookupStatus.denied ||
-                  state.quota?.remaining == 0,
+            statusNotice: Column(
+              children: [
+                if (drafts != null) PendingCaptureCard(draft: drafts!, barcode: state.barcode),
+                QuotaStatus(
+                  snapshot: state.quota,
+                  session: session,
+                  metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
+                  unavailable: state.status == LookupStatus.error,
+                  rateLimited: state.error == 'rate_limited',
+                  loadedResult:
+                      state.status == LookupStatus.error ||
+                      state.status == LookupStatus.denied ||
+                      state.quota?.remaining == 0,
+                ),
+              ],
             ),
           );
         },

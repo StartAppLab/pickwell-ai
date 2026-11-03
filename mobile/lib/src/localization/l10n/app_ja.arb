@@ -349,5 +349,19 @@
   "@pkQuotaRemaining": {"placeholders": {"remaining": {"type": "int"}, "limit": {"type": "int"}}},
   "@pkQuotaReserved": {"placeholders": {"count": {"type": "int"}}},
   "@pkQuotaReset": {"placeholders": {"time": {"type": "String"}}},
-  "pkQuotaHeld": "All slots are used or reserved. Processing may release a slot before the next reset."
+  "pkQuotaHeld": "All slots are used or reserved. Processing may release a slot before the next reset.",
+  "pkPendingTitle": "Needs analysis",
+  "pkPendingSaved": "Photos are saved privately on this device. This draft expires after 24 hours; device cleanup may remove it sooner. Other products can be saved separately.",
+  "pkPendingResume": "Continue analysis",
+  "pkPendingDelete": "Delete saved draft",
+  "pkPendingSaveError": "Your photos are still open, but could not be saved for restart. Check device storage and try again before closing the app.",
+  "pkAnalysisServiceDaily": "The service’s daily analysis test capacity has been reached. Your photos are kept; this does not spend a successful-analysis credit.",
+  "pkAnalysisRetryAt": "Try again after {time}.",
+  "@pkAnalysisRetryAt": {"placeholders": {"time": {"type": "String"}}},
+  "pkAnalysisTryAfter": "Wait at least {seconds} seconds, then check again. Your photos are kept.",
+  "@pkAnalysisTryAfter": {"placeholders": {"seconds": {"type": "int"}}},
+  "pkPendingSaving": "Saving photos on this device…",
+  "pkPendingLimit": "You have {limit} saved drafts. Finish or delete one before capturing another product.",
+  "@pkPendingLimit": {"placeholders": {"limit": {"type": "int"}}},
+  "pkPendingLoadError": "Saved drafts could not be loaded. Try again; existing files have been kept."
 }

@@ -186,6 +186,10 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **2026-11-03 user confirmation:** Physical-camera capture works on the user's device. Capture UI checkbox verified using that report plus automated tests; actual OTP return remains pending T04.2. No agent-run hardware test is claimed.
 
+**User-requested draft follow-up (2026-11-03):** [Pending analysis evidence](PICKWELL_PENDING_ANALYSES.md). Back and ordinary app close now preserve one bounded private pending draft, with a 24-hour expiry, Home/detail resume warning and explicit deletion. Publication still awaits local photo cleanup; no photos enter published recents or cloud history. The old one-hour process-only policy is superseded by this explicit request. Device forced-close acceptance is not claimed.
+
+**Multiple-draft follow-up (2026-11-03):** The user-requested pending queue now supports five independent products, one per normalized barcode, with legacy single-draft migration and per-item Home/detail resume, expiry and deletion. Switching products preserves photos and idempotency metadata; a full queue refuses new captures without evicting saved items. 100 catalog tests pass; analyzer clean. Device/live acceptance remains unverified. See [pending analysis evidence](PICKWELL_PENDING_ANALYSES.md).
+
 ### T04.2 Email OTP auth and submission gate
 
 - [x] Configure Supabase Auth Email OTP as an actual code flow; verify email template, provider delivery limits and session persistence.

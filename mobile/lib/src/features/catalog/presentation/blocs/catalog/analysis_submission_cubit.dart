@@ -33,14 +33,15 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
       !isClosed &&
       !state.busy &&
       draft.state.ready &&
+      draft.attempts < 3 &&
       (!current || state.phase == AnalysisPhase.idle || state.phase == AnalysisPhase.authRequired);
   bool beginAuthorization() {
     if (!canStart) return false;
     final s = draft.state, stamp = _fingerprint(s);
     if (stamp != _stamp) {
       _stamp = stamp;
-      _key = createCatalogRequestId();
-      _attempts = 0;
+      _key = draft.requestId ?? createCatalogRequestId();
+      _attempts = draft.attempts;
     }
     _submitted = s;
     emit(AnalysisSubmissionState(phase: AnalysisPhase.authenticating, barcode: s.barcode));
@@ -70,6 +71,21 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
     _submitted = snapshot;
     _attempts++;
     emit(AnalysisSubmissionState(phase: AnalysisPhase.submitting, barcode: snapshot.barcode));
+    if (!await draft.recordAttempts(_attempts)) {
+      _attempts--;
+      await draft.recordAttempts(_attempts);
+      if (!isClosed) {
+        emit(
+          AnalysisSubmissionState(
+            phase: AnalysisPhase.error,
+            barcode: snapshot.barcode,
+            error: 'draft_save',
+            canRetry: true,
+          ),
+        );
+      }
+      return;
+    }
     final response = await analyze(
       AnalysisRequest(
         barcode: snapshot.barcode!,
@@ -103,10 +119,18 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
     }
     if (isClosed) return;
     // A definitive quota denial made no model attempt; manual same-key checks
-    // may re-evaluate a reset/config change. They never refill or spend local quota.
+    // may re-evaluate a reset/config change. Only explicit no-provider admission responses
+    // permit a fresh persisted request key; uncertain provider outcomes always reuse it.
     if (result.phase == AnalysisPhase.authRequired ||
-        (result.phase == AnalysisPhase.denied && result.error == 'quota_exceeded')) {
+        result.phase == AnalysisPhase.denied ||
+        result.restartAllowed) {
       _attempts--;
+      await draft.recordAttempts(_attempts);
+      if (result.restartAllowed) {
+        await draft.renewRequest();
+        _key = draft.requestId;
+        _attempts = 0;
+      }
     }
     emit(
       AnalysisSubmissionState(

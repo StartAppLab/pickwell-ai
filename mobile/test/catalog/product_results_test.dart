@@ -263,6 +263,8 @@ void main() {
           .descendant(of: find.byType(ListView).first, matching: find.byType(Scrollable))
           .first,
     );
+    await tester.ensureVisible(find.text('Analyze Product'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Analyze Product'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('VERIFIED SESSION FIXTURE'));

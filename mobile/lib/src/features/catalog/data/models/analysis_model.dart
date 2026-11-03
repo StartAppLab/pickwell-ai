@@ -46,7 +46,10 @@ class AnalysisModel {
         AnalysisPhase.denied,
         error: status as String,
         quota: quota,
-        retryable: status == 'quota_exceeded',
+        retryable: true,
+        retryAfterSeconds: json['retry_after_seconds'] is int
+            ? (json['retry_after_seconds'] as int).clamp(1, 86400)
+            : 60,
       );
     }
     final error = json['error'];
@@ -65,7 +68,24 @@ class AnalysisModel {
         'provider_attempt_limit',
         'retry_denied',
       ].contains(error)) {
-        return AnalysisResult(AnalysisPhase.denied, quota: quota, error: error as String?);
+        return AnalysisResult(
+          AnalysisPhase.denied,
+          quota: quota,
+          error: error as String?,
+          retryable: [
+            'rate_limited',
+            'quota_exceeded',
+            'service_budget_exceeded',
+            'concurrency_limited',
+          ].contains(error),
+          restartAllowed: json['retry_with_new_request'] == true,
+          retryAt: json['retry_at'] is String
+              ? DateTime.tryParse(json['retry_at'] as String)
+              : null,
+          retryAfterSeconds: json['retry_after_seconds'] is int
+              ? (json['retry_after_seconds'] as int).clamp(1, 86400)
+              : 60,
+        );
       }
       if (error == 'inference_disabled' ||
           error == 'idempotency_conflict' ||
@@ -75,6 +95,7 @@ class AnalysisModel {
           quota: quota,
           error: error == 'inference_disabled' ? 'inference_disabled' : 'analysis_failed',
           retryable: error == 'inference_disabled',
+          restartAllowed: error == 'inference_disabled' && json['retry_with_new_request'] == true,
         );
       }
       return AnalysisResult(

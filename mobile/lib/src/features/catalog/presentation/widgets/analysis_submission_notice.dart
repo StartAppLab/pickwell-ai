@@ -27,7 +27,11 @@ class AnalysisSubmissionNotice extends StatelessWidget {
       AnalysisPhase.retake => l.pkAnalysisRetake,
       AnalysisPhase.authRequired => l.pkAnalysisAuthRequired,
       AnalysisPhase.denied =>
-        state.error == 'quota_exceeded' ? l.pkAnalysisDenied : l.pkQuotaRateLimited,
+        state.error == 'service_budget_exceeded'
+            ? l.pkAnalysisServiceDaily
+            : state.error == 'quota_exceeded'
+            ? l.pkAnalysisDenied
+            : l.pkQuotaRateLimited,
       AnalysisPhase.cleanupFailed => l.pkCaptureCleanupError,
       AnalysisPhase.error => l.pkAnalysisUncertain,
       AnalysisPhase.blocked =>
@@ -43,7 +47,17 @@ class AnalysisSubmissionNotice extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(message),
+              Text(state.error == 'draft_save' ? l.pkPendingSaveError : message),
+              if (state.phase == AnalysisPhase.denied && state.result?.retryAt != null)
+                Text(
+                  l.pkAnalysisRetryAt(
+                    '${MaterialLocalizations.of(context).formatFullDate(state.result!.retryAt!.toLocal())} · ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(state.result!.retryAt!.toLocal()))} ${state.result!.retryAt!.toLocal().timeZoneName}',
+                  ),
+                ),
+              if (state.phase == AnalysisPhase.denied &&
+                  state.result?.retryAt == null &&
+                  state.result?.retryable == true)
+                Text(l.pkAnalysisTryAfter(state.result!.retryAfterSeconds)),
               if (state.result != null)
                 QuotaStatus(
                   snapshot: state.result?.quota,

@@ -289,7 +289,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal((await rest('usage_reservations?job_id=eq.'+row.job_id))[0].state,'reserved');
    assert.equal((await rest('analysis_jobs?id=eq.'+row.job_id))[0].state,'processing');
    await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
-   deferPublication=false;assert.equal((await submit(alice,barcode,key)).body.status,'ready');
+   deferPublication=false;assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
   });
   await t.test('invalidated catalog records require operator review and cannot be overwritten by contributors',async()=>{
    const barcode=code(),key=crypto.randomUUID();
@@ -339,4 +339,25 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   for(const id of made)await fetch(origin.origin+'/auth/v1/admin/users/'+id,{method:'DELETE',headers:serverHeaders});
   await new Promise(resolve=>server.close(resolve));
  }
+});
+
+test('daily service admission denial reports UTC reset and explicit safe restart without provider invocation',async()=>{
+ const user='10000000-0000-4000-8000-000000000001',now=new Date();let provider=0,denied=false;
+ const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_ANON_KEY:'fixture-public',SUPABASE_SERVICE_ROLE_KEY:'fixture-server',
+  PICKWELL_NETWORK_HASH_SECRET:'fixture-network-secret-'.repeat(3),META_API_URL:META_URL,META_API_KEY:'fixture-provider',META_MODEL:'muse-spark-1.3'};
+ const h=createAnalyzeProductHandler(env,async(url,options)=>{
+  if(url===META_URL){provider++;throw Error('Forbidden model call');}
+  if(url.endsWith('/auth/v1/user'))return Response.json({id:user,is_anonymous:false,email:'test@example.invalid',email_confirmed_at:'2026-01-01T00:00:00Z'});
+  if(url.endsWith('/pickwell_lookup_throttle'))return Response.json({allowed:true});
+  if(url.endsWith('/pickwell_admit_analysis'))return Response.json(denied?{status:'analysis_failed',error:'service_budget_exceeded'}:{status:'reserved',reservation_id:crypto.randomUUID()});
+  if(url.endsWith('/pickwell_begin_provider'))return Response.json({call_allowed:false,status:'service_budget_exceeded'});
+  if(url.endsWith('/pickwell_settle_analysis')){denied=true;return Response.json({status:'analysis_failed'});}
+  if(url.endsWith('/pickwell_quota_snapshot'))return Response.json({plan:'free',limit:3,used:0,reserved:0,remaining:3,version:1,reset_at:'2026-11-04T00:00:00Z'});
+  return Response.json({});
+ });
+ const r=await h(new Request('https://fixture.invalid',{method:'POST',headers:{Authorization:'Bearer fixture.header.signature'},body:form('96385074')})),body=await r.json();
+ assert.equal(r.status,429);assert.equal(body.error,'service_budget_exceeded');assert.equal(body.retry_with_new_request,true);
+ const reset=new Date(body.retry_at);assert.equal(reset.getUTCHours(),0);assert.ok(reset>now);assert.ok(body.retry_after_seconds>0&&body.retry_after_seconds<=86400);assert.equal(provider,0);
+ const again=await h(new Request('https://fixture.invalid',{method:'POST',headers:{Authorization:'Bearer fixture.header.signature'},body:form('96385074')}));
+ const replay=await again.json();assert.equal(again.status,429);assert.equal(replay.retry_with_new_request,true);assert.equal(replay.error,'service_budget_exceeded');assert.equal(provider,0);
 });

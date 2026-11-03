@@ -48,6 +48,8 @@ class CaptureEntryView extends StatelessWidget {
               'image_dimensions' => l.pkCaptureDimensionsError,
               'draft_expired' => l.pkCaptureExpired,
               'cleanup' => l.pkCaptureCleanupError,
+              'draft_save' => l.pkPendingSaveError,
+              'draft_limit' => l.pkPendingLimit(LabelCaptureCubit.maxDrafts),
               _ => l.pkCaptureCameraError,
             };
             return Center(
@@ -60,6 +62,20 @@ class CaptureEntryView extends StatelessWidget {
                     Gap(d.spacingSm),
                     Text(state.barcode ?? barcode),
                     if (entryQuota != null) QuotaStatus(snapshot: entryQuota, session: session),
+                    if (state.count > 0) ...[
+                      Text(
+                        state.saving
+                            ? l.pkPendingSaving
+                            : state.error == 'draft_save'
+                            ? l.pkPendingSaveError
+                            : l.pkPendingSaved,
+                      ),
+                      TextButton(
+                        onPressed: busy ? null : () => draft.discard(),
+                        child: Text(l.pkPendingDelete),
+                      ),
+                    ],
+                    if (draft.attempts >= 3) Text(l.pkAnalysisRetryLimit),
                     Gap(d.spacingLg),
                     Wrap(
                       spacing: d.spacingXs,

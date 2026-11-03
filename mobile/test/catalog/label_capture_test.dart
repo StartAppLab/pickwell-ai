@@ -146,23 +146,27 @@ void main() {
     },
   );
 
-  test(
-    'same-barcode route return keeps draft; a different barcode removes prior captures',
-    () async {
-      final media = DraftMedia()..next = photo('nutrition');
-      final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
-      await cubit.begin('96385074');
-      await cubit.capture(LabelKind.nutrition);
-      final original = cubit.state;
-      await cubit.begin('00000096385074');
-      expect(cubit.state, same(original));
-      await cubit.begin('036000291452');
-      expect(cubit.state.count, 0);
-      expect(cubit.state.barcode, '00036000291452');
-      expect(media.deleted.single.path, 'nutrition');
-      await cubit.close();
-    },
-  );
+  test('same-barcode return reuses draft; other barcodes open without deleting it', () async {
+    final media = DraftMedia()..next = photo('nutrition');
+    final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
+    await cubit.begin('96385074');
+    await cubit.capture(LabelKind.nutrition);
+    final original = cubit.state;
+    await cubit.begin('00000096385074');
+    expect(cubit.state, same(original));
+    await cubit.begin('036000291452');
+    expect(cubit.state.count, 0);
+    expect(cubit.state.pending.single.barcode, '00000096385074');
+    expect(media.deleted, isEmpty);
+    await cubit.begin('96385074');
+    expect(cubit.state.nutrition?.path, 'nutrition');
+    await cubit.discard();
+    await cubit.begin('036000291452');
+    expect(cubit.state.count, 0);
+    expect(cubit.state.barcode, '00036000291452');
+    expect(media.deleted.single.path, 'nutrition');
+    await cubit.close();
+  });
 
   test(
     'duplicate actions are suppressed and late camera result after discard is deleted',
@@ -239,7 +243,7 @@ void main() {
     },
   );
 
-  testWidgets('one-hour draft expiry removes references and files', (tester) async {
+  testWidgets('24-hour draft expiry removes references and files', (tester) async {
     final media = DraftMedia()..next = photo('expired');
     final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
     await cubit.begin('96385074');

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -7,10 +8,12 @@ import '../../../../core/_core.dart';
 import '../../../../config/_config.dart';
 import '../../../app/app.dart';
 import '../../../catalog/catalog.dart';
+import '../../../catalog/presentation/widgets/pending_capture_card.dart';
 import '../blocs/home/home_cubit.dart';
 
 class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+  final LabelCaptureCubit? drafts;
+  const HomeView({super.key, this.drafts});
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -22,6 +25,7 @@ class _HomeViewState extends State<HomeView> {
   void initState() {
     super.initState();
     context.read<HomeCubit>().load();
+    if (widget.drafts != null) unawaited(widget.drafts!.restore());
   }
 
   Future<void> _open(String barcode) async {
@@ -47,7 +51,13 @@ class _HomeViewState extends State<HomeView> {
                 );
                 final visible = filterRecentProducts(items, query: query, foodOnly: food);
                 if (state.maybeWhen(loading: () => true, orElse: () => false)) {
-                  return const Center(child: CircularProgressIndicator());
+                  return ListView(
+                    children: [
+                      if (widget.drafts != null)
+                        PendingCaptureCard(draft: widget.drafts!, query: query),
+                      const Center(child: CircularProgressIndicator()),
+                    ],
+                  );
                 }
                 return RefreshIndicator(
                   onRefresh: () => context.read<HomeCubit>().load(),
@@ -134,6 +144,8 @@ class _HomeViewState extends State<HomeView> {
                                 child: Text(l.pkRetry),
                               ),
                             ],
+                            if (widget.drafts != null)
+                              PendingCaptureCard(draft: widget.drafts!, query: query),
                             if (visible.isEmpty) ...[
                               Gap(d.spacingXxl),
                               AppIcon(

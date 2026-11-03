@@ -538,3 +538,20 @@ Lookup/submission screens display authenticated server-reported quotas and local
 reset times. Guest copy uses fair use; expired/offline counts show unavailable.
 Loaded results remain accessible when exhausted, without purchases or per-build
 usage requests. See [T06.2 evidence](../docs/PICKWELL_QUOTA_UI.md).
+
+## Pending analysis drafts
+
+One private photo draft survives Back and normal app restart for up to its 24-hour
+expiry; OS cache cleanup can remove it sooner. Home shows Needs analysis with
+Continue/Delete actions. Successful analysis clears it before result navigation.
+Daily service limits now show the local reset and a manual check action. Rebuild
+the app for these changes. See [pending analysis evidence](../docs/PICKWELL_PENDING_ANALYSES.md).
+
+### Multiple pending products
+
+Current behavior supports five private Needs analysis drafts, deduplicated by
+barcode, with independent 24-hour expiry and retry keys. Home can resume/delete
+any item; scanning another unknown product preserves existing drafts. The prior
+single draft migrates automatically. A full queue asks you to finish/delete an
+item instead of evicting photos. Rebuild/relaunch without uninstalling to preserve
+app cache. See [pending analysis evidence](../docs/PICKWELL_PENDING_ANALYSES.md).

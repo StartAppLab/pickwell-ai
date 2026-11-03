@@ -253,7 +253,9 @@ void main() {
           await tester.tap(find.text('Verify'));
         }
         await tester.pumpAndSettle();
-        expect(draft.state, same(before));
+        expect(draft.state.barcode, before.barcode);
+        expect(draft.state.nutrition, same(before.nutrition));
+        expect(draft.state.ingredients, same(before.ingredients));
         expect(draft.state.ready, true);
         expect(find.text('Continue with Email'), findsNothing);
         expect(analysis.requests.length, cancel ? 0 : 1);

@@ -84,6 +84,8 @@ import '../features/catalog/data/repositories/analysis_repository.dart'
 import '../features/catalog/data/repositories/catalog_repository.dart' as _i496;
 import '../features/catalog/data/repositories/label_capture_repository.dart'
     as _i10;
+import '../features/catalog/data/repositories/pending_capture_repository.dart'
+    as _i686;
 import '../features/catalog/domain/_domain.dart' as _i721;
 import '../features/catalog/domain/repositories/analysis_repository.dart'
     as _i217;
@@ -91,6 +93,8 @@ import '../features/catalog/domain/repositories/catalog_repository.dart'
     as _i919;
 import '../features/catalog/domain/repositories/label_capture_repository.dart'
     as _i0;
+import '../features/catalog/domain/repositories/pending_capture_repository.dart'
+    as _i583;
 import '../features/catalog/domain/use_cases/analyze_product_use_case.dart'
     as _i103;
 import '../features/catalog/domain/use_cases/capture_label_use_case.dart'
@@ -247,6 +251,9 @@ Future<_i174.GetIt> init(
     () => registerModule.revenueCatiOSApiKey,
     instanceName: 'revenueCatiOSApiKey',
   );
+  gh.lazySingleton<_i583.PendingCaptureRepository>(
+    () => _i686.PendingCaptureRepositoryImpl(gh<_i1007.ScannerMediaService>()),
+  );
   gh.lazySingleton<_i637.SecureStorage>(
     () => _i637.SecureStorage(storage: gh<_i558.FlutterSecureStorage>()),
   );
@@ -307,10 +314,6 @@ Future<_i174.GetIt> init(
       gh<_i460.SharedPreferences>(),
     ),
   );
-  gh.lazySingleton<_i84.LabelCaptureCubit>(
-    () => _i84.LabelCaptureCubit(gh<_i721.CaptureLabelUseCase>()),
-    dispose: (i) => i.close(),
-  );
   gh.factory<_i176.AuthApiService>(
     () => _i176.AuthApiServiceImpl(
       gh<_i454.SupabaseClient>(),
@@ -339,6 +342,13 @@ Future<_i174.GetIt> init(
   gh.lazySingleton<_i361.Dio>(() => registerModule.dio(gh<_i369.AppConfig>()));
   gh.factory<_i1039.SettingsApiService>(
     () => _i1039.SettingsApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),
+  );
+  gh.lazySingleton<_i84.LabelCaptureCubit>(
+    () => _i84.LabelCaptureCubit(
+      gh<_i721.CaptureLabelUseCase>(),
+      gh<_i721.PendingCaptureRepository>(),
+    ),
+    dispose: (i) => i.close(),
   );
   gh.factory<_i54.PaywallApiService>(
     () => _i54.PaywallApiServiceImpl(gh<_i361.Dio>(), gh<_i369.AppConfig>()),

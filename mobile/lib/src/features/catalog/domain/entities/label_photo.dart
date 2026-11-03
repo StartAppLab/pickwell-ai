@@ -1,6 +1,7 @@
 enum LabelKind { nutrition, ingredients }
 
-// Transient, app-private file reference. Never persist this in recents/account data.
+// App-private working photo. Only the expiring pending draft may persist a copy;
+// never store this in published recents or account/cloud history.
 class LabelPhoto {
   final String path, mimeType;
   final int byteLength, width, height;
