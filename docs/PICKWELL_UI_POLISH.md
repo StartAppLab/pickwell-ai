@@ -2,11 +2,31 @@
 
 Date: 2026-11-04 (Asia/Manila). Scope: presentation-only polish after T07.1; no backend, database, quota, provider, auth policy or persistence changes. T06.4 was not started.
 
+## Latest scope — Home reference follow-up (2026-11-04)
+
+The owner subsequently supplied **`docs/reference/home.png`** and requested Home first, setting further logo work aside. Inspected that image directly before this revision. Earlier paragraphs describing absent mockups record the initial pass; Home now has an actual visual reference. Other supplied reference files are available but have not been applied in this Home-only follow-up.
+
+Compared with the first flat-cream implementation, Home now has:
+
+- Warm off-white canvas with soft green upper/lower curves, drawn in Flutter rather than generated image assets.
+- Larger forest wordmark and raised circular search control; search still expands only when requested.
+- Forest selected All/Food pills, outlined inactive filter and compact newest-order indicator. No fake sort menu is introduced when only newest order exists.
+- Larger, individually rounded white cards with restrained elevation, 76×88 neutral thumbnail placeholders, stronger product names and quieter supporting text.
+- Existing glass-inspired Home/Settings dock and independent rightmost Scan retained. Chat/Cosmetics shown in the concept remain excluded under the approved MVP scope.
+
+The current product contract has no authorized package media, so reference package photos are not copied into live cards. Generic good/bad check badges from the concept are not assigned to products without an explicit, supported finding; this pass does not introduce an overall product safety classification. The prior logo implementation is untouched in this follow-up, as requested.
+
+Additional files touched in this follow-up: `home_view.dart`, `catalog_widget.dart`, new `home_backdrop.dart` and its existing widget barrel, the UI layout test, this report and TASKS note. No further OTP, scanner, results, backend or persistence changes.
+
+**Validation:** `fvm flutter test --no-pub test/catalog/home_widget_test.dart test/catalog/ui_polish_test.dart test/catalog/recent_products_test.dart` — **22 passed**. `fvm flutter analyze --no-pub` — no issues. `git diff --check` — passed. Home's compact/large-phone, landscape, tablet, large-text, keyboard, guest scan navigation and local search/filter/restart checks remain covered. The landscape keyboard test scrolls the expanded search into view before input.
+
+Compared the reference with `.secrets/ui-polish/home-390.png`, an actual widget render containing a clearly labeled synthetic test record, not a real product or full catalogue. Reference photo content, deferred routes and global food-certification badges are intentional deviations; physical-device visual review remains outstanding. Logs: `.secrets/home-reference-tests.log`, `.secrets/home-reference-analyze.log`.
+
 ## References and limitations
 
 Read mobile instructions, shared app design guidelines, PRD v1.4, DESIGN v1.2, SPEC v1.2 and current UI/test implementation. Inspected bundled app artwork and earlier local implementation captures (`.secrets/pickwell-home-final.png`, `.secrets/t061-results-light.png`, `.secrets/t061-results-dark.png`). The old Home capture is a splash screen, not an approved Home mockup. These files are historical implementation evidence, not approved visual targets.
 
-No approved screen mockups were found during the initial inspection of repository/assets. Requested a local reference path and proceeded with the approved written design. During the pass, `assets/pickwell-raw.png` appeared: inspected the supplied whole-lemon/two-leaf image, preserved the original, and copied it unchanged to `mobile/assets/images/pickwell_lemon.png` for Home. **Exact screen-mockup fidelity remains unverified.** Home now uses that supplied brand artwork instead of the emoji placeholder. The bundled launcher/splash artwork is still the starter mark; native icon/splash regeneration was not performed. No artwork was generated or edited, and no product package photos were invented. The result/media contract currently supplies no authorized package photo, so neutral placeholders remain appropriate. Captured label photos are not reused as product imagery.
+At the initial pass, before the reference folder was supplied, no approved screen mockups were found in the inspected repository/assets. Requested a local reference path and proceeded with the approved written design. During the pass, `assets/pickwell-raw.png` appeared: inspected the supplied whole-lemon/two-leaf image, preserved the original, and copied it unchanged to `mobile/assets/images/pickwell_lemon.png` for Home. **Initial screen-mockup fidelity was unverified; the later Home-specific comparison is recorded above.** Home now uses that supplied brand artwork instead of the emoji placeholder. The bundled launcher/splash artwork is still the starter mark; native icon/splash regeneration was not performed. No artwork was generated or edited, and no product package photos were invented. The result/media contract currently supplies no authorized package photo, so neutral placeholders remain appropriate. Captured label photos are not reused as product imagery.
 
 ## Screens and before/after changes
 
@@ -52,6 +72,9 @@ Private render evidence: `.secrets/ui-polish/home-390.png`, `details-light.png`,
 - `mobile/lib/src/features/catalog/presentation/widgets/product_result_content.dart`
 - `mobile/lib/src/features/catalog/presentation/widgets/product_section.dart`
 - `mobile/lib/src/features/home/presentation/views/home_view.dart`
+- `mobile/lib/src/features/home/presentation/widgets/home_backdrop.dart`
+- `mobile/lib/src/features/home/presentation/widgets/_widgets.dart`
+- `mobile/lib/src/features/catalog/presentation/widgets/catalog_widget.dart`
 - `mobile/lib/src/features/root/presentation/views/root_view.dart`
 - `mobile/lib/src/features/root/presentation/widgets/nav_item.dart`
 - `mobile/test/catalog/email_otp_test.dart`
@@ -63,7 +86,7 @@ Private render evidence: `.secrets/ui-polish/home-390.png`, `details-light.png`,
 
 ## Remaining deviations and handoff
 
-- Screen mockup comparison remains outstanding for this initial pass. Home uses the supplied whole-lemon image unchanged, including its white canvas/thin source border. A transparent/vector header variant and native launcher/splash replacements were not produced; existing starter launcher/splash artwork was preserved.
+- The supplied Home mockup has now been compared in the Home follow-up above. Other screen references have not yet had their own focused fidelity pass. Home uses the supplied whole-lemon image unchanged, including its white canvas/thin source border. A transparent/vector header variant and native launcher/splash replacements were not produced; existing starter launcher/splash artwork was preserved.
 - This pass verifies widget rendering and automated navigation/workflow behavior. A quick device visual review of the new spacing, keyboard, native camera/torch and platform glass remains advisable; no fresh signed build, device installation or live Meta/OTP trial was performed here.
 - Existing user-approved OCR/unknown-value behavior, server protections, photo disposal and quota semantics are unchanged. The prior T07.1 record remains historical evidence; these UI changes have their own automated regression results above.
 - No backend deployment, paid provider calls, new dependency, analytics or billing activation. Cloud testing allowances remain untouched.

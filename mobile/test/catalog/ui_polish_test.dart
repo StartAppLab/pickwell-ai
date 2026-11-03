@@ -119,6 +119,12 @@ void main() {
       await tester.pumpWidget(host(RepaintBoundary(key: key, child: content), keyboard: 280));
       await tester.pumpAndSettle();
       expect(find.byTooltip('Scan barcode'), findsNothing);
+      await tester.scrollUntilVisible(
+        find.byType(TextField),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'no matching fixture');
       await tester.pumpAndSettle();
       expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsNothing);

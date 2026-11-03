@@ -27,6 +27,8 @@ This section and the dated reconciliation notes below describe current status. E
 
 **Evidence boundary:** Device and further real-product/unreadable-label passes are owner-reported in the conversation and recorded in T07.1. Automated/native/hosted checks are separately identified in the QA report. This documentation-only reconciliation performs no new device test, provider call, deployment or full regression.
 
+**2026-11-04 — Home visual follow-up:** The owner supplied `docs/reference/home.png` and requested Home first, with further logo work set aside. Warm canvas/green curves, circular search, filter hierarchy and larger truthful product cards now follow that reference. 22 focused tests pass; analyzer clean. [UI evidence and intentional deviations](PICKWELL_UI_POLISH.md). Other screen reference passes and device visual review remain separate; T06.4 is not started.
+
 **Configuration exception:** Cloud testing allowances remain **1,000 lookups / 100 successful analyses per day**, explicitly retained by the owner. Approved **30/3**, dynamic 20 and UTC/concurrency boundaries passed in isolation. Restore production allowances before public release; billing remains disabled.
 
 **Remaining release checks:** Signed store/iOS release artifacts and production signing ownership remain outside this sign-off. The first naturally scheduled daily telemetry-retention run was not observed during T07.1; registration and accelerated execution were verified. This reconciliation does not claim a new scheduler observation or configured CI/staging deployment.

@@ -13,40 +13,53 @@ class CatalogWidget extends StatelessWidget {
     final d = context.themeData.dimensionsData;
     return Card(
       margin: EdgeInsets.zero,
+      elevation: 2,
+      shadowColor: context.colorScheme.shadow.withValues(alpha: 0.12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(d.cardCornerRadius)),
       child: InkWell(
         borderRadius: BorderRadius.circular(d.cardCornerRadius),
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.all(d.paddingMd),
+          padding: EdgeInsets.all(d.paddingSm),
           child: Row(
             children: [
               Semantics(
                 label: context.l10n.pkPhotoPlaceholder,
                 child: Container(
-                  width: 64,
-                  height: 72,
+                  width: 76,
+                  height: 88,
                   decoration: BoxDecoration(
-                    color: context.colorScheme.surfaceContainerLow,
+                    color: context.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(d.nestedCornerRadius),
                   ),
-                  child: const AppIcon(icon: Icons.inventory_2_outlined),
+                  child: AppIcon(
+                    icon: Icons.inventory_2_outlined,
+                    size: d.iconLarge,
+                    color: context.colorScheme.onPrimaryContainer,
+                  ),
                 ),
               ),
-              Gap(d.spacingMd),
+              Gap(d.spacingSm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       entry.product?.name ?? context.l10n.pkFoodProduct,
-                      style: context.textTheme.titleMedium,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Gap(d.spacingXxs),
                     Text(
                       entry.product?.brand ?? entry.barcode,
-                      style: context.textTheme.bodySmall,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
