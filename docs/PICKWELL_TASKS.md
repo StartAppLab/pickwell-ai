@@ -231,7 +231,7 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 - [x] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.
 - [x] Rejected/failed analysis does not consume successful-analysis credits, but provider spend remains in ledger.
-- [ ] Do not persist original images unless private temporary storage is absolutely required; delete temporary files after successful extraction and via bounded cleanup of failures/orphans.
+- [x] Do not persist original images unless private temporary storage is absolutely required; delete temporary files after successful extraction and via bounded cleanup of failures/orphans.
 - [x] Do not expose contributor email or transient images in public record.
 
 **Acceptance:** Another guest sees the result by scanning same barcode without AI; photos are not retained after successful extraction.  
@@ -239,17 +239,21 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **2026-11-03 — PARTIAL (backend complete; client disposal/full flow pending):** [Publication evidence](PICKWELL_PUBLICATION.md). Recomputed validation and exact staged/version binding precede atomic product/revision/findings/ready/quota settlement. Lost acknowledgements resume without another model call; invalidated products require operator review. Terminal/expired candidates clean up, original server photos are never persisted, and public metadata is allowlisted. **76 targeted tests plus 11 hosted checks pass.** New additive migration and protected analyze-product/get-product deployed with inference/billing OFF. Real new publication→guest reuse is verified against native Auth/REST/SQL with a mocked provider, not fresh real Meta labels. Successful client upload/result must still invoke existing draft discard; leave the photo-disposal checkbox open. Full-flow/device tests are deferred by user request; T05.2 quality blockers remain.
 
+**T06.1 follow-up:** The previously missing Flutter submission/result/disposal handoff is implemented. Confirmed ready/cache success awaits owned-file disposal before result navigation; real temporary-file deletion, cleanup failure/retry and late-result protection pass targeted tests. All T05.3 implementation checkboxes are now verified; full live/device acceptance is still deferred and no new real Meta publication is claimed. See [client-flow evidence](PICKWELL_RESULTS_FLOW.md).
+
 ## 8. Phase 6 — Results, quota UI and RevenueCat readiness (P0/P1)
 
 ### T06.1 Product results and accountable findings (P0)
 
-- [ ] Implement approved nested Product Details: back + overflow, **no logo app-bar title or bottom tabs**, product identity/photo or fallback, ingredient explanations, nutrition, summary, green/yellow/red findings, declared allergens, missing information and analysis timestamp.
-- [ ] **No numeric 92/100 score, unsupported healthy certification, or Add to List.** Share native action is optional P1 with valid non-sensitive data.
-- [ ] Show color-independent warning icons/labels and readable explanations; format servings/units consistently.
-- [ ] Display explicit status while analyzing and relevant-label retake state; safe retry, not infinite progress.
+- [x] Implement approved nested Product Details: back + overflow, **no logo app-bar title or bottom tabs**, product identity/photo or fallback, ingredient explanations, nutrition, summary, green/yellow/red findings, declared allergens, missing information and analysis timestamp.
+- [x] **No numeric 92/100 score, unsupported healthy certification, or Add to List.** Share native action is optional P1 with valid non-sensitive data.
+- [x] Show color-independent warning icons/labels and readable explanations; format servings/units consistently.
+- [x] Display explicit status while analyzing and relevant-label retake state; safe retry, not infinite progress.
 
 **Acceptance:** Cached and newly generated analyses use the same result UI and evidence model; result understandable without relying on color.  
 **Targeted validation:** Widget tests for green/yellow/red/unknown, missing values, long ingredient names and error states.
+
+**2026-11-03 — IMPLEMENTED (targeted automated acceptance; live/device flow deferred):** [Results/client-flow evidence](PICKWELL_RESULTS_FLOW.md). Contextual OTP now submits bounded binary photos with image-bound request-key reuse, explicit response states, bounded manual checks and no automatic paid retry. Accepted publication is stored in memory/recents and opens the shared nested result UI after awaited photo cleanup; cleanup failure has a cleanup-only retry and late results preserve unrelated drafts. Result cards expose label explanations, evidence/rules, units/basis, unknowns, declared allergens, missing information and timestamp, with icons/text beyond colour and no score/Add to List/dock. **74 focused tests pass, analyzer clean; light/dark renders inspected.** No new packages, backend changes, paid calls or inference/billing activation. Real-device/live Meta acceptance and prior T05.2 blockers remain deferred; new translations use English fallbacks.
 
 ### T06.2 Remaining usage and quota-exceeded states (P0)
 

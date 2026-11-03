@@ -1055,7 +1055,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCapturePrivacy.
   ///
   /// In en, this message translates to:
-  /// **'Photos stay on this device. No analysis has been submitted.'**
+  /// **'Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.'**
   String get pkCapturePrivacy;
 
   /// No description provided for @pkCaveat.
@@ -1267,6 +1267,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We could not verify your sign-in. Check your connection and try again.'**
   String get pkOtpNetworkError;
+
+  /// No description provided for @pkAnalysisSubmitHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Both label photos will be sent securely for analysis. Sign in only when you submit.'**
+  String get pkAnalysisSubmitHint;
+
+  /// No description provided for @pkAnalysisAuthenticating.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying your email session…'**
+  String get pkAnalysisAuthenticating;
+
+  /// No description provided for @pkAnalysisSubmitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending labels and preparing your analysis…'**
+  String get pkAnalysisSubmitting;
+
+  /// No description provided for @pkAnalysisProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request is processing. Check again after a moment; the same request will be reused.'**
+  String get pkAnalysisProcessing;
+
+  /// No description provided for @pkAnalysisRetake.
+  ///
+  /// In en, this message translates to:
+  /// **'Please retake the indicated photo. Keep the other accepted photo.'**
+  String get pkAnalysisRetake;
+
+  /// No description provided for @pkAnalysisAuthRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session needs verification. Sign in again to resume the same photos.'**
+  String get pkAnalysisAuthRequired;
+
+  /// No description provided for @pkAnalysisUncertain.
+  ///
+  /// In en, this message translates to:
+  /// **'We could not confirm the outcome. Your photos are retained temporarily. Check again safely using the same request.'**
+  String get pkAnalysisUncertain;
+
+  /// No description provided for @pkAnalysisDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'New analyses are temporarily unavailable. Your photos have not been submitted for AI processing.'**
+  String get pkAnalysisDisabled;
+
+  /// No description provided for @pkAnalysisReview.
+  ///
+  /// In en, this message translates to:
+  /// **'This request cannot be retried automatically. It may need review. Cached products remain available.'**
+  String get pkAnalysisReview;
+
+  /// No description provided for @pkAnalysisCheckAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check request again'**
+  String get pkAnalysisCheckAgain;
+
+  /// No description provided for @pkAnalysisRetryCleanup.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry photo cleanup'**
+  String get pkAnalysisRetryCleanup;
+
+  /// No description provided for @pkAnalysisRetryLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'The request-check limit has been reached. Keep this request for review; do not repeatedly submit it.'**
+  String get pkAnalysisRetryLimit;
+
+  /// No description provided for @pkFindingGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourable finding'**
+  String get pkFindingGreen;
+
+  /// No description provided for @pkFindingYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs context'**
+  String get pkFindingYellow;
+
+  /// No description provided for @pkFindingRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Concern'**
+  String get pkFindingRed;
+
+  /// No description provided for @pkEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Label evidence and rule'**
+  String get pkEvidence;
+
+  /// No description provided for @pkRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Rule'**
+  String get pkRule;
+
+  /// No description provided for @pkNoProductPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Product photo unavailable; showing a placeholder'**
+  String get pkNoProductPhoto;
+
+  /// No description provided for @pkPer100g.
+  ///
+  /// In en, this message translates to:
+  /// **'Per 100 g'**
+  String get pkPer100g;
+
+  /// No description provided for @pkPer100ml.
+  ///
+  /// In en, this message translates to:
+  /// **'Per 100 mL'**
+  String get pkPer100ml;
+
+  /// No description provided for @pkPerServing.
+  ///
+  /// In en, this message translates to:
+  /// **'Per serving'**
+  String get pkPerServing;
+
+  /// No description provided for @pkNoFindings.
+  ///
+  /// In en, this message translates to:
+  /// **'No supported colour findings for the available label context.'**
+  String get pkNoFindings;
+
+  /// No description provided for @pkRawLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Printed ingredient text'**
+  String get pkRawLabel;
+
+  /// No description provided for @pkDeclaredAllergens.
+  ///
+  /// In en, this message translates to:
+  /// **'Declared allergens'**
+  String get pkDeclaredAllergens;
+
+  /// No description provided for @pkServingSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Serving size'**
+  String get pkServingSize;
+
+  /// No description provided for @pkMissingInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing information'**
+  String get pkMissingInformation;
+
+  /// No description provided for @pkNoMissingReported.
+  ///
+  /// In en, this message translates to:
+  /// **'No additional missing fields were reported. This is not a guarantee of completeness.'**
+  String get pkNoMissingReported;
+
+  /// No description provided for @pkAnalysisMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis and provenance'**
+  String get pkAnalysisMethod;
+
+  /// No description provided for @pkAnalysisDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzed'**
+  String get pkAnalysisDate;
+
+  /// No description provided for @pkModelVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get pkModelVersion;
+
+  /// No description provided for @pkRulesVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Rules version'**
+  String get pkRulesVersion;
+
+  /// No description provided for @pkPromptVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Prompt version'**
+  String get pkPromptVersion;
+
+  /// No description provided for @pkAnalysisDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'An analysis limit is active. Please try later; your photos are retained temporarily.'**
+  String get pkAnalysisDenied;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

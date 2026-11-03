@@ -162,8 +162,11 @@ class AppRouter {
             final barcode = normalizeGtin(state.pathParameters['barcode'] ?? '');
             final draft = getIt<LabelCaptureCubit>();
             unawaited(draft.begin(barcode));
-            return BlocProvider.value(
-              value: draft,
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider.value(value: draft),
+                BlocProvider.value(value: getIt<AnalysisSubmissionCubit>()),
+              ],
               child: CaptureEntryView(barcode: barcode),
             );
           } catch (_) {

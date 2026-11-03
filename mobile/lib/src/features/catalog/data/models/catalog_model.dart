@@ -49,6 +49,35 @@ class CatalogModel {
           throw const FormatException();
         }
       }
+      for (final finding in findings) {
+        final details = finding['source_details'];
+        if (details is! Map ||
+            details['rule_id'] is! String ||
+            details['evidence'] is! List ||
+            (details['evidence'] as List).isEmpty) {
+          throw const FormatException();
+        }
+        if (!(details['evidence'] as List).every((entry) => entry is Map)) {
+          throw const FormatException();
+        }
+        if (details['thresholds'] != null && details['thresholds'] is! Map) {
+          throw const FormatException();
+        }
+        if (details['portion'] != null && details['portion'] is! Map) throw const FormatException();
+      }
+      final explanations = (p['explanations'] as List? ?? [])
+          .map((v) => Map<String, dynamic>.from(v as Map))
+          .toList();
+      if (!explanations.every(
+        (v) =>
+            ['nutrition', 'ingredients'].contains(v['photo']) &&
+            v['source'] is String &&
+            v['text'] is String,
+      )) {
+        throw const FormatException();
+      }
+      final missing = p['missing_information'] as List? ?? [];
+      if (!missing.every((v) => v is String)) throw const FormatException();
       product = ProductRecord(
         barcode: barcode,
         name: p['name'] as String?,
@@ -58,6 +87,18 @@ class CatalogModel {
         ingredients: Map.unmodifiable(ingredients),
         findings: List.unmodifiable(findings.map((f) => Map<String, dynamic>.unmodifiable(f))),
         isDemo: p['is_demo'] == true,
+        explanations: List.unmodifiable(
+          explanations.map((v) => Map<String, dynamic>.unmodifiable(v)),
+        ),
+        missingInformation: List<String>.unmodifiable(missing),
+        analyzedAt: p['analyzed_at'] is String
+            ? DateTime.tryParse(p['analyzed_at'] as String)
+            : null,
+        provenance: Map<String, dynamic>.unmodifiable(
+          p['provenance'] is Map ? p['provenance'] as Map : {},
+        ),
+        modelVersion: p['model_version'] as String?,
+        rulesVersion: p['rules_version'] as String?,
       );
     }
     return CatalogEntity(

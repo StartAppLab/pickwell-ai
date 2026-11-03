@@ -73,22 +73,32 @@ import '../features/catalog/data/data_sources/catalog_local_source.dart'
     as _i871;
 import '../features/catalog/data/data_sources/catalog_remote_source.dart'
     as _i895;
+import '../features/catalog/data/data_sources/services/analysis_api_service.dart'
+    as _i674;
 import '../features/catalog/data/data_sources/services/catalog_api_service.dart'
     as _i988;
 import '../features/catalog/data/data_sources/services/scanner_media_service.dart'
     as _i1007;
+import '../features/catalog/data/repositories/analysis_repository.dart'
+    as _i641;
 import '../features/catalog/data/repositories/catalog_repository.dart' as _i496;
 import '../features/catalog/data/repositories/label_capture_repository.dart'
     as _i10;
 import '../features/catalog/domain/_domain.dart' as _i721;
+import '../features/catalog/domain/repositories/analysis_repository.dart'
+    as _i217;
 import '../features/catalog/domain/repositories/catalog_repository.dart'
     as _i919;
 import '../features/catalog/domain/repositories/label_capture_repository.dart'
     as _i0;
+import '../features/catalog/domain/use_cases/analyze_product_use_case.dart'
+    as _i103;
 import '../features/catalog/domain/use_cases/capture_label_use_case.dart'
     as _i835;
 import '../features/catalog/domain/use_cases/get_catalog_use_case.dart'
     as _i670;
+import '../features/catalog/presentation/blocs/catalog/analysis_submission_cubit.dart'
+    as _i724;
 import '../features/catalog/presentation/blocs/catalog/catalog_cubit.dart'
     as _i1068;
 import '../features/catalog/presentation/blocs/catalog/label_capture_cubit.dart'
@@ -371,6 +381,9 @@ Future<_i174.GetIt> init(
       gh<_i709.BillingClient>(),
     ),
   );
+  gh.lazySingleton<_i674.AnalysisApiService>(
+    () => _i674.SupabaseAnalysisApiService(gh<_i609.AppConfig>()),
+  );
   gh.lazySingleton<_i544.ChangePasswordUseCase>(
     () => _i544.ChangePasswordUseCase(gh<_i63.AuthRepository>()),
   );
@@ -420,6 +433,12 @@ Future<_i174.GetIt> init(
       networkInfo: gh<_i172.NetworkInfo>(),
       autoMapper: gh<_i369.AutoMapper>(),
       storage: gh<_i172.DataStorage>(),
+    ),
+  );
+  gh.lazySingleton<_i217.AnalysisRepository>(
+    () => _i641.AnalysisRepositoryImpl(
+      gh<_i674.AnalysisApiService>(),
+      gh<_i871.CatalogLocalSource>(),
     ),
   );
   gh.factory<_i315.PaywallCubit>(
@@ -473,6 +492,9 @@ Future<_i174.GetIt> init(
       gh<_i63.OtpResendUseCase>(),
     ),
   );
+  gh.lazySingleton<_i103.AnalyzeProductUseCase>(
+    () => _i103.AnalyzeProductUseCase(gh<_i217.AnalysisRepository>()),
+  );
   gh.lazySingleton<_i729.NotificationRemoteSource>(
     () => _i729.NotificationRemoteSource(
       notificationApiService: gh<_i884.NotificationApiService>(),
@@ -498,6 +520,13 @@ Future<_i174.GetIt> init(
   );
   gh.lazySingleton<_i744.EmailOtpUseCase>(
     () => _i744.EmailOtpUseCase(gh<_i172.EmailOtpRepository>()),
+  );
+  gh.lazySingleton<_i724.AnalysisSubmissionCubit>(
+    () => _i724.AnalysisSubmissionCubit(
+      gh<_i721.AnalyzeProductUseCase>(),
+      gh<_i84.LabelCaptureCubit>(),
+    ),
+    dispose: (i) => i.close(),
   );
   gh.lazySingleton<_i641.HomeCubit>(
     () => _i641.HomeCubit(gh<_i721.GetRecentProductsUseCase>()),

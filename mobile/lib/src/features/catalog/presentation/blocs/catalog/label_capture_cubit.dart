@@ -50,7 +50,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     _pendingCleanup.addAll(photos);
     for (final photo in _pendingCleanup.toList()) {
       try {
-        await captureLabel.discard(photo);
+        await captureLabel.discard(photo).timeout(const Duration(seconds: 5));
         _pendingCleanup.remove(photo);
       } catch (_) {
         // Do not accumulate more photos while cleanup fails. Retry on the next
@@ -131,6 +131,23 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     if (!isClosed && _pendingCleanup.isNotEmpty) {
       emit(LabelCaptureState(barcode: state.barcode, error: 'cleanup'));
     }
+  }
+
+  // Dispose only this completed upload's photos; a late result must not wipe a newer draft.
+  Future<bool> discardSubmitted(LabelCaptureState submitted) async {
+    if (!isClosed &&
+        state.barcode == submitted.barcode &&
+        identical(state.nutrition, submitted.nutrition) &&
+        identical(state.ingredients, submitted.ingredients)) {
+      await discard();
+    } else {
+      await _delete(
+        [submitted.nutrition, submitted.ingredients].whereType<LabelPhoto>().where(
+          (photo) => !identical(photo, state.nutrition) && !identical(photo, state.ingredients),
+        ),
+      );
+    }
+    return _pendingCleanup.isEmpty;
   }
 
   @override

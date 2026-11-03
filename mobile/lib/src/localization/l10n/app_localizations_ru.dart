@@ -516,7 +516,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pkBarcodeDone => 'Barcode ✓';
 
   @override
-  String get pkCapturePrivacy => 'Photos stay on this device. No analysis has been submitted.';
+  String get pkCapturePrivacy =>
+      'Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.';
 
   @override
   String get pkCaveat => 'Label information is not medical advice.';
@@ -634,4 +635,113 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get pkOtpNetworkError =>
       'We could not verify your sign-in. Check your connection and try again.';
+
+  @override
+  String get pkAnalysisSubmitHint =>
+      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+
+  @override
+  String get pkAnalysisAuthenticating => 'Verifying your email session…';
+
+  @override
+  String get pkAnalysisSubmitting => 'Sending labels and preparing your analysis…';
+
+  @override
+  String get pkAnalysisProcessing =>
+      'Your request is processing. Check again after a moment; the same request will be reused.';
+
+  @override
+  String get pkAnalysisRetake =>
+      'Please retake the indicated photo. Keep the other accepted photo.';
+
+  @override
+  String get pkAnalysisAuthRequired =>
+      'Your session needs verification. Sign in again to resume the same photos.';
+
+  @override
+  String get pkAnalysisUncertain =>
+      'We could not confirm the outcome. Your photos are retained temporarily. Check again safely using the same request.';
+
+  @override
+  String get pkAnalysisDisabled =>
+      'New analyses are temporarily unavailable. Your photos have not been submitted for AI processing.';
+
+  @override
+  String get pkAnalysisReview =>
+      'This request cannot be retried automatically. It may need review. Cached products remain available.';
+
+  @override
+  String get pkAnalysisCheckAgain => 'Check request again';
+
+  @override
+  String get pkAnalysisRetryCleanup => 'Retry photo cleanup';
+
+  @override
+  String get pkAnalysisRetryLimit =>
+      'The request-check limit has been reached. Keep this request for review; do not repeatedly submit it.';
+
+  @override
+  String get pkFindingGreen => 'Favourable finding';
+
+  @override
+  String get pkFindingYellow => 'Needs context';
+
+  @override
+  String get pkFindingRed => 'Concern';
+
+  @override
+  String get pkEvidence => 'Label evidence and rule';
+
+  @override
+  String get pkRule => 'Rule';
+
+  @override
+  String get pkNoProductPhoto => 'Product photo unavailable; showing a placeholder';
+
+  @override
+  String get pkPer100g => 'Per 100 g';
+
+  @override
+  String get pkPer100ml => 'Per 100 mL';
+
+  @override
+  String get pkPerServing => 'Per serving';
+
+  @override
+  String get pkNoFindings => 'No supported colour findings for the available label context.';
+
+  @override
+  String get pkRawLabel => 'Printed ingredient text';
+
+  @override
+  String get pkDeclaredAllergens => 'Declared allergens';
+
+  @override
+  String get pkServingSize => 'Serving size';
+
+  @override
+  String get pkMissingInformation => 'Missing information';
+
+  @override
+  String get pkNoMissingReported =>
+      'No additional missing fields were reported. This is not a guarantee of completeness.';
+
+  @override
+  String get pkAnalysisMethod => 'Analysis and provenance';
+
+  @override
+  String get pkAnalysisDate => 'Analyzed';
+
+  @override
+  String get pkModelVersion => 'Model';
+
+  @override
+  String get pkRulesVersion => 'Rules version';
+
+  @override
+  String get pkPromptVersion => 'Prompt version';
+
+  @override
+  String get pkAnalysisDenied =>
+      'An analysis limit is active. Please try later; your photos are retained temporarily.';
 }

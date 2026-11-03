@@ -1,3 +1,5 @@
+import 'analysis_fixtures.dart';
+import '../../lib/src/features/catalog/presentation/blocs/catalog/analysis_submission_cubit.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -200,14 +202,19 @@ void main() {
         await draft.capture(LabelKind.nutrition);
         await draft.capture(LabelKind.ingredients);
         final before = draft.state;
+        final analysis = FakeAnalysis();
+        final submission = AnalysisSubmissionCubit(AnalyzeProductUseCase(analysis), draft);
         final gate = EmailOtpCubit(EmailOtpUseCase(repository));
         final router = GoRouter(
           initialLocation: '/capture',
           routes: [
             GoRoute(
               path: '/capture',
-              builder: (_, _) => BlocProvider.value(
-                value: draft,
+              builder: (_, _) => MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: draft),
+                  BlocProvider.value(value: submission),
+                ],
                 child: const CaptureEntryView(barcode: '00000096385074'),
               ),
             ),
@@ -249,11 +256,13 @@ void main() {
         expect(draft.state, same(before));
         expect(draft.state.ready, true);
         expect(find.text('Continue with Email'), findsNothing);
-        if (!cancel) expect(find.textContaining('Email verified.'), findsOneWidget);
+        expect(analysis.requests.length, cancel ? 0 : 1);
+        if (!cancel) expect(submission.state.phase, AnalysisPhase.retake);
         expect(tester.takeException(), isNull);
         await tester.pumpWidget(const SizedBox.shrink());
         router.dispose();
         await gate.close();
+        await submission.close();
         await draft.close();
         await tester.runAsync(() => dir.delete(recursive: true));
       },

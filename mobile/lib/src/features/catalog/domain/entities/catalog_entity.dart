@@ -9,6 +9,11 @@ class ProductRecord {
   final Map<String, dynamic> nutrition, ingredients;
   final List<Map<String, dynamic>> findings;
   final bool isDemo;
+  final List<Map<String, dynamic>> explanations;
+  final List<String> missingInformation;
+  final DateTime? analyzedAt;
+  final Map<String, dynamic> provenance;
+  final String? modelVersion, rulesVersion;
   const ProductRecord({
     required this.barcode,
     this.name,
@@ -18,6 +23,12 @@ class ProductRecord {
     required this.ingredients,
     required this.findings,
     this.isDemo = false,
+    this.explanations = const [],
+    this.missingInformation = const [],
+    this.analyzedAt,
+    this.provenance = const {},
+    this.modelVersion,
+    this.rulesVersion,
   });
 }
 

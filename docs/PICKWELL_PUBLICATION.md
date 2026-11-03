@@ -1,5 +1,11 @@
 # T05.3 — Atomic publication and photo disposal
 
+**T06.1 follow-up (2026-11-03):** The client handoff and awaited successful photo
+disposal described as missing in the original report below are now implemented
+and tested, including real temporary-file deletion and cleanup-only retries.
+See [current client/results evidence](PICKWELL_RESULTS_FLOW.md). Full live/device
+acceptance remains deferred; prior findings below are retained as historical evidence.
+
 2026-11-03. **PARTIAL overall; backend publication and targeted checks pass.**
 The protected backend now publishes accepted analyses and serves them to guests.
 The remaining mobile submission/result handoff must call the existing draft disposal

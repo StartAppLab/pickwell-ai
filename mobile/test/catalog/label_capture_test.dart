@@ -1,3 +1,5 @@
+import 'analysis_fixtures.dart';
+import '../../lib/src/features/catalog/presentation/blocs/catalog/analysis_submission_cubit.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -315,6 +317,7 @@ void main() {
       final file = (await tester.runAsync(() => pngFixture(dir!)))!;
       final media = DraftMedia()..next = photo(file.path);
       final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
+      final submission = AnalysisSubmissionCubit(AnalyzeProductUseCase(FakeAnalysis()), cubit);
       final router = GoRouter(
         initialLocation: '/capture',
         routes: [
@@ -322,8 +325,11 @@ void main() {
             path: '/capture',
             builder: (_, _) {
               unawaited(cubit.begin('96385074'));
-              return BlocProvider.value(
-                value: cubit,
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider.value(value: cubit),
+                  BlocProvider.value(value: submission),
+                ],
                 child: const CaptureEntryView(barcode: '00000096385074'),
               );
             },
@@ -369,6 +375,7 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox.shrink());
       router.dispose();
+      await submission.close();
       await cubit.close();
       await tester.runAsync(() => dir!.delete(recursive: true));
     },

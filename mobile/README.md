@@ -515,3 +515,19 @@ identity or Premium flag. It does not upload photos, reserve quota or call Meta.
 T05's actual submission endpoint must invoke the shared verified-email guard again.
 See [T04.2 evidence](../docs/PICKWELL_EMAIL_OTP_GATE.md) for live verification and
 remaining full-submission/device acceptance.
+
+## Pickwell contribution and results flow
+
+After an unknown barcode, capture Nutrition and Ingredients, then choose Analyze.
+The existing Email OTP gate resumes the same draft and submits two binary photos
+to the protected backend. Retakes identify the relevant capture; uncertain outcomes
+reuse the same request key within a bounded manual-check window. Confirmed success
+awaits owned temporary-photo deletion before opening the same result screen used
+by cached lookup. Cleanup failures have a cleanup-only retry.
+
+Results expose label evidence, explicit units/basis, unknowns, declared allergens
+and provenance, without an overall score or purchase UI. Only recent barcode/time
+references persist. No new client config or package is needed. Live new analysis
+remains unavailable while the existing server inference flag is off; this task did
+not enable it. See [results/submission evidence](../docs/PICKWELL_RESULTS_FLOW.md)
+for targeted checks and the deferred real-device/provider acceptance.
