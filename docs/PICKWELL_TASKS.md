@@ -5,7 +5,33 @@
 **Date:** 2026-11-02  
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
-**Status:** Planned; all tasks unchecked until verified in the actual repository.
+**Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish is next; optional Settings scope is undecided; submission handoff remains open.
+
+## Current status — reconciled 2026-11-04
+
+This section and the dated reconciliation notes below describe current status. Earlier dated reports are historical snapshots: phrases such as “not started”, “inference OFF”, “Docker blocked” and “device pending” describe that report's execution time, not today's implementation. Preserve their original observations; use the later linked evidence for resolved prerequisites.
+
+| Tasks | Current status |
+| --- | --- |
+| T00.1–T00.2 | COMPLETE for development readiness. Inventory and secret-safe setup verified; production signing, a separate staging deployment and CI provisioning are not claimed. |
+| T01.1 | COMPLETE for the agreed feasibility gate, combining measured real two-image calls, automated provider/schema/security tests and owner's subsequent product/unreadable-label checks. Original failed trials remain documented. |
+| T02.1–T02.4 | COMPLETE. Hosted lookup/security and scheduled maintenance follow-ups resolve the original local-only/deployment caveats; see T07.1. |
+| T03.1–T03.3 | COMPLETE for the tested hackathon path, combining automated checks, hosted lookup and owner-confirmed device scanning/restart/permissions. Not an exhaustive device/format matrix. |
+| T04.1 | Required capture/OTP behavior COMPLETE; optional name/brand editing omitted and remains unchecked. |
+| T04.2–T05.3 | COMPLETE for the tested flow and approved OCR-first policy, combining later implementation, real-call evidence, T07.1 and owner's full-flow/accuracy/cleanup confirmation. No guarantee of perfect OCR or complete ingredient coverage. |
+| T06.1–T06.2 | COMPLETE for the tested results/usage flow. UI polish is the next owner-requested work; no new polish work is implied by this reconciliation. |
+| T06.3 | DEFERRED explicitly by owner; billing disabled and RevenueCat webhook undeployed. |
+| T06.4 | OPTIONAL / DECISION PENDING after UI polish. Existing sign-in/sign-out fixes do not complete the broader Settings task. |
+| T07.1 | COMPLETE for the owner-approved testing profile; [QA matrix and evidence](PICKWELL_END_TO_END_QA.md). |
+| T07.2 | NOT STARTED; submission handoff follows UI polish and the T06.4 decision. |
+
+**Evidence boundary:** Device and further real-product/unreadable-label passes are owner-reported in the conversation and recorded in T07.1. Automated/native/hosted checks are separately identified in the QA report. This documentation-only reconciliation performs no new device test, provider call, deployment or full regression.
+
+**Configuration exception:** Cloud testing allowances remain **1,000 lookups / 100 successful analyses per day**, explicitly retained by the owner. Approved **30/3**, dynamic 20 and UTC/concurrency boundaries passed in isolation. Restore production allowances before public release; billing remains disabled.
+
+**Remaining release checks:** Signed store/iOS release artifacts and production signing ownership remain outside this sign-off. The first naturally scheduled daily telemetry-retention run was not observed during T07.1; registration and accelerated execution were verified. This reconciliation does not claim a new scheduler observation or configured CI/staging deployment.
+
+**Agreed order:** reconcile statuses (this update) → UI polish → decide whether to implement T06.4 → T07.2. Optional name/brand editing and RevenueCat do not block this sequence.
 
 ## 0. Source of truth and non-goals
 
@@ -40,18 +66,22 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T00.1 Inspect actual repo, docs and environment
 
-- [ ] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
-- [ ] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
-- [ ] Confirm configured Supabase project, local CLI/deployment method, target app identifiers, device camera test path, CI/secret management.
+**2026-11-04 — RECONCILED COMPLETE (inventory):** [Original inventory](PICKWELL_INTEGRATION_INVENTORY.md) verifies architecture, SDKs, IDs, deployment conventions and conflicts. Later [cloud deployment](PICKWELL_CLOUD_MIGRATIONS.md), [lookup](PICKWELL_PRODUCT_LOOKUP.md) and [T07.1](PICKWELL_END_TO_END_QA.md) establish project access, Native Runtime, working camera path and secret boundaries. CI/signing gaps are identified rather than silently treated as configured; implementing CI/store signing was not this inventory task.
+
+- [x] Identify existing Flutter template modules, routing, Cubit/Bloc patterns, native targets, Supabase initialization, environment conventions, and any `AGENTS.md`; reuse instead of duplicating.
+- [x] Reconcile any old code/docs that contradict latest PRD (especially authentication, 30/3 quotas, billing disabled, and use of Meta via Supabase); report conflicts before destructive edits.
+- [x] Confirm configured Supabase project, local CLI/deployment method, target app identifiers, device camera test path, CI/secret management.
 
 **Acceptance:** Concise integration inventory of existing files, work already completed, missing credentials, and risks; no unnecessary scaffold rewrite.  
 **Targeted validation:** Dependency install / static analyzer on relevant code; verify environment examples contain no real secrets.
 
 ### T00.2 Configure secret-safe dev environment
 
-- [ ] Configure Flutter with only Supabase project URL and publishable key (legacy anon only if existing project requires it).
-- [ ] Configure Meta API key and privileged Supabase credentials only in protected Edge Function/server environments; never expose them to Flutter or logs.
-- [ ] Prepare `.env.example`, `.gitignore`, safe test accounts, development/staging environment values, and zero-secrets check.
+**2026-11-04 — RECONCILED COMPLETE (development profile):** [Environment samples/conventions](PICKWELL_ENVIRONMENT_SETUP.md), [real OTP/server authorization](PICKWELL_EMAIL_OTP_GATE.md) and [T07.1 config/repository/APK scans](PICKWELL_END_TO_END_QA.md) resolve the initial missing-key/connectivity blockers. Dev/staging examples and ignores exist; the dev project and protected server secrets work. A distinct staging deployment/credentials are not claimed. No secret values are included in this status update.
+
+- [x] Configure Flutter with only Supabase project URL and publishable key (legacy anon only if existing project requires it).
+- [x] Configure Meta API key and privileged Supabase credentials only in protected Edge Function/server environments; never expose them to Flutter or logs.
+- [x] Prepare `.env.example`, `.gitignore`, safe test accounts, development/staging environment values, and zero-secrets check.
 
 **Acceptance:** App can connect using public configuration and backend can read private secrets; no secret is committed.  
 **Targeted validation:** Search tracked files and build config for known secret patterns; verify fake secret in client cannot authorize privileged work.
@@ -60,9 +90,11 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T01.1 Supabase → Meta vision proof of concept
 
+**2026-11-04 — RECONCILED COMPLETE (agreed feasibility gate):** The [original measured live trials](PICKWELL_META_VISION_SPIKE.md), [later two-product OCR-first calls](PICKWELL_OCR_FIRST_POLICY.md), [grounded interpretation trials](PICKWELL_INTERPRETATION.md) and [T07.1](PICKWELL_END_TO_END_QA.md) jointly cover real multi-image/model/schema behavior, recorded timing/tokens, protected input/timeout/failure tests and spike lockdown. Subsequent clearer-product and genuinely unreadable-label checks are owner-confirmed, not new agent-run trials or retained per-field accuracy measurements. Provider-invoiced cost was unavailable; estimates remain labeled. Earlier failed/inconsistent low-resolution samples are preserved, not reclassified as accurate.
+
 - [x] Deploy a narrowly scoped, non-public or separately protected test Edge Function that sends **two real food-package photos** (nutrition and ingredients) to the selected Meta vision model.
-- [ ] Validate authentication/authorization, request format, model availability, response schema, per-image behavior, max input size, duration, provider token/cost reporting, timeout and failure modes.
-- [ ] Test at least two clearly different product pairs and one unreadable label. Demand null/unknown rather than fabricated values; evaluate image basis/units.
+- [x] Validate authentication/authorization, request format, model availability, response schema, per-image behavior, max input size, duration, provider token/cost reporting, timeout and failure modes.
+- [x] Test at least two clearly different product pairs and one unreadable label. Demand null/unknown rather than fabricated values; evaluate image basis/units.
 - [x] Remove or lock down temporary spike endpoint after use; retain tests/fixtures with non-sensitive sample data.
 
 **2026-11-02 — PARTIAL:** [Live spike evidence](PICKWELL_META_VISION_SPIKE.md). Verified Email OTP, protected hosted multi-image Meta calls and post-trial disabled-state/token rotation. Product A nutrition and Product B ingredients extracted in diagnostic candidates; their other labels requested retakes, so complete two-product extraction did not pass. The supplied third image passed a mismatch-retake test; genuinely unreadable testing is deferred by user direction. Eleven local tests pass. Original full T01.1 acceptance remains unmet; no later phase started.
@@ -138,10 +170,12 @@ Work on Phase 1 as early as possible, even in parallel with Phase 2. If time bec
 
 ### T03.2 Flutter scanner/home and lookup UX
 
+**2026-11-04 — RECONCILED COMPLETE (tested scanner path):** [Scanner implementation/tests](PICKWELL_SCANNER_HOME.md) cover scanner/gallery integration, EAN/UPC canonicalization and permission/error recovery; later hosted lookup and owner-reported physical barcode/camera/permission checks resolve the original device blocker. [T07.1](PICKWELL_END_TO_END_QA.md) records the combined evidence. This is not a claim that every camera, platform, barcode format or gallery decoder was physically exercised. Brand artwork/visual refinements belong to the upcoming UI polish.
+
 - [x] Reuse existing template/navigation; implement **lemon-branded recent-products Home**, not scanner-first. Header logo + only search icon, All/Food chips, Newest sort, separate rounded cards, no section heading or list/grid toggle.
 - [x] Create liquid-glass-inspired translucent Home/Settings pill, **separate far-right scan circle with icon only**; hide it on nested routes, with Android visual fallback. Chat is future visual reference and must not ship as dead tab.
-- [ ] Implement minimal scanner camera and permissions following DESIGN.
-- [ ] Integrate suitable scanner dependency only if none exists; enable camera and gallery where needed; test common EAN/UPC.
+- [x] Implement minimal scanner camera and permissions following DESIGN.
+- [x] Integrate suitable scanner dependency only if none exists; enable camera and gallery where needed; test common EAN/UPC.
 - [x] Use Cubit/Bloc states for idle, scanning, checking, found, miss, processing, denied, error.
 - [x] Navigate directly to results for `ready`; to 3-step wizard for `not_found`; expose retry for network failure.
 - [x] Optionally add manual barcode input as a P1 fallback, without displacing P0.
@@ -160,8 +194,10 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T03.3 Local recent-products Home index and search (P0 recent index / P1 filtering polish)
 
+**2026-11-04 — RECONCILED COMPLETE:** [Persistence/search/filter tests](PICKWELL_LOCAL_RECENTS.md) plus owner-confirmed restart/recovery and the [T07.1 Home/cached-path checks](PICKWELL_END_TO_END_QA.md) resolve the original real-product restart blocker. Cards remain bounded barcode references with truthful online/unavailable handling, not offline full analyses.
+
 - [x] Record only unique published ready barcode references and last-opened timestamps in a bounded device-local index; no personal account/cloud history, persistent user label photos or full offline analysis payloads.
-- [ ] On app relaunch, display available last-viewed product cards with truthful thumbnails (actual authorized media or placeholder). Refresh summary online when needed and follow server lookup/quota rules; never invent package photos or pretend results are locally available offline.
+- [x] On app relaunch, display available last-viewed product cards with truthful thumbnails (actual authorized media or placeholder). Refresh summary online when needed and follow server lookup/quota rules; never invent package photos or pretend results are locally available offline.
 - [x] Search icon expands into search field; filter the local list, allow All/Food and newest order; Cosmetics and Chat must remain nonfunctional concepts outside shipped MVP.
 - [x] Empty state encourages scan without fake product fixtures.
 
@@ -174,10 +210,12 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T04.1 Three-step nutrition + ingredients photo capture
 
+**2026-11-04 — RECONCILED: required capture/OTP criteria COMPLETE; optional identity editing remains omitted.** [OTP resume](PICKWELL_EMAIL_OTP_GATE.md), [submission/disposal](PICKWELL_RESULTS_FLOW.md), [bounded multi-draft recovery](PICKWELL_PENDING_ANALYSES.md) and [T07.1](PICKWELL_END_TO_END_QA.md) supersede the initial missing-auth/device-return caveats. Owner-confirmed capture, recovery and cleanup supplement automated state/file tests. The current five-item/24-hour private draft policy supersedes the original one-hour/single-draft description.
+
 - [x] Display **Step 1 Barcode ✓ → Step 2 Nutrition → Step 3 Ingredients**, with preview, retake, guidance, and progress.
 - [x] Store in-progress photos only in bounded app-local transient state; compress/resize; check supported MIME and size before upload.
 - [ ] Optionally infer/edit product name and brand without extra mandatory step; never accept them as authoritative replacements for labels.
-- [ ] Preserve selected photos/barcode across OTP redirect and return.
+- [x] Preserve selected photos/barcode across OTP redirect and return.
 
 **Acceptance:** After a missing barcode, user captures 2 readable photos without rescanning barcode; can retake one image independently.  
 **Targeted validation:** Wizard state persistence across navigation, invalid-format/oversize, camera failure, separate retake paths.
@@ -220,7 +258,9 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T05.2 Extract, interpret and validate
 
-- [ ] Extract ingredient raw text, ordered items, nutrition values with units and per-serving/per-100g basis, and declared allergens where visible.
+**2026-11-04 — RECONCILED COMPLETE for the approved evidence-aware, OCR-first policy:** [Real two-product extraction](PICKWELL_OCR_FIRST_POLICY.md), [unit support](PICKWELL_NUTRIENT_UNITS.md), [interpretation/reference evidence](PICKWELL_INTERPRETATION.md) and [T07.1](PICKWELL_END_TO_END_QA.md) cover the implemented raw/ordered ingredients, nutrition units/basis, visible declared allergens, unknown values, retakes and provenance. Further clearer-product/unreadable-label accuracy tests are owner-confirmed. This does not certify the historical low-resolution cereal readings, every nutrient or every additive; uncertain/missing fields remain explicit and unsupported claims are excluded.
+
+- [x] Extract ingredient raw text, ordered items, nutrition values with units and per-serving/per-100g basis, and declared allergens where visible.
 - [x] Meta generates understandable explanations; deterministic backend rules assign green/yellow/red only with evidenced and threshold-backed reasons.
 - [x] Represent ambiguous values as unknown; verify required fields, product consistency, numeric ranges and source basis.
 - [x] If nutrition or ingredient image unclear, return `needs_retake` referencing **which photo** rather than publishing partial misleading results.
@@ -279,6 +319,8 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T06.3 Premium-ready entitlement tables and RevenueCat webhook safety (P0 backend design; deploy only when prerequisites satisfied)
 
+**2026-11-04 — DEFERRED by explicit owner instruction.** Existing billing-off/RLS safeguards remain; no RevenueCat task completion is claimed.
+
 - [ ] Implement backend Free/Premium plan resolution, future entitlements, user-to-RevenueCat App User ID mapping, append-only unique event ledger and billing feature flag `false`.
 - [ ] Prepare protected `revenuecat-webhook` entrypoint or isolated handler with RevenueCat's documented authentication verification; refuse unsigned/invalid requests; test duplicate/out-of-order event handling.
 - [ ] Never grant Premium from Flutter `CustomerInfo`, a claimed plan string or any unverified webhook. Ambiguous aliases and expired subscription events require reconciliation before changing a plan.
@@ -290,6 +332,8 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 **Scope safeguard:** Do not block the actual hackathon barcode+AI demo on real subscription events or RevenueCat store configuration.
 
 ### T06.4 Settings/account & minimal operational UI (P1)
+
+**2026-11-04 — OPTIONAL; scope decision follows UI polish.** T07.1 fixed Email OTP navigation and guest return after sign-out, but broader Settings/account/privacy/usage acceptance is not signed off.
 
 - [ ] Implement minimal account email, sign-out, privacy links, and usage section per DESIGN; no fake purchases. Use newest lemon/cream tokens and consistent simple surfaces.
 - [ ] Respect template styling and avoid new onboarding carousel or additional premium screens.
