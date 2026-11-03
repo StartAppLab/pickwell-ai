@@ -229,13 +229,15 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T05.3 Publish product and securely dispose photos
 
-- [ ] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.
-- [ ] Rejected/failed analysis does not consume successful-analysis credits, but provider spend remains in ledger.
+- [x] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.
+- [x] Rejected/failed analysis does not consume successful-analysis credits, but provider spend remains in ledger.
 - [ ] Do not persist original images unless private temporary storage is absolutely required; delete temporary files after successful extraction and via bounded cleanup of failures/orphans.
-- [ ] Do not expose contributor email or transient images in public record.
+- [x] Do not expose contributor email or transient images in public record.
 
 **Acceptance:** Another guest sees the result by scanning same barcode without AI; photos are not retained after successful extraction.  
 **Targeted validation:** Save/lookup integration, duplicate publish, cleanup success/failure, sensitive data projection.
+
+**2026-11-03 — PARTIAL (backend complete; client disposal/full flow pending):** [Publication evidence](PICKWELL_PUBLICATION.md). Recomputed validation and exact staged/version binding precede atomic product/revision/findings/ready/quota settlement. Lost acknowledgements resume without another model call; invalidated products require operator review. Terminal/expired candidates clean up, original server photos are never persisted, and public metadata is allowlisted. **76 targeted tests plus 11 hosted checks pass.** New additive migration and protected analyze-product/get-product deployed with inference/billing OFF. Real new publication→guest reuse is verified against native Auth/REST/SQL with a mocked provider, not fresh real Meta labels. Successful client upload/result must still invoke existing draft discard; leave the photo-disposal checkbox open. Full-flow/device tests are deferred by user request; T05.2 quality blockers remain.
 
 ## 8. Phase 6 — Results, quota UI and RevenueCat readiness (P0/P1)
 

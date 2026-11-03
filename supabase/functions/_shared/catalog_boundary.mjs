@@ -97,11 +97,16 @@ export function sanitizePublishedProduct(row) {
   result.findings = (row.findings ?? []).map(finding => ({
     ...pick(finding, ['severity', 'title', 'explanation', 'sort_order']),
     source_details: {
-      ...pick(finding.source_details, ['rule_id']),
+      ...pick(finding.source_details, ['rule_id','reference','section']),
+      thresholds:pick(finding.source_details?.thresholds,['low_max_g','high_above_g','large_portion_high_above_g']),
+      portion:finding.source_details?.portion?pick(finding.source_details.portion,['value','unit','source','triggered']):null,
       evidence: (finding.source_details?.evidence ?? []).map(evidence =>
-        pick(evidence, ['source', 'field', 'label_text', 'reference', 'is_demo'])),
+        pick(evidence, ['source', 'field', 'label_text', 'reference', 'is_demo','photo','value','unit','basis'])),
     },
   }));
+  result.explanations=(row.explanations??[]).map(e=>pick(e,['photo','source','text']));
+  result.missing_information=(row.missing_information??[]).filter(v=>typeof v==='string');
+  result.provenance=pick(row.provenance,['model_version','prompt_version','rules_version','validated_at','extraction_source','explanation_source']);
   return result;
 }
 
@@ -110,7 +115,7 @@ export function sanitizePublishedProduct(row) {
 export async function readPublishedProduct(env, canonicalBarcode, fetcher = fetch) {
   if (!/^[0-9]{14}$/.test(canonicalBarcode)) throw new Error('invalid_barcode');
   const query = new URLSearchParams({ barcode: `eq.${canonicalBarcode}`, limit: '1',
-    select: 'id,barcode,name,brand,is_demo,summary,schema_version,rules_version,model_version,analyzed_at,nutrition,ingredients,findings' });
+    select: 'id,barcode,name,brand,is_demo,summary,schema_version,rules_version,model_version,analyzed_at,nutrition,ingredients,findings,explanations,missing_information,provenance' });
   const rows = await serverRead(env, 'published_products?' + query, fetcher);
   if (!Array.isArray(rows)) throw new Error('invalid_server_shape');
   return rows.length ? sanitizePublishedProduct(rows[0]) : null;

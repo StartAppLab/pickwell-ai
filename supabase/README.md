@@ -324,3 +324,19 @@ unreadable fixture is a readable mismatch. Normal inference/billing are disabled
 The optional operator-only `spikes/meta-vision/analysis-index.ts` reuses the existing
 guards; its three-case manifest/runner must not treat retakes as successful products.
 No publication or Flutter upload implementation is included.
+
+## Atomic publication and disposal (T05.3)
+
+`analysis_publication.mjs` revalidates owned private candidates and calls the new
+server-only atomic publisher. Existing quota finalization, unique barcodes and
+immutable revisions are reused. Publication writes explanations/provenance and
+findings, marks ready, finalizes one successful credit and deletes the candidate
+in one transaction. Retakes/failures release allowance but retain provider costs.
+Lost publication acknowledgements resume safely; invalidated records require
+operator review. V2 results may have no supported colour findings.
+
+The migration and updated analysis/lookup functions are deployed with inference
+and billing OFF. Backend photos are request-local, with no files/Storage uploads.
+Client success must still call existing transient-draft disposal when the Flutter
+submission/result handoff is connected. See [publication evidence](../docs/PICKWELL_PUBLICATION.md)
+for targeted native/hosted checks and the remaining partial acceptance.

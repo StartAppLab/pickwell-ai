@@ -3,6 +3,7 @@ import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mj
 import { createQuotaService, networkBucket } from './quota_boundary.mjs';
 import { createOperationalEvents } from './operational_events.mjs';
 import { readAnalysisInput, AnalysisInputError } from './analysis_input.mjs';
+import { publishAnalysis } from './analysis_publication.mjs';
 import { analysisProfile, validateAnalysis, PROMPT_VERSION } from './analysis_validation.mjs';
 import { invokeMetaLabels, META_URL } from '../../spikes/meta-vision/core.mjs';
 
@@ -38,10 +39,10 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
   const settle=(outcome,error=null,retake=null)=>rpc('pickwell_settle_analysis',{
    ...identity,p_outcome:outcome,p_error:error,p_retake:retake});
   function safe(result,http=200){
-   if(!['already_exists','processing','analysis_failed','needs_retake'].includes(result.status))throw Error();
+   if(!['ready','already_exists','processing','analysis_failed','needs_retake'].includes(result.status))throw Error();
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.
-   if(result.status==='already_exists')body.product=sanitizePublishedProduct(result.product);
+   if(['ready','already_exists'].includes(result.status))body.product=sanitizePublishedProduct(result.product);
    if(result.status==='needs_retake')body.retake=result.retake_target==='both'?['nutrition','ingredients']:[result.retake_target];
    if(result.status==='processing'){
     body.retry_after_seconds=4;
@@ -51,6 +52,10 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
    if(result.status==='analysis_failed')body.error=result.error||'analysis_failed';
    return reply(body,http);
   }
+  async function complete(){
+   try{return safe(await publishAnalysis(rpc,identity,settle));}
+   catch{const result=await current();return safe(result,result.status==='processing'?202:200);}
+  }
   try{
    const admitted=await rpc('pickwell_admit_analysis',{...identity,p_barcode:input.barcode,p_digest:input.digest});
    if(admitted.status==='quota_exceeded'){
@@ -59,7 +64,10 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
     ['plan','limit','version','used','reserved','remaining','reset_at'].filter(k=>Object.hasOwn(admitted,k)).map(k=>[k,admitted[k]]))},429);
    }
    if(admitted.status==='inference_disabled')return failure('inference_disabled');
-   if(admitted.status!=='reserved')return safe(admitted);
+   if(admitted.status!=='reserved'){
+    if(admitted.status==='processing'&&admitted.stage==='validation_pending')return await complete();
+    return safe(admitted);
+   }
    // Missing/mismatched credentials cannot spend a provider-attempt claim.
    if(!env.META_API_KEY||env.META_API_URL!==META_URL||env.META_MODEL!=='muse-spark-1.3'){
     await settle('failed','service_unavailable');return failure('service_unavailable');
@@ -98,12 +106,13 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
     const targets=extracted.validation.retake;
     return safe(await settle('retake',null,targets.length===1?targets[0]:'both'),422);
    }
-   // Validated private handoff only. Publication and successful credit remain T05.3.
-   return safe(await rpc('pickwell_stage_analysis',{...identity,p_candidate:{...extracted.candidate,validation:extracted.validation},
-    p_model:claim.model,p_prompt:PROMPT_VERSION}),202);
+   // Stage first so a lost publication acknowledgement can resume without another model call.
+   await rpc('pickwell_stage_analysis',{...identity,p_candidate:{...extracted.candidate,validation:extracted.validation},
+    p_model:claim.model,p_prompt:PROMPT_VERSION});
+   return await complete();
   }catch(error){
    return failure(error?.message==='idempotency_conflict'?'idempotency_conflict':'service_unavailable',
     error?.message==='idempotency_conflict'?409:503);
-  }
+  }finally{if(input)input.images=null;} // Includes cache hits, admission failures and lost RPC acknowledgements.
  };
 }

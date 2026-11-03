@@ -5,6 +5,7 @@ import {createServer} from 'node:http';
 import {deflateSync} from 'node:zlib';
 import {createAnalyzeProductHandler} from '../functions/_shared/analyze_product.mjs';
 import {labelFixture} from './fixtures/label_analysis.mjs';
+import {createGetProductHandler} from '../functions/_shared/get_product.mjs';
 import {META_URL} from '../spikes/meta-vision/core.mjs';
 const crc=bytes=>{let n=0xffffffff;for(const v of bytes){n^=v;for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;}return (n^0xffffffff)>>>0;};
 function png(color=0,width=1){
@@ -48,6 +49,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   body:JSON.stringify({email:`orchestrate-${crypto.randomUUID()}@example.invalid`,password:crypto.randomUUID()+'Aa1!'})});
   assert.equal(r.status,200);const u=await r.json();assert.ok(u.access_token);made.push(u.user.id);return u;}
  let providerCalls=0,behavior='success',badAuth=false,claimLoss=false,claimLost=false;
+ let deferPublication=true,publicationAckLoss=false;
  const fetcher=async(url,options)=>{
   if(url===META_URL){
    providerCalls++;assert.equal(options.redirect,'error');assert.ok(options.signal);
@@ -57,14 +59,19 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='timeout')throw new DOMException('PRIVATE upstream','TimeoutError');
    if(behavior==='fail')return new Response('PRIVATE upstream',{status:429});
    if(behavior==='malformed')return modelResult({...candidate(),extra:'PRIVATE'});
+   if(behavior==='unclassified')return modelResult(labelFixture({basis:'per_serving',portion:'100 g'}));
    if(behavior==='contradiction'){const c=candidate();c.nutrition.nutrients[0].value=9000;return modelResult(c);}
    if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
    if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.nutrition.basis='unknown';return modelResult(c);}
    return modelResult(candidate());
   }
   assert.equal(new URL(url).origin,origin.origin,'Only native Supabase and mocked Meta are allowed');
+  assert.ok(!url.includes('/storage/v1/'),'Analysis must not persist photos in Storage');
+  if(url.includes('/rest/v1/'))assert.ok(!String(options?.body??'').includes('data:image'),'No photo payload may enter SQL');
+  if(deferPublication&&url.endsWith('/pickwell_publish_analysis'))return Response.json({error:'Simulated transient publication outage'},{status:503});
   if(badAuth&&url.endsWith('/auth/v1/user'))return Response.json({id:made[0],is_anonymous:true,email:'fixture@example.invalid',email_confirmed_at:new Date().toISOString(),user_metadata:{verified:true}});
   const result=await fetch(url,options);
+  if(publicationAckLoss&&url.endsWith('/pickwell_publish_analysis')){publicationAckLoss=false;await result.text();throw Error('Simulated lost publication acknowledgement');}
   if(claimLoss&&!claimLost&&url.endsWith('/pickwell_begin_provider')){claimLost=true;await result.text();throw Error('Simulated lost SQL acknowledgement');}
   return result;
  };
@@ -218,6 +225,84 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal(providerCalls,before);assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,1);
    assert.equal((await submit(alice,barcode,key)).body.status,'already_exists');assert.equal(providerCalls,before);
   });
+  await rest('plan_limits?plan_code=eq.free&metric=eq.ai_analysis','PATCH',{daily_limit:100,change_reason:'Disposable publication integration only'});
+  await t.test('actual publication revalidates, seals facts and charges once; another guest reads without Meta',async()=>{
+   deferPublication=false;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+   const quotaBefore=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+   const output=await submit(alice,barcode,key);assert.equal(output.http,200);assert.equal(output.body.status,'ready');
+   const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(product.findings.length,4);
+   assert.equal(product.explanations.length,2);assert.equal(product.provenance.prompt_version,'label-analysis-v2');
+   assert.ok(product.findings.every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
+   assert.equal(providerCalls-before,1);
+   assert.equal((await rest('analysis_candidates')).length,0);
+   const revisions=await rest('product_analyses?product_id=eq.'+product.id);assert.equal(revisions.length,1);assert.ok(revisions[0].sealed_at);
+   const quotaAfter=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+   assert.equal(quotaAfter.used,quotaBefore.used+1);assert.equal(quotaAfter.reserved,0);
+   const lookup=createGetProductHandler(env,fetcher),request=()=>new Request('http://127.0.0.1/get-product',{
+    method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})});
+   for(let n=0;n<2;n++){const response=await lookup(request());assert.equal(response.status,200);const body=await response.json();
+    assert.equal(body.status,'ready');assert.equal(body.product.id,product.id);assert.equal(body.product.explanations.length,2);
+    assert.ok(!/contributor_id|user_id|email|data:image|input_digest|refresh_token/.test(JSON.stringify(body.product)));}
+   const retries=await Promise.all(Array.from({length:12},()=>submit(alice,barcode,key)));
+   assert.ok(retries.every(r=>r.body.status==='already_exists'));assert.equal(providerCalls-before,1);
+   assert.equal((await rest('product_analyses?product_id=eq.'+product.id)).length,1);
+   assert.equal((await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'})).used,quotaAfter.used);
+  });
+  await t.test('a valid per-serving label publishes without inventing any colour finding',async()=>{
+   behavior='unclassified';const result=await submit(alice,code());behavior='success';
+   assert.equal(result.body.status,'ready');assert.deepEqual(result.body.product.findings,[]);
+   assert.equal(result.body.product.nutrition.basis,'per_serving');
+   assert.ok(result.body.product.missing_information.some(v=>v.includes('No supported nutrition colour')));
+  });
+  await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
+   deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+   const staged=await submit(alice,barcode,key);assert.equal(staged.http,202);
+   deferPublication=false;publicationAckLoss=true;
+   const results=await Promise.all(Array.from({length:12},()=>submit(alice,barcode,key)));
+   assert.ok(results.every(r=>r.http===200&&['ready','already_exists'].includes(r.body.status)));
+   assert.equal(providerCalls-before,1);
+   const request=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${key}`))[0];
+   const reservation=(await rest('usage_reservations?id=eq.'+request.reservation_id))[0];
+   assert.equal(reservation.state,'consumed');assert.equal(reservation.outcome,'published');
+   assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,1);
+   assert.equal((await rest('analysis_candidates?job_id=eq.'+request.job_id)).length,0);
+  });
+  await t.test('failed finding insert rolls back product/revision/credit and retry can safely recover',async()=>{
+   deferPublication=true;const key=crypto.randomUUID(),barcode=code();const staged=await submit(alice,barcode,key);
+   assert.equal(staged.http,202);const row=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
+   const broken=structuredClone(row.candidate);broken.validation.findings[0].severity='purple';
+   await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:broken});
+   await assert.rejects(rpc('pickwell_publish_analysis',{p_user:alice.user.id,p_key:key,p_validated:broken.validation}));
+   assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,0);
+   assert.equal((await rest('usage_reservations?job_id=eq.'+row.job_id))[0].state,'reserved');
+   assert.equal((await rest('analysis_jobs?id=eq.'+row.job_id))[0].state,'processing');
+   await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
+   deferPublication=false;assert.equal((await submit(alice,barcode,key)).body.status,'ready');
+  });
+  await t.test('invalidated catalog records require operator review and cannot be overwritten by contributors',async()=>{
+   const barcode=code(),key=crypto.randomUUID();
+   const existing=(await rest('products','POST',{barcode,status:'invalidated',invalidated_at:new Date().toISOString(),invalidation_reason:'Synthetic operator review fixture'}))[0];
+   const before=providerCalls,result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
+   assert.equal(result.body.error,'correction_review_required');
+   assert.equal((await rest('products?id=eq.'+existing.id))[0].status,'invalidated');
+   assert.equal((await rest('product_analyses?product_id=eq.'+existing.id)).length,0);
+   const request=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${key}`))[0];
+   assert.equal((await rest('usage_reservations?id=eq.'+request.reservation_id))[0].state,'released');
+   assert.equal((await rest('analysis_candidates?job_id=eq.'+request.job_id)).length,0);
+   assert.equal((await submit(alice,barcode,key)).body.status,'analysis_failed');assert.equal(providerCalls-before,1);
+  });
+  await t.test('changed staged facts are revalidated and rejected without spending successful-use credit',async()=>{
+   deferPublication=true;const key=crypto.randomUUID(),barcode=code();const staged=await submit(alice,barcode,key);
+   const row=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
+   row.candidate.nutrition.nutrients[0].value=9999;
+   await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
+   deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'needs_retake');
+   assert.deepEqual(result.body.retake,['nutrition']);
+   assert.equal((await rest('analysis_candidates?job_id=eq.'+row.job_id)).length,0);
+   assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,0);
+   assert.equal((await rest('usage_reservations?job_id=eq.'+row.job_id))[0].state,'released');
+   const ledger=(await rest('ai_usage?job_id=eq.'+row.job_id))[0];assert.equal(ledger.state,'succeeded');assert.equal(ledger.input_tokens,123);
+  });
   await t.test('client table/RPC grants remain denied while server staging works',async()=>{
    for(const token of [null,alice.access_token]){
     for(const resource of ['analysis_requests?select=*','analysis_candidates?select=*']){
@@ -231,6 +316,9 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
      const denied=await fetch(origin.origin+'/rest/v1/'+table,{method:'POST',headers:{apikey:env.SUPABASE_ANON_KEY,'content-type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body)});
      assert.ok([401,403].includes(denied.status));
     }
+    for(const [name,body]of [['pickwell_read_analysis_candidate',{p_user:alice.user.id,p_key:crypto.randomUUID()}],
+     ['pickwell_publish_analysis',{p_user:alice.user.id,p_key:crypto.randomUUID(),p_validated:{}}]]){
+     const denied=await fetch(origin.origin+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:env.SUPABASE_ANON_KEY,'content-type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify(body)});assert.ok([401,403].includes(denied.status));}
     const r=await fetch(origin.origin+'/rest/v1/rpc/pickwell_admit_analysis',{method:'POST',headers:{apikey:env.SUPABASE_ANON_KEY,'content-type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({p_user:alice.user.id,p_key:crypto.randomUUID(),p_barcode:'96385074',p_digest:'a'.repeat(64)})});assert.ok([401,403].includes(r.status));
    }
   });

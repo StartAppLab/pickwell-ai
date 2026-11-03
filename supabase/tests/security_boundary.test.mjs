@@ -6,12 +6,14 @@ import { createAnalysisStatusHandler, sanitizePublishedProduct, readPublishedPro
 
 test('published projection strips contributor, internal and nested arbitrary fields', () => {
   const safe = sanitizePublishedProduct({ id: 'fixture', barcode: '02900000000018',
+    provenance:{model_version:'fixture',email:'private',input_digest:'private',identity:{user_id:'private'}},
+    explanations:[{photo:'ingredients',source:'oats',text:'Oats',email:'private',image:'private'}],
     contributor_id: 'private', user_id: 'private', prompt_version: 'private', lease_expires_at: 'private',
     nutrition: { raw: 'label', basis: 'per_100g', token: 'private', nutrients: [
       { name: 'Protein', value: 4, unit: 'g', source: '4 g', email: 'private' }] },
     ingredients: { raw: 'oats', items: ['oats'], declared_allergens: null, token: 'private' },
     findings: [{ severity: 'yellow', title: 'Demo', user_id: 'private', source_details: {
-      rule_id: 'demo', token: 'private', evidence: [{ source: 'fixture', token: 'private' }] } }] });
+      rule_id: 'demo', token: 'private',thresholds:{low_max_g:3,api_key:'private'},portion:{value:30,unit:'g',email:'private'}, evidence: [{ source: 'fixture', token: 'private' }] } }] });
   assert.ok(!JSON.stringify(safe).includes('private'));
   assert.equal(safe.ingredients.declared_allergens, null);
 });
