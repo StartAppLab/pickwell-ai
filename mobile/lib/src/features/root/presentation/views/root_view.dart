@@ -153,7 +153,8 @@ class _RootViewState extends State<RootView> {
       bottomNavigationBar: BlocSelector<RootCubit, RootState, int>(
         selector: (state) => state.selectedIndex,
         builder: (context, selectedIndex) {
-          final hasActionButton = true;
+          if (MediaQuery.viewInsetsOf(context).bottom > 0) return const SizedBox.shrink();
+          final d = context.themeData.dimensionsData;
           final routeSelectedIndex = tabs.indexWhere((tab) => tab.routeName == widget.currentPath);
           final safeSelectedIndex = (routeSelectedIndex >= 0 ? routeSelectedIndex : selectedIndex)
               .clamp(0, tabs.length - 1);
@@ -161,25 +162,34 @@ class _RootViewState extends State<RootView> {
           return SafeArea(
             bottom: true,
             maintainBottomViewPadding: true,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(child: navShell),
-                  if (hasActionButton) ...[
-                    Gap(context.themeData.dimensionsData.spacingSm),
-                    widget.actionButton ??
-                        IconButton.filled(
-                          tooltip: context.l10n.pkScan,
-                          style: IconButton.styleFrom(minimumSize: const Size(56, 56)),
-                          onPressed: () async {
-                            await context.push('/scan');
-                            if (context.mounted) await getIt<HomeCubit>().load();
-                          },
-                          icon: const AppIcon(icon: HugeIcons.strokeRoundedBarcodeScan),
-                        ),
-                  ],
-                ],
+            child: Center(
+              heightFactor: 1,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: d.maxWidth),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: d.paddingComfortable,
+                    vertical: d.paddingXs,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(child: navShell),
+                      ...[
+                        Gap(context.themeData.dimensionsData.spacingSm),
+                        widget.actionButton ??
+                            IconButton.filled(
+                              tooltip: context.l10n.pkScan,
+                              style: IconButton.styleFrom(minimumSize: const Size(64, 64)),
+                              onPressed: () async {
+                                await context.push('/scan');
+                                if (context.mounted) await getIt<HomeCubit>().load();
+                              },
+                              icon: const AppIcon(icon: HugeIcons.strokeRoundedBarcodeScan),
+                            ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           );
@@ -210,7 +220,10 @@ class _RootViewState extends State<RootView> {
           sigmaY: Theme.of(context).platform == TargetPlatform.android ? 0 : 12,
         ),
         child: Container(
-          height: 56,
+          height: (44 + MediaQuery.textScalerOf(context).scale(12) * 1.6).clamp(
+            64.0,
+            double.infinity,
+          ),
           decoration: BoxDecoration(
             color: context.colorScheme.surfaceContainerLowest.withValues(alpha: 0.88),
             borderRadius: BorderRadius.circular(28),
@@ -229,7 +242,9 @@ class _RootViewState extends State<RootView> {
               return Stack(
                 children: [
                   AnimatedPositioned(
-                    duration: const Duration(milliseconds: 300),
+                    duration: MediaQuery.disableAnimationsOf(context)
+                        ? Duration.zero
+                        : const Duration(milliseconds: 200),
                     curve: Curves.easeInOut,
                     left: selectedIndex * itemWidth,
                     top: 0,
@@ -237,7 +252,7 @@ class _RootViewState extends State<RootView> {
                     child: Container(
                       width: itemWidth,
                       decoration: BoxDecoration(
-                        color: context.colorScheme.primary,
+                        color: context.colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(28),
                       ),
                     ),

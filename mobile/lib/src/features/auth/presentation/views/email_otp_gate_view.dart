@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
+import '../../../app/app.dart';
 import '../blocs/email_otp/email_otp_cubit.dart';
 
 class EmailOtpGateView extends StatefulWidget {
@@ -63,8 +64,23 @@ class _EmailOtpGateViewState extends State<EmailOtpGateView> {
                 constraints: BoxConstraints(maxWidth: d.maxWidth),
                 child: ListView(
                   padding: context.themeData.edgeInsetsData.pagePadding,
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                   children: [
-                    const Icon(Icons.mail_outline, size: 40),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Container(
+                        padding: EdgeInsets.all(d.paddingMd),
+                        decoration: BoxDecoration(
+                          color: context.colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(d.cardCornerRadius),
+                        ),
+                        child: AppIcon(
+                          icon: Icons.mail_outline,
+                          size: d.iconLarge,
+                          color: context.colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
                     Gap(d.spacingLg),
                     Text(
                       widget.barcode == null ? l.signIn : l.pkOtpTitle,
@@ -79,6 +95,10 @@ class _EmailOtpGateViewState extends State<EmailOtpGateView> {
                       TextField(
                         controller: _code,
                         keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) {
+                          if (!state.busy) cubit.verify(_code.text);
+                        },
                         enabled: !state.busy,
                         autofillHints: const [AutofillHints.oneTimeCode],
                         autocorrect: false,
@@ -123,6 +143,10 @@ class _EmailOtpGateViewState extends State<EmailOtpGateView> {
                       TextField(
                         controller: _email,
                         keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) {
+                          if (!state.busy && state.resendAfter == 0) cubit.send(_email.text);
+                        },
                         enabled: !state.busy,
                         autofillHints: const [AutofillHints.email],
                         autocorrect: false,

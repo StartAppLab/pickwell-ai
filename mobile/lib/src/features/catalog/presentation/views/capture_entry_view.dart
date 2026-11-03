@@ -69,6 +69,9 @@ class CaptureEntryView extends StatelessWidget {
                             : state.error == 'draft_save'
                             ? l.pkPendingSaveError
                             : l.pkPendingSaved,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       TextButton(
                         onPressed: busy ? null : () => draft.discard(),
@@ -81,13 +84,22 @@ class CaptureEntryView extends StatelessWidget {
                       spacing: d.spacingXs,
                       runSpacing: d.spacingXs,
                       children: [
-                        Chip(label: Text(l.pkCaptureStepBarcode)),
                         Chip(
+                          avatar: const Icon(Icons.check_circle_outline, size: 18),
+                          label: Text(l.pkCaptureStepBarcode),
+                        ),
+                        Chip(
+                          backgroundColor: next == LabelKind.nutrition && !state.ready
+                              ? context.colorScheme.primaryContainer
+                              : null,
                           label: Text(
                             '${l.pkCaptureStepNutrition}${state.nutrition != null ? ' ✓' : ''}',
                           ),
                         ),
                         Chip(
+                          backgroundColor: next == LabelKind.ingredients && !state.ready
+                              ? context.colorScheme.primaryContainer
+                              : null,
                           label: Text(
                             '${l.pkCaptureStepIngredients}${state.ingredients != null ? ' ✓' : ''}',
                           ),

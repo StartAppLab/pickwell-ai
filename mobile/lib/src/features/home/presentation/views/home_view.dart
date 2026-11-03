@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/_core.dart';
 import '../../../../config/_config.dart';
 import '../../../app/app.dart';
@@ -50,19 +52,12 @@ class _HomeViewState extends State<HomeView> {
                   orElse: () => <RecentProduct>[],
                 );
                 final visible = filterRecentProducts(items, query: query, foodOnly: food);
-                if (state.maybeWhen(loading: () => true, orElse: () => false)) {
-                  return ListView(
-                    children: [
-                      if (widget.drafts != null)
-                        PendingCaptureCard(draft: widget.drafts!, query: query),
-                      const Center(child: CircularProgressIndicator()),
-                    ],
-                  );
-                }
+                final loading = state.maybeWhen(loading: () => true, orElse: () => false);
                 return RefreshIndicator(
                   onRefresh: () => context.read<HomeCubit>().load(),
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                     slivers: [
                       SliverPadding(
                         padding: EdgeInsets.all(d.paddingComfortable),
@@ -70,12 +65,11 @@ class _HomeViewState extends State<HomeView> {
                           children: [
                             Row(
                               children: [
-                                Tooltip(
-                                  message: l.pkLemonPlaceholder,
-                                  child: Semantics(
-                                    label: l.pkLemonPlaceholder,
-                                    child: const Text('🍋', style: TextStyle(fontSize: 32)),
-                                  ),
+                                Image.asset(
+                                  'assets/images/pickwell_lemon.png',
+                                  width: 40,
+                                  height: 40,
+                                  excludeFromSemantics: true,
                                 ),
                                 Gap(d.spacingXs),
                                 Expanded(
@@ -91,7 +85,10 @@ class _HomeViewState extends State<HomeView> {
                                   tooltip: search ? l.pkCloseSearch : l.pkSearch,
                                   onPressed: () => setState(() {
                                     search = !search;
-                                    if (!search) query = '';
+                                    if (!search) {
+                                      query = '';
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                    }
                                   }),
                                   icon: AppIcon(icon: search ? Icons.close : Icons.search),
                                 ),
@@ -101,13 +98,18 @@ class _HomeViewState extends State<HomeView> {
                               Gap(d.spacingMd),
                               TextField(
                                 autofocus: true,
-                                decoration: InputDecoration(hintText: l.pkSearch),
+                                textInputAction: TextInputAction.search,
+                                decoration: InputDecoration(
+                                  labelText: l.pkSearch,
+                                  prefixIcon: const AppIcon(icon: Icons.search),
+                                ),
                                 onChanged: (value) => setState(() => query = value),
                               ),
                             ],
                             Gap(d.spacingLg),
                             Wrap(
                               alignment: WrapAlignment.spaceBetween,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: d.spacingMd,
                               runSpacing: d.spacingXs,
                               children: [
@@ -146,7 +148,11 @@ class _HomeViewState extends State<HomeView> {
                             ],
                             if (widget.drafts != null)
                               PendingCaptureCard(draft: widget.drafts!, query: query),
-                            if (visible.isEmpty) ...[
+                            if (loading) ...[
+                              const Center(child: CircularProgressIndicator()),
+                              Gap(d.spacingLg),
+                            ],
+                            if (!loading && visible.isEmpty) ...[
                               Gap(d.spacingXxl),
                               AppIcon(
                                 icon: HugeIcons.strokeRoundedBarcodeScan,

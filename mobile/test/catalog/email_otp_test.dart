@@ -297,6 +297,9 @@ void main() {
         expect(find.text('Continue with Email'), findsNothing);
         expect(repository.sends, 0);
         await tester.scrollUntilVisible(find.text('Analyze Product'), 180);
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('Analyze Product'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Analyze Product'));
         await gate.check();
         await tester.pumpAndSettle();
@@ -305,6 +308,11 @@ void main() {
         await tester.tap(find.text('Send Code'));
         await tester.pumpAndSettle();
         if (cancel) {
+          await tester.scrollUntilVisible(
+            find.text('Cancel'),
+            100,
+            scrollable: find.byType(Scrollable).first,
+          );
           await tester.tap(find.text('Cancel'));
         } else {
           await tester.enterText(find.byType(TextField), '12345678');

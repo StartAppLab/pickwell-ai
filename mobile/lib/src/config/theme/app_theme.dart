@@ -32,7 +32,38 @@ class AppTheme {
       fontFamily: AppFonts.manrope,
       visualDensity: VisualDensity.standard,
       extensions: [base, ...extensions],
-      textTheme: _getTextTheme(),
+      textTheme: _getTextTheme().apply(
+        bodyColor: colorScheme.onSurface,
+        displayColor: colorScheme.onSurface,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: Size(0, base.dimensionsData.buttonHeight),
+          padding: EdgeInsets.symmetric(
+            horizontal: base.dimensionsData.paddingLg,
+            vertical: base.dimensionsData.paddingSm,
+          ),
+          textStyle: base.textStyleData.buttonTextStyle,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(base.dimensionsData.cornerRadius),
+          ),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          minimumSize: Size.square(base.dimensionsData.minimumTouchTarget),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        shape: const StadiumBorder(),
+        side: BorderSide.none,
+        selectedColor: colorScheme.primaryContainer,
+        backgroundColor: colorScheme.surfaceContainerLowest,
+        labelStyle: _getTextTheme().labelLarge?.copyWith(
+          color: colorScheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       appBarTheme: _getAppBarTheme(base, colorScheme),
       elevatedButtonTheme: _getElevatedButtonTheme(base, colorScheme),
       outlinedButtonTheme: _getOutlinedButtonTheme(base, colorScheme),
@@ -73,10 +104,10 @@ class AppTheme {
         const TextStyle(fontWeight: FontWeight.w400, fontSize: 28, height: 1.29, letterSpacing: 0),
       ),
       headlineSmall: style.merge(
-        const TextStyle(fontWeight: FontWeight.w400, fontSize: 24, height: 1.33, letterSpacing: 0),
+        const TextStyle(fontWeight: FontWeight.w700, fontSize: 24, height: 1.33, letterSpacing: 0),
       ),
       titleLarge: style.merge(
-        const TextStyle(fontWeight: FontWeight.w400, fontSize: 22, height: 1.27, letterSpacing: 0),
+        const TextStyle(fontWeight: FontWeight.w700, fontSize: 20, height: 1.3, letterSpacing: 0),
       ),
       titleMedium: style.merge(
         const TextStyle(
@@ -124,18 +155,13 @@ class AppTheme {
       bodyMedium: style.merge(
         const TextStyle(
           fontWeight: FontWeight.w400,
-          fontSize: 14,
-          height: 1.43,
-          letterSpacing: 0.25,
+          fontSize: 16,
+          height: 1.5,
+          letterSpacing: 0.15,
         ),
       ),
       bodySmall: style.merge(
-        const TextStyle(
-          fontWeight: FontWeight.w400,
-          fontSize: 12,
-          height: 1.33,
-          letterSpacing: 0.4,
-        ),
+        const TextStyle(fontWeight: FontWeight.w400, fontSize: 13, height: 1.4, letterSpacing: 0.2),
       ),
     );
   }
@@ -195,8 +221,11 @@ class AppTheme {
     return TextButtonThemeData(
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        minimumSize: Size(
+          base.dimensionsData.minimumTouchTarget,
+          base.dimensionsData.minimumTouchTarget,
+        ),
+        tapTargetSize: MaterialTapTargetSize.padded,
         foregroundColor: colorScheme.primary,
         textStyle: base.textStyleData.buttonTextStyle.copyWith(fontSize: 14),
         shape: RoundedRectangleBorder(
@@ -218,6 +247,7 @@ class AppTheme {
       hintStyle: _getTextTheme().bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
       errorStyle: _getTextTheme().bodyMedium?.copyWith(color: colorScheme.error),
       errorMaxLines: 3,
+      helperMaxLines: 3,
       border: border,
       enabledBorder: border,
       disabledBorder: border.copyWith(borderSide: BorderSide(color: colorScheme.outlineVariant)),
@@ -239,8 +269,13 @@ class AppTheme {
 
   static CardThemeData _getCardTheme(AppThemeData base, ColorScheme colorScheme) {
     return CardThemeData(
+      color: colorScheme.surfaceContainerLowest,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(base.dimensionsData.cornerRadius)),
+        side: BorderSide(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(base.dimensionsData.cardCornerRadius),
       ),
     );
   }

@@ -5,7 +5,7 @@
 **Date:** 2026-11-02  
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
-**Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish is next; optional Settings scope is undecided; submission handoff remains open.
+**Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
 
 ## Current status — reconciled 2026-11-04
 
@@ -19,7 +19,7 @@ This section and the dated reconciliation notes below describe current status. E
 | T03.1–T03.3 | COMPLETE for the tested hackathon path, combining automated checks, hosted lookup and owner-confirmed device scanning/restart/permissions. Not an exhaustive device/format matrix. |
 | T04.1 | Required capture/OTP behavior COMPLETE; optional name/brand editing omitted and remains unchecked. |
 | T04.2–T05.3 | COMPLETE for the tested flow and approved OCR-first policy, combining later implementation, real-call evidence, T07.1 and owner's full-flow/accuracy/cleanup confirmation. No guarantee of perfect OCR or complete ingredient coverage. |
-| T06.1–T06.2 | COMPLETE for the tested results/usage flow. UI polish is the next owner-requested work; no new polish work is implied by this reconciliation. |
+| T06.1–T06.2 | COMPLETE for the tested results/usage flow. [UI polish](PICKWELL_UI_POLISH.md) is now implemented and regression-tested; screen mockups/native brand assets and fresh device visual review remain. |
 | T06.3 | DEFERRED explicitly by owner; billing disabled and RevenueCat webhook undeployed. |
 | T06.4 | OPTIONAL / DECISION PENDING after UI polish. Existing sign-in/sign-out fixes do not complete the broader Settings task. |
 | T07.1 | COMPLETE for the owner-approved testing profile; [QA matrix and evidence](PICKWELL_END_TO_END_QA.md). |
@@ -31,7 +31,7 @@ This section and the dated reconciliation notes below describe current status. E
 
 **Remaining release checks:** Signed store/iOS release artifacts and production signing ownership remain outside this sign-off. The first naturally scheduled daily telemetry-retention run was not observed during T07.1; registration and accelerated execution were verified. This reconciliation does not claim a new scheduler observation or configured CI/staging deployment.
 
-**Agreed order:** reconcile statuses (this update) → UI polish → decide whether to implement T06.4 → T07.2. Optional name/brand editing and RevenueCat do not block this sequence.
+**Agreed order:** statuses reconciled → UI polish implemented ([changes, validation and remaining visual deviations](PICKWELL_UI_POLISH.md)) → owner UI review / decide whether to implement T06.4 → T07.2. Optional name/brand editing and RevenueCat do not block this sequence.
 
 ## 0. Source of truth and non-goals
 

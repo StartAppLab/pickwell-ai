@@ -163,7 +163,24 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
     final l = context.l10n;
     final d = context.themeData.dimensionsData;
     return Scaffold(
-      appBar: AppBar(title: Text(l.pkScan)),
+      appBar: AppBar(
+        title: Text(l.pkScan),
+        actions: [
+          BlocBuilder<CatalogCubit, CatalogState>(
+            builder: (context, state) => IconButton(
+              tooltip: l.pkTorch,
+              onPressed:
+                  state.status == LookupStatus.scanning &&
+                      camera.value.torchState != TorchState.unavailable
+                  ? () => camera.toggleTorch().catchError((Object _) {
+                      if (context.mounted) context.read<CatalogCubit>().cameraError();
+                    })
+                  : null,
+              icon: const AppIcon(icon: Icons.flash_on),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: BlocConsumer<CatalogCubit, CatalogState>(
           listener: (context, state) {
@@ -197,10 +214,13 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
                     if (state.status == LookupStatus.scanning || state.status == LookupStatus.idle)
                       IgnorePointer(
                         child: Container(
-                          width: 260,
+                          width: MediaQuery.sizeOf(context).width.clamp(0, 300) - 40,
                           height: 160,
                           decoration: BoxDecoration(
-                            border: Border.all(color: context.colorScheme.tertiary, width: 3),
+                            border: Border.all(
+                              color: context.colorScheme.tertiaryContainer,
+                              width: 3,
+                            ),
                             borderRadius: BorderRadius.circular(d.cardCornerRadius),
                           ),
                         ),
@@ -244,17 +264,6 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: l.pkTorch,
-                      onPressed:
-                          state.status == LookupStatus.scanning &&
-                              camera.value.torchState != TorchState.unavailable
-                          ? () => camera.toggleTorch().catchError((Object _) {
-                              if (context.mounted) context.read<CatalogCubit>().cameraError();
-                            })
-                          : null,
-                      icon: const AppIcon(icon: Icons.flash_on),
-                    ),
                     IconButton(
                       tooltip: l.pkGallery,
                       onPressed: state.status == LookupStatus.checking ? null : _gallery,

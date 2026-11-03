@@ -10,6 +10,7 @@ class ProductSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = context.themeData.dimensionsData;
     return Card(
+      margin: EdgeInsets.only(bottom: d.spacingSm),
       color: context.colorScheme.surfaceContainerLowest,
       child: Padding(
         padding: EdgeInsets.all(d.paddingMd),

@@ -31,62 +31,66 @@ class ProductFindingCard extends StatelessWidget {
     final evidence = source?['evidence'] as List? ?? [];
     return Semantics(
       container: true,
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: d.paddingXs),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppIcon(icon: icon, color: color),
-                Gap(d.spacingXs),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(label, style: context.textTheme.labelLarge?.copyWith(color: color)),
-                      Text(
-                        finding['title']?.toString() ?? l.pkUnknownValue,
-                        style: context.textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Gap(d.spacingXs),
-            Text(finding['explanation']?.toString() ?? l.pkUnknownValue),
-            if (evidence.isNotEmpty || source?['rule_id'] != null)
-              ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                title: Text(l.pkEvidence),
+      child: Material(
+        color: color.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(d.nestedCornerRadius),
+        child: Padding(
+          padding: EdgeInsets.all(d.paddingSm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (final item in evidence)
-                    if (item is Map)
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Text(
-                          (item['source'] ??
-                                  item['label_text'] ??
-                                  item['reference'] ??
-                                  l.pkUnknownValue)
-                              .toString(),
+                  AppIcon(icon: icon, color: color),
+                  Gap(d.spacingXs),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(label, style: context.textTheme.labelLarge?.copyWith(color: color)),
+                        Text(
+                          finding['title']?.toString() ?? l.pkUnknownValue,
+                          style: context.textTheme.titleMedium,
                         ),
-                      ),
-                  if (source?['rule_id'] != null)
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text('${l.pkRule}: ${source!['rule_id']}'),
+                      ],
                     ),
-                  if (source?['reference'] is String)
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: SelectableText(source!['reference'] as String),
-                    ),
+                  ),
                 ],
               ),
-          ],
+              Gap(d.spacingXs),
+              Text(finding['explanation']?.toString() ?? l.pkUnknownValue),
+              if (evidence.isNotEmpty || source?['rule_id'] != null)
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(l.pkEvidence),
+                  children: [
+                    for (final item in evidence)
+                      if (item is Map)
+                        Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            (item['source'] ??
+                                    item['label_text'] ??
+                                    item['reference'] ??
+                                    l.pkUnknownValue)
+                                .toString(),
+                          ),
+                        ),
+                    if (source?['rule_id'] != null)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text('${l.pkRule}: ${source!['rule_id']}'),
+                      ),
+                    if (source?['reference'] is String)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: SelectableText(source!['reference'] as String),
+                      ),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );

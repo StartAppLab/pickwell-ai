@@ -14,7 +14,7 @@ class AppBaseTheme {
       dimensionsData: const DimensionsData(
         maxWidth: 512,
         cornerRadius: 16,
-        buttonHeight: 50,
+        buttonHeight: 52,
         textFieldSpacing: 24,
         textSpacing: 2,
         smallSpacing: 12,
@@ -23,7 +23,7 @@ class AppBaseTheme {
         indicatorSpacing: 16,
       ),
       edgeInsetsData: const EdgeInsetsData(
-        pagePadding: EdgeInsets.all(24),
+        pagePadding: EdgeInsets.all(20),
         containerPadding: EdgeInsets.all(12),
         dialogPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         contentPadding: EdgeInsets.all(14),

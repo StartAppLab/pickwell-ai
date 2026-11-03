@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
 
 class InterpretationExplanation extends StatelessWidget {
@@ -48,7 +49,12 @@ class InterpretationExplanation extends StatelessWidget {
       subtitle: ingredient is String ? Text(l.pkIngredientContext) : null,
       childrenPadding: EdgeInsets.only(bottom: context.themeData.dimensionsData.paddingSm),
       expandedCrossAxisAlignment: CrossAxisAlignment.start,
-      children: content,
+      children: [
+        for (var i = 0; i < content.length; i++) ...[
+          if (i > 0) Gap(context.themeData.dimensionsData.spacingXs),
+          content[i],
+        ],
+      ],
     );
   }
 }

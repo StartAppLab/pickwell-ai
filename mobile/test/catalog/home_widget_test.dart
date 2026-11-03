@@ -175,7 +175,15 @@ void main() {
         tester.getTopLeft(find.text('00000096385074')).dy,
         lessThan(tester.getTopLeft(find.text('Loaded cereal')).dy),
       );
-      expect(find.byType(Image), findsNothing, reason: 'No invented product images');
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Image &&
+              widget.image != const AssetImage('assets/images/pickwell_lemon.png'),
+        ),
+        findsNothing,
+        reason: 'Only supplied brand art is allowed; no invented product images',
+      );
       await tester.tap(find.text('Food'));
       await tester.pumpAndSettle();
       expect(find.text('00000096385074'), findsNothing);

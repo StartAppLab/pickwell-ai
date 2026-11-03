@@ -43,7 +43,16 @@ class LookupNotice extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(text, textAlign: TextAlign.center),
+          Icon(
+            status == LookupStatus.processing ? Icons.hourglass_top_rounded : Icons.info_outline,
+            size: context.themeData.dimensionsData.iconLarge,
+            color: context.colorScheme.primary,
+          ),
+          Gap(context.themeData.dimensionsData.spacingSm),
+          Semantics(
+            liveRegion: true,
+            child: Text(text, textAlign: TextAlign.center, style: context.textTheme.titleMedium),
+          ),
           if (!{'camera', 'invalid_barcode', 'no_barcode'}.contains(error))
             QuotaStatus(
               snapshot: quota,

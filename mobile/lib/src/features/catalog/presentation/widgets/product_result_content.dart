@@ -42,7 +42,19 @@ class ProductResultContent extends StatelessWidget {
               children: [
                 Semantics(
                   label: l.pkNoProductPhoto,
-                  child: const AppIcon(icon: Icons.inventory_2_outlined, size: 64),
+                  child: Container(
+                    width: 80,
+                    height: 96,
+                    decoration: BoxDecoration(
+                      color: context.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(d.nestedCornerRadius),
+                    ),
+                    child: AppIcon(
+                      icon: Icons.inventory_2_outlined,
+                      size: 40,
+                      color: context.colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
                 Gap(d.spacingMd),
                 Expanded(
