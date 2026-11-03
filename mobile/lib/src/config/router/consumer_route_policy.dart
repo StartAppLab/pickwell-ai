@@ -3,7 +3,14 @@ import 'app_flow_resolver.dart';
 
 /// Pure route decisions, shared by the router and the consumer-mode tests.
 class ConsumerRoutePolicy {
-  static const authRoutes = {'/auth-options', '/sign-in', '/sign-up', '/otp', '/forgot-password'};
+  static const authRoutes = {
+    '/auth-options',
+    '/sign-in',
+    '/email-sign-in',
+    '/sign-up',
+    '/otp',
+    '/forgot-password',
+  };
   static const accountRoutes = {'/profile', '/settings-account', '/change-password'};
   static const legalRoutes = {'/terms-of-use', '/privacy-policy'};
   static const onboardingRoutes = {'/welcome', '/onboarding'};

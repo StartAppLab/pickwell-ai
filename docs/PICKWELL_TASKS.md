@@ -301,17 +301,19 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1 End-to-end acceptance and security pass
 
-- [ ] **Home:** New install has honest empty state; previously viewed barcode is present after restart in bounded local recents; header search and actual Food/Newest filters work. No Chat/cosmetics fake routes.
-- [ ] **Cached path:** Scan existing barcode as guest → show analysis without Meta call, no OTP wall.
-- [ ] **New path:** Scan missing barcode → nutrition photo → ingredients photo → Email OTP → server-only AI → validation → publish → results.
-- [ ] **Reuse:** Another guest/session rescans new barcode → cached result, no repeat Meta inference.
-- [ ] **Bad input:** Incorrect/blurred image → identify label to retake, no public bad record, successful-analysis quota preserved.
-- [ ] **Quotas:** 30 barcode/day Free and 3 successful analyses/day, server-config limit reduction to 20 test, UTC reset, concurrent job handling, spend ceiling, missing auth.
-- [ ] **Security:** RLS negative tests, no secrets in build/repo, no public write, no fake Premium, webhook validation if enabled, rate limits.
-- [ ] **Privacy:** Review temporary image deletion, minimal telemetry, no contributor email in cached product output.
-- [ ] **Accessibility:** Color labels/icons usable independent of hue, loading, permissions, network and OTP recovery.
+- [x] **Home:** New install has honest empty state; previously viewed barcode is present after restart in bounded local recents; header search and actual Food/Newest filters work. No Chat/cosmetics fake routes.
+- [x] **Cached path:** Scan existing barcode as guest → show analysis without Meta call, no OTP wall.
+- [x] **New path:** Scan missing barcode → nutrition photo → ingredients photo → Email OTP → server-only AI → validation → publish → results.
+- [x] **Reuse:** Another guest/session rescans new barcode → cached result, no repeat Meta inference.
+- [x] **Bad input:** Incorrect/blurred image → identify label to retake, no public bad record, successful-analysis quota preserved.
+- [x] **Quotas:** 30 barcode/day Free and 3 successful analyses/day, server-config limit reduction to 20 test, UTC reset, concurrent job handling, spend ceiling, missing auth.
+- [x] **Security:** RLS negative tests, no secrets in build/repo, no public write, no fake Premium, webhook validation if enabled, rate limits.
+- [x] **Privacy:** Review temporary image deletion, minimal telemetry, no contributor email in cached product output.
+- [x] **Accessibility:** Color labels/icons usable independent of hue, loading, permissions, network and OTP recovery.
 
 **Acceptance:** Each test has recorded pass/fail and fixes; no known P0 blockers. Full release QA is appropriate here, not after every task.
+
+**2026-11-03 — COMPLETE for owner-approved hackathon testing profile:** [QA matrix, fixes and evidence](PICKWELL_END_TO_END_QA.md). 115 Flutter, 146 backend, 142 SQL assertions, 21 tooling tests and 30 hosted boundary checks passed; analyzer and rebuilt Android APK credential checks passed. Device/accuracy checks are owner-reported passes. Cloud testing allowances remain 1,000/100 by explicit request; baseline 30/3 and mutable 20 passed in isolation. Restore production allowances before public release. Billing stays disabled; T06.3 explicitly deferred. No new Meta inference or fresh hardware/store-release test claimed.
 
 ### T07.2 Hackathon submission handoff
 

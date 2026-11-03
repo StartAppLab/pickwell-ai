@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 import check_environment as check
@@ -66,6 +67,28 @@ class EnvironmentTest(unittest.TestCase):
                     contextlib.redirect_stderr(io.StringIO()) as output:
                 self.assertEqual(check.main(), 1)
                 self.assertNotIn(key, output.getvalue())
+
+    def test_binary_sdk_pem_markers_are_not_complete_credentials(self):
+        marker = '-----BEGIN ' + 'PRIVATE KEY-----'
+        self.assertEqual(check.artifact_findings(marker + '\x00SDK parser END marker'), set())
+        body = base64.b64encode(b'not a real key: synthetic regression fixture only' * 3).decode()
+        block = marker + '\n' + body + '\n-----END ' + 'PRIVATE KEY-----'
+        self.assertEqual(check.artifact_findings(block), {'private key block'})
+
+    def test_artifact_checks_chunk_boundaries_and_reports_categories_without_values(self):
+        key = 'sb_secret_' + 'fixture' * 8
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'app.apk'
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('assets/kernel_blob.bin', b'\x00' * (1024 * 1024 - 4) + key.encode())
+            self.assertEqual(check.scan_artifact(path), [('assets/kernel_blob.bin', 'Supabase secret key')])
+
+    def test_binary_service_role_jwt_is_flagged_but_public_tokens_are_not(self):
+        def token(role):
+            payload = base64.urlsafe_b64encode(json.dumps({'role': role}).encode()).decode().rstrip('=')
+            return 'eyJhbGciOiJIUzI1NiJ9.' + payload + '.signature'
+        self.assertEqual(check.artifact_findings(token('anon')), set())
+        self.assertEqual(check.artifact_findings(token('service_role')), {'service-role JWT'})
 
 
 if __name__ == '__main__':

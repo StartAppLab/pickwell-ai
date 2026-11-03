@@ -7,8 +7,8 @@ import '../../../../core/_core.dart';
 import '../blocs/email_otp/email_otp_cubit.dart';
 
 class EmailOtpGateView extends StatefulWidget {
-  final String barcode;
-  const EmailOtpGateView({super.key, required this.barcode});
+  final String? barcode;
+  const EmailOtpGateView({super.key, this.barcode});
   @override
   State<EmailOtpGateView> createState() => _EmailOtpGateViewState();
 }
@@ -19,7 +19,7 @@ class _EmailOtpGateViewState extends State<EmailOtpGateView> {
     if (context.canPop()) {
       context.pop(authorized);
     } else {
-      context.go('/capture/${widget.barcode}');
+      context.go(widget.barcode == null ? '/settings' : '/capture/${widget.barcode}');
     }
   }
 
@@ -66,9 +66,12 @@ class _EmailOtpGateViewState extends State<EmailOtpGateView> {
                   children: [
                     const Icon(Icons.mail_outline, size: 40),
                     Gap(d.spacingLg),
-                    Text(l.pkOtpTitle, style: context.textTheme.headlineSmall),
+                    Text(
+                      widget.barcode == null ? l.signIn : l.pkOtpTitle,
+                      style: context.textTheme.headlineSmall,
+                    ),
                     Gap(d.spacingSm),
-                    Text(l.pkOtpDraftSafe),
+                    if (widget.barcode != null) Text(l.pkOtpDraftSafe),
                     Gap(d.spacingLg),
                     if (enteringCode) ...[
                       Text(state.email),

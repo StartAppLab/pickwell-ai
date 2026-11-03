@@ -20,6 +20,7 @@ class AppRouter {
   static const String onboardingPaywallRoute = '/onboarding-paywall';
   static const String authOptionsRoute = '/auth-options';
   static const String signInRoute = '/sign-in';
+  static const String emailSignInRoute = '/email-sign-in';
   static const String signUpRoute = '/sign-up';
   static const String otpRoute = '/otp';
   static const String forgotPasswordRoute = '/forgot-password';
@@ -73,6 +74,14 @@ class AppRouter {
         path: authOptionsRoute,
         builder: (context, state) =>
             BlocProvider(create: (_) => getIt<PaywallCubit>(), child: const AuthOptionsView()),
+      ),
+      GoRoute(
+        name: emailSignInRoute,
+        path: emailSignInRoute,
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<EmailOtpCubit>()..check(),
+          child: const EmailOtpGateView(),
+        ),
       ),
       GoRoute(
         name: signInRoute,

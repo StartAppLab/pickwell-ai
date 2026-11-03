@@ -176,7 +176,7 @@ class _SettingsViewState extends State<SettingsView> {
     _signIn = SettingsEntity(
       icon: HugeIcons.strokeRoundedLoginSquare01,
       title: context.l10n.signIn,
-      onPressed: () => context.pushNamed(AppRouter.signInRoute),
+      onPressed: () => context.pushNamed(AppRouter.emailSignInRoute),
     );
   }
 
@@ -688,7 +688,7 @@ class _SettingsViewState extends State<SettingsView> {
                                   if (getIt<AppConfig>().features.authMode == AuthMode.required) {
                                     context.goNamed(AppRouter.signInRoute);
                                   } else {
-                                    context.pushNamed(AppRouter.signInRoute);
+                                    context.goNamed(AppRouter.homeRoute);
                                   }
                                 },
                                 error: (error) {

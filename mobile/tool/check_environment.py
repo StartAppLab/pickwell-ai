@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import zipfile
 
 from check_billing_config import InvalidConfig, load_json, validate
 
@@ -23,6 +24,55 @@ PATTERNS = {
     'credential URL': re.compile(r'\b(?:postgres(?:ql)?|https?)://[^\s/:]+:[^\s/@]+@'),
 }
 JWT = re.compile(r'\beyJ[A-Za-z0-9_-]+\.([A-Za-z0-9_-]+)\.[A-Za-z0-9_-]+')
+PEM_BLOCK = re.compile(
+    r'-----BEGIN ((?:RSA |EC |OPENSSH )?PRIVATE KEY)-----\s*'
+    r'([A-Za-z0-9+/=\r\n\t ]{64,16384})\s*-----END \1-----'
+)
+
+
+def artifact_findings(content):
+    """Inspect decoded binary strings; SDK PEM parser markers are not keys."""
+    result = set()
+    for label, pattern in PATTERNS.items():
+        if label in {'private key', 'credential URL'}:
+            continue  # Binary SDK sources contain parser markers and example URLs.
+        if pattern.search(content):
+            result.add(label)
+    for block in PEM_BLOCK.finditer(content):
+        try:
+            decoded = base64.b64decode(re.sub(r'\s+', '', block[2]), validate=True)
+            if len(decoded) >= 32:
+                result.add('private key block')
+        except ValueError:
+            pass
+    for token in JWT.finditer(content):
+        try:
+            payload = json.loads(base64.urlsafe_b64decode(token[1] + '=' * (-len(token[1]) % 4)))
+            if isinstance(payload, dict) and payload.get('role') == 'service_role':
+                result.add('service-role JWT')
+        except (ValueError, UnicodeError):
+            pass
+    return result
+
+
+def scan_artifact(path):
+    """Stream a ZIP-based Android/iOS artifact without extracting private data."""
+    result = set()
+    with zipfile.ZipFile(path) as archive:
+        for info in archive.infolist():
+            if info.is_dir():
+                continue
+            tail = b''
+            with archive.open(info) as stream:
+                while True:
+                    chunk = stream.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    content = tail + chunk
+                    result.update((info.filename, label) for label in
+                                  artifact_findings(content.decode('latin1')))
+                    tail = content[-32768:]
+    return sorted(result)
 
 
 def findings(content):
@@ -84,6 +134,7 @@ def check_public_config(config):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', help='Ignored public Flutter JSON file to validate')
+    parser.add_argument('--artifact', help='APK/AAB/IPA to scan without printing secret values')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
     try:
@@ -94,7 +145,13 @@ def main():
             return 1
         if args.config:
             check_public_config(load_json(args.config))
-    except (InvalidConfig, OSError, subprocess.CalledProcessError, TypeError, ValueError) as error:
+        if args.artifact:
+            artifact_hits = scan_artifact(Path(args.artifact))
+            for name, label in artifact_hits:
+                print(f'Artifact {name}: {label} detected (value suppressed)', file=sys.stderr)
+            if artifact_hits:
+                return 1
+    except (InvalidConfig, OSError, zipfile.BadZipFile, subprocess.CalledProcessError, TypeError, ValueError) as error:
         message = str(error) if isinstance(error, InvalidConfig) else 'Unable to complete environment check'
         print(f'Environment check failed: {message}', file=sys.stderr)
         return 1

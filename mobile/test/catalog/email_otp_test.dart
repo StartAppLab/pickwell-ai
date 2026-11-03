@@ -64,6 +64,64 @@ class OtpFixture extends EmailOtpRepository {
 }
 
 void main() {
+  testWidgets('account Email OTP needs no capture draft or password and cancels to Settings', (
+    tester,
+  ) async {
+    final repository = OtpFixture(), gate = EmailOtpCubit(EmailOtpUseCase(repository));
+    await gate.check();
+    final router = GoRouter(
+      initialLocation: '/email-sign-in',
+      routes: [
+        GoRoute(
+          path: '/email-sign-in',
+          builder: (_, _) => BlocProvider.value(value: gate, child: const EmailOtpGateView()),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (_, _) => const Scaffold(body: Text('Guest Settings fixture')),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        theme: AppTheme.lightTheme(AppColorScheme.lightColorScheme),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(
+      find.byWidgetPredicate((widget) => widget is TextField && widget.obscureText),
+      findsNothing,
+    );
+    expect(repository.sends, 0);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(find.text('Guest Settings fixture'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    router.dispose();
+    await gate.close();
+  });
+  test(
+    'account Email OTP route is disabled with auth and allowed for guests with optional auth',
+    () {
+      for (final mode in [AuthMode.disabled, AuthMode.optional]) {
+        expect(
+          ConsumerRoutePolicy.redirect(
+            features: AppFeatures(authMode: mode),
+            isAuthenticated: false,
+            recoveringPassword: false,
+            onboardingCompleted: true,
+            path: '/email-sign-in',
+          ),
+          mode == AuthMode.disabled ? '/home' : null,
+        );
+      }
+    },
+  );
   test('guest check requires email while existing backend-authorized identity resumes', () async {
     for (final authorized in [false, true]) {
       final repository = OtpFixture()..authorized = authorized;
