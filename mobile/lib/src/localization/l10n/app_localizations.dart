@@ -1465,6 +1465,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An analysis limit is active. Please try later; your photos are retained temporarily.'**
   String get pkAnalysisDenied;
+
+  /// No description provided for @pkQuotaAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'New-product analysis allowance'**
+  String get pkQuotaAnalysis;
+
+  /// No description provided for @pkQuotaBarcode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode lookup allowance'**
+  String get pkQuotaBarcode;
+
+  /// No description provided for @pkQuotaRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining} of {limit} remaining'**
+  String pkQuotaRemaining(int remaining, int limit);
+
+  /// No description provided for @pkQuotaReserved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} currently reserved for processing'**
+  String pkQuotaReserved(int count);
+
+  /// No description provided for @pkQuotaReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets at {time} (your local time)'**
+  String pkQuotaReset(String time);
+
+  /// No description provided for @pkQuotaReported.
+  ///
+  /// In en, this message translates to:
+  /// **'Last server report; other activity may change this allowance.'**
+  String get pkQuotaReported;
+
+  /// No description provided for @pkQuotaExhausted.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily allowance reached. New requests can resume after the server reset.'**
+  String get pkQuotaExhausted;
+
+  /// No description provided for @pkQuotaRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests are temporarily limited. Please try later; this may be a network or service limit.'**
+  String get pkQuotaRateLimited;
+
+  /// No description provided for @pkQuotaGuestFairUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Public lookups use fair-use and network rate limits. Guests do not have a guaranteed personal daily counter.'**
+  String get pkQuotaGuestFairUse;
+
+  /// No description provided for @pkQuotaGuestLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Public requests from this network are temporarily limited. This is not a personal daily allowance.'**
+  String get pkQuotaGuestLimited;
+
+  /// No description provided for @pkQuotaSignInAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'New analyses require verified email. No personal allowance is shown for a guest.'**
+  String get pkQuotaSignInAnalysis;
+
+  /// No description provided for @pkQuotaRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'The previous report has passed its reset. Allowance will be checked on the next server request.'**
+  String get pkQuotaRefresh;
+
+  /// No description provided for @pkQuotaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Usage is unavailable. It will be checked on the next server request; no allowance is assumed.'**
+  String get pkQuotaUnavailable;
+
+  /// No description provided for @pkQuotaLoadedAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Already loaded product information remains available without a new request.'**
+  String get pkQuotaLoadedAvailable;
+
+  /// No description provided for @pkQuotaHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'All slots are used or reserved. Processing may release a slot before the next reset.'**
+  String get pkQuotaHeld;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

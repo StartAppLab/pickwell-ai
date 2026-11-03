@@ -1,3 +1,4 @@
+import { attachAnalysisQuota } from './analysis_quota_response.mjs';
 import { requireVerifiedEmail, IdentityError } from './analysis_authorization.mjs';
 import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mjs';
 import { createQuotaService, networkBucket } from './quota_boundary.mjs';
@@ -9,8 +10,8 @@ import { invokeMetaLabels, META_URL } from '../../spikes/meta-vision/core.mjs';
 
 const reply=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const failure=(error,status=503)=>reply({status:'error',error},status);
-export function createAnalyzeProductHandler(env,fetcher=fetch){
- return async request=>{
+function createAnalysisExecution(env,fetcher){
+ return async (request,context)=>{
   if(request.method!=='POST')return failure('method_not_allowed',405);
   let user,q,input,bucket;
   try{
@@ -20,6 +21,7 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
     trustedHeader:env.PICKWELL_TRUSTED_IP_HEADER||undefined,
     trustedProxyHops:env.PICKWELL_TRUSTED_PROXY_HOPS?Number(env.PICKWELL_TRUSTED_PROXY_HOPS):undefined});
    if((await q.throttle(bucket,user)).allowed!==true)return reply({status:'rate_limited',error:'rate_limited'},429);
+   context.user=user; // Set only after trusted Auth and successful throttle admission.
    input=await readAnalysisInput(request);
   }catch(error){
    if(error instanceof IdentityError)return failure(error.message,error.status);
@@ -114,5 +116,14 @@ export function createAnalyzeProductHandler(env,fetcher=fetch){
    return failure(error?.message==='idempotency_conflict'?'idempotency_conflict':'service_unavailable',
     error?.message==='idempotency_conflict'?409:503);
   }finally{if(input)input.images=null;} // Includes cache hits, admission failures and lost RPC acknowledgements.
+ };
+}
+
+export function createAnalyzeProductHandler(env,fetcher=fetch){
+ const execute=createAnalysisExecution(env,fetcher);
+ return async request=>{
+  const context={};
+  const response=await execute(request,context);
+  return attachAnalysisQuota(response,context.user,env,fetcher);
  };
 }

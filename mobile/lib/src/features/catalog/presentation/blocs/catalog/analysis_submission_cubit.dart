@@ -102,7 +102,12 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
       return;
     }
     if (isClosed) return;
-    if (result.phase == AnalysisPhase.authRequired) _attempts--;
+    // A definitive quota denial made no model attempt; manual same-key checks
+    // may re-evaluate a reset/config change. They never refill or spend local quota.
+    if (result.phase == AnalysisPhase.authRequired ||
+        (result.phase == AnalysisPhase.denied && result.error == 'quota_exceeded')) {
+      _attempts--;
+    }
     emit(
       AnalysisSubmissionState(
         phase: result.phase,

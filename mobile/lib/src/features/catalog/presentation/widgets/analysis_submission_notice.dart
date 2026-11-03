@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
+import '../../../../config/app_session.dart';
+import 'quota_status.dart';
 import '../../domain/_domain.dart';
 import '../blocs/catalog/analysis_submission_cubit.dart';
 
 class AnalysisSubmissionNotice extends StatelessWidget {
   final AnalysisSubmissionState state;
+  final AppSession? session;
   final VoidCallback? retry, cleanup;
-  const AnalysisSubmissionNotice({super.key, required this.state, this.retry, this.cleanup});
+  const AnalysisSubmissionNotice({
+    super.key,
+    required this.state,
+    this.retry,
+    this.cleanup,
+    this.session,
+  });
   @override
   Widget build(BuildContext context) {
     final l = context.l10n, d = context.themeData.dimensionsData;
@@ -17,7 +26,8 @@ class AnalysisSubmissionNotice extends StatelessWidget {
       AnalysisPhase.processing => l.pkAnalysisProcessing,
       AnalysisPhase.retake => l.pkAnalysisRetake,
       AnalysisPhase.authRequired => l.pkAnalysisAuthRequired,
-      AnalysisPhase.denied => l.pkAnalysisDenied,
+      AnalysisPhase.denied =>
+        state.error == 'quota_exceeded' ? l.pkAnalysisDenied : l.pkQuotaRateLimited,
       AnalysisPhase.cleanupFailed => l.pkCaptureCleanupError,
       AnalysisPhase.error => l.pkAnalysisUncertain,
       AnalysisPhase.blocked =>
@@ -34,6 +44,14 @@ class AnalysisSubmissionNotice extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(message),
+              if (state.result != null)
+                QuotaStatus(
+                  snapshot: state.result?.quota,
+                  metric: QuotaMetric.aiAnalysis,
+                  session: session,
+                  rateLimited: state.error == 'rate_limited',
+                  unavailable: state.phase == AnalysisPhase.authRequired,
+                ),
               if (state.busy) ...[Gap(d.spacingSm), const LinearProgressIndicator()],
               if (state.phase == AnalysisPhase.retake)
                 for (final target in state.result?.retake ?? <LabelKind>{})

@@ -4,7 +4,7 @@ class CatalogState {
   final LookupStatus status;
   final String? barcode, error;
   final ProductRecord? product;
-  final Map<String, dynamic>? quota;
+  final QuotaSnapshot? quota;
   final bool recentSaved;
   const CatalogState({
     this.status = LookupStatus.idle,

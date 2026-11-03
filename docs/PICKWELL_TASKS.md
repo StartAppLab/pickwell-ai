@@ -257,13 +257,15 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T06.2 Remaining usage and quota-exceeded states (P0)
 
-- [ ] Surface exact authenticated remaining barcode and AI quota where backend provides it, with UTC reset converted to user's time zone for display.
-- [ ] Guest messaging must avoid claiming strict personal limits; display general fair-use or rate-limit status as appropriate.
-- [ ] When quota exhausted, explain next reset and allow user to view already loaded results; no unavailable purchase button.
-- [ ] Avoid refreshing usage on every widget frame; trust server response, not a local mutable allowance.
+- [x] Surface exact authenticated remaining barcode and AI quota where backend provides it, with UTC reset converted to user's time zone for display.
+- [x] Guest messaging must avoid claiming strict personal limits; display general fair-use or rate-limit status as appropriate.
+- [x] When quota exhausted, explain next reset and allow user to view already loaded results; no unavailable purchase button.
+- [x] Avoid refreshing usage on every widget frame; trust server response, not a local mutable allowance.
 
 **Acceptance:** 30/3 remaining states agree with server; changing server plan limits updates UI without app release.  
 **Targeted validation:** Boundary/reset, offline display fallback and no-paywall quota states.
+
+**2026-11-03 — IMPLEMENTED (targeted/native/hosted verification):** [Quota UI evidence](PICKWELL_QUOTA_UI.md). Typed server snapshots, local reset display, guest fair-use copy, loaded-result access and unknown/offline/expired states; no client allowance or paywall. **86 Flutter and 58 backend tests pass; analyzer clean; eight hosted checks pass.** Updated only the protected analysis response metadata; zero Meta calls, billing/inference remain disabled. Full live/device flow and earlier T05.2 constraints remain deferred.
 
 ### T06.3 Premium-ready entitlement tables and RevenueCat webhook safety (P0 backend design; deploy only when prerequisites satisfied)
 

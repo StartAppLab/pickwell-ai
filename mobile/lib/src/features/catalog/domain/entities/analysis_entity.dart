@@ -1,4 +1,5 @@
 import 'catalog_entity.dart';
+import 'quota_snapshot.dart';
 import 'label_photo.dart';
 
 enum AnalysisPhase {
@@ -29,6 +30,7 @@ class AnalysisRequest {
 class AnalysisResult {
   final AnalysisPhase phase;
   final ProductRecord? product;
+  final QuotaSnapshot? quota;
   final Set<LabelKind> retake;
   final String? error;
   final bool retryable;
@@ -36,6 +38,7 @@ class AnalysisResult {
   const AnalysisResult(
     this.phase, {
     this.product,
+    this.quota,
     this.retake = const {},
     this.error,
     this.retryable = false,

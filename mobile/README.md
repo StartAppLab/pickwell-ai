@@ -531,3 +531,10 @@ references persist. No new client config or package is needed. Live new analysis
 remains unavailable while the existing server inference flag is off; this task did
 not enable it. See [results/submission evidence](../docs/PICKWELL_RESULTS_FLOW.md)
 for targeted checks and the deferred real-device/provider acceptance.
+
+## Pickwell remaining usage
+
+Lookup/submission screens display authenticated server-reported quotas and local
+reset times. Guest copy uses fair use; expired/offline counts show unavailable.
+Loaded results remain accessible when exhausted, without purchases or per-build
+usage requests. See [T06.2 evidence](../docs/PICKWELL_QUOTA_UI.md).

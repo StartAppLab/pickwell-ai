@@ -49,7 +49,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   body:JSON.stringify({email:`orchestrate-${crypto.randomUUID()}@example.invalid`,password:crypto.randomUUID()+'Aa1!'})});
   assert.equal(r.status,200);const u=await r.json();assert.ok(u.access_token);made.push(u.user.id);return u;}
  let providerCalls=0,behavior='success',badAuth=false,claimLoss=false,claimLost=false;
- let deferPublication=true,publicationAckLoss=false;
+ let deferPublication=true,publicationAckLoss=false,snapshotDown=false;
  const fetcher=async(url,options)=>{
   if(url===META_URL){
    providerCalls++;assert.equal(options.redirect,'error');assert.ok(options.signal);
@@ -68,6 +68,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   assert.equal(new URL(url).origin,origin.origin,'Only native Supabase and mocked Meta are allowed');
   assert.ok(!url.includes('/storage/v1/'),'Analysis must not persist photos in Storage');
   if(url.includes('/rest/v1/'))assert.ok(!String(options?.body??'').includes('data:image'),'No photo payload may enter SQL');
+  if(snapshotDown&&url.endsWith('/pickwell_quota_snapshot'))return Response.json({error:'Optional snapshot unavailable'},{status:503});
   if(deferPublication&&url.endsWith('/pickwell_publish_analysis'))return Response.json({error:'Simulated transient publication outage'},{status:503});
   if(badAuth&&url.endsWith('/auth/v1/user'))return Response.json({id:made[0],is_anonymous:true,email:'fixture@example.invalid',email_confirmed_at:new Date().toISOString(),user_metadata:{verified:true}});
   const result=await fetch(url,options);
@@ -103,7 +104,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   });
   await t.test('inference-disabled flag fails closed without creating jobs',async()=>{
    await config({inference_enabled:false});const before=(await rest('analysis_jobs?select=id')).length;
-   const r=await submit(alice,code());assert.equal(r.http,503);assert.equal(r.body.error,'inference_disabled');
+   const r=await submit(alice,code());assert.equal(r.http,503);assert.equal(r.body.error,'inference_disabled');assert.equal(r.body.quota.limit,3);assert.equal(r.body.quota.remaining,3);
    assert.equal((await rest('analysis_jobs?select=id')).length,before);await config({inference_enabled:true});
   });
   await t.test('malformed, duplicate, corrupt, excessive-dimension and claimed-privilege files never invoke model',async()=>{
@@ -229,7 +230,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   await t.test('actual publication revalidates, seals facts and charges once; another guest reads without Meta',async()=>{
    deferPublication=false;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const quotaBefore=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
-   const output=await submit(alice,barcode,key);assert.equal(output.http,200);assert.equal(output.body.status,'ready');
+   snapshotDown=true;const output=await submit(alice,barcode,key);snapshotDown=false;assert.equal(output.http,200);assert.equal(output.body.status,'ready');assert.equal(output.body.quota_unavailable,true);
    const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(product.findings.length,4);
    assert.equal(product.explanations.length,2);assert.equal(product.provenance.prompt_version,'label-analysis-v2');
    assert.ok(product.findings.every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
@@ -238,6 +239,9 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const revisions=await rest('product_analyses?product_id=eq.'+product.id);assert.equal(revisions.length,1);assert.ok(revisions[0].sealed_at);
    const quotaAfter=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
    assert.equal(quotaAfter.used,quotaBefore.used+1);assert.equal(quotaAfter.reserved,0);
+   await rest('plan_limits?plan_code=eq.free&metric=eq.ai_analysis','PATCH',{daily_limit:20,change_reason:'Disposable mutable response test'});
+   const observed=await submit(alice,barcode,key);assert.equal(observed.body.quota.limit,20);assert.equal(observed.body.quota.used,quotaAfter.used);assert.equal(observed.body.quota.remaining,20-quotaAfter.used);
+   await rest('plan_limits?plan_code=eq.free&metric=eq.ai_analysis','PATCH',{daily_limit:100,change_reason:'Restore disposable publication fixture'});
    const lookup=createGetProductHandler(env,fetcher),request=()=>new Request('http://127.0.0.1/get-product',{
     method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})});
    for(let n=0;n<2;n++){const response=await lookup(request());assert.equal(response.status,200);const body=await response.json();

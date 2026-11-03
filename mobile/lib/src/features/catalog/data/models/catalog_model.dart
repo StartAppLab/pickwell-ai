@@ -1,4 +1,6 @@
 import '../../domain/entities/catalog_entity.dart';
+import '../../domain/entities/quota_snapshot.dart';
+import 'quota_model.dart';
 
 class CatalogModel {
   static CatalogEntity parse(Map<String, dynamic> json, String barcode) {
@@ -105,8 +107,10 @@ class CatalogModel {
       status: status,
       barcode: barcode,
       product: product,
-      quota: json['quota'] is Map ? Map<String, dynamic>.from(json['quota'] as Map) : null,
-      errorCode: json['error'] as String?,
+      quota: QuotaModel.parse(json, QuotaMetric.barcodeLookup),
+      errorCode:
+          json['error'] as String? ??
+          (status == LookupStatus.denied ? json['status'] as String : null),
     );
   }
 }

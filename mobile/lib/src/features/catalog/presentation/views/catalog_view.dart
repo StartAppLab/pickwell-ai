@@ -13,7 +13,8 @@ import '../blocs/catalog/catalog_cubit.dart';
 import '../widgets/lookup_notice.dart';
 
 class CatalogView extends StatefulWidget {
-  const CatalogView({super.key});
+  final AppSession? session;
+  const CatalogView({super.key, this.session});
   @override
   State<CatalogView> createState() => _CatalogViewState();
 }
@@ -166,8 +167,12 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
       body: SafeArea(
         child: BlocConsumer<CatalogCubit, CatalogState>(
           listener: (context, state) {
-            if (state.status == LookupStatus.found) context.replace('/product/${state.barcode}');
-            if (state.status == LookupStatus.miss) context.replace('/capture/${state.barcode}');
+            if (state.status == LookupStatus.found) {
+              context.replace('/product/${state.barcode}', extra: state.quota);
+            }
+            if (state.status == LookupStatus.miss) {
+              context.replace('/capture/${state.barcode}', extra: state.quota);
+            }
           },
           builder: (context, state) => Column(
             children: [
@@ -221,6 +226,7 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
                       status: state.status,
                       error: state.error,
                       quota: state.quota,
+                      session: widget.session,
                       retry: () {
                         if (state.barcode != null && state.error != 'invalid_barcode') {
                           context.read<CatalogCubit>().retry();

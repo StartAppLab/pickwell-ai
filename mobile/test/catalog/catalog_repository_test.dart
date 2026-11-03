@@ -147,10 +147,17 @@ void main() {
     );
     final result = CatalogModel.parse({
       'status': 'quota_exceeded',
-      'quota': {'limit': 20, 'remaining': 0, 'reset_at': '2026-11-03T00:00:00Z'},
+      'quota': {
+        'limit': 20,
+        'remaining': 0,
+        'used': 25,
+        'reserved': 0,
+        'version': 2,
+        'reset_at': '2026-11-03T00:00:00Z',
+      },
     }, '00000096385074');
     expect(result.status, LookupStatus.denied);
-    expect(result.quota!['limit'], 20);
+    expect(result.quota!.limit, 20);
   });
   test('a fresh miss evicts a previously loaded published result', () async {
     final api = FakeApi(), local = CatalogLocalSource(MemoryStorage());

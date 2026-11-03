@@ -19,6 +19,16 @@ class SupabaseCatalogApiService implements CatalogApiService {
       session = (await client.auth.refreshSession().timeout(const Duration(seconds: 10))).session;
       if (session == null) throw StateError('session_expired');
     }
+    Map<String, dynamic> scoped(Object? data) {
+      final result = Map<String, dynamic>.from(data as Map);
+      result['_quota_subject'] = session?.user.id;
+      if (client.auth.currentUser?.id != session?.user.id) {
+        result.remove('quota');
+        result['_quota_subject'] = null;
+      }
+      return result;
+    }
+
     try {
       final response = await client.functions
           .invoke(
@@ -31,9 +41,9 @@ class SupabaseCatalogApiService implements CatalogApiService {
             },
           )
           .timeout(const Duration(seconds: 15));
-      return Map<String, dynamic>.from(response.data as Map);
+      return scoped(response.data);
     } on FunctionException catch (e) {
-      if (e.details is Map) return Map<String, dynamic>.from(e.details as Map);
+      if (e.details is Map) return scoped(e.details);
       rethrow;
     }
   }

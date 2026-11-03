@@ -86,6 +86,12 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
       };
     }
     if (client.auth.currentUser?.id != owner) return {'status': 'auth_required'};
+    Map<String, dynamic> scoped(Object? data) {
+      final result = Map<String, dynamic>.from(data as Map);
+      result['_quota_subject'] = owner;
+      return result;
+    }
+
     final abort = Completer<void>();
     final timer = Timer(const Duration(seconds: 45), () {
       if (!abort.isCompleted) abort.complete();
@@ -113,12 +119,12 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
       if (client.auth.currentUser?.id != owner) return {'status': 'auth_required'};
       if ([401, 403].contains(response.status)) return {'status': 'auth_required'};
       if (response.data is! Map) throw const FormatException();
-      return Map<String, dynamic>.from(response.data as Map);
+      return scoped(response.data);
     } on FunctionException catch (error) {
       if ([401, 403].contains(error.status) || client.auth.currentUser?.id != owner) {
         return {'status': 'auth_required'};
       }
-      if (error.details is Map) return Map<String, dynamic>.from(error.details as Map);
+      if (error.details is Map) return scoped(error.details);
       rethrow;
     } finally {
       timer.cancel();

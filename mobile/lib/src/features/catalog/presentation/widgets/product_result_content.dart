@@ -10,7 +10,13 @@ import 'nutrition_fact_row.dart';
 class ProductResultContent extends StatelessWidget {
   final ProductRecord product;
   final bool recentSaved;
-  const ProductResultContent({super.key, required this.product, this.recentSaved = true});
+  final Widget? statusNotice;
+  const ProductResultContent({
+    super.key,
+    required this.product,
+    this.recentSaved = true,
+    this.statusNotice,
+  });
   @override
   Widget build(BuildContext context) {
     final p = product, l = context.l10n, d = context.themeData.dimensionsData;
@@ -53,6 +59,7 @@ class ProductResultContent extends StatelessWidget {
             if (p.isDemo) Text(l.pkDemo, style: context.textTheme.labelLarge),
             if (!recentSaved) Text(l.pkRecentNotSaved),
             Gap(d.spacingSm),
+            ?statusNotice,
             ProductSection(
               title: l.pkOverview,
               children: [

@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
 import '../../domain/entities/catalog_entity.dart';
+import '../../domain/entities/quota_snapshot.dart';
+import '../../../../config/app_session.dart';
+import 'quota_status.dart';
 
 class LookupNotice extends StatelessWidget {
   final LookupStatus status;
   final String? error;
-  final Map<String, dynamic>? quota;
+  final QuotaSnapshot? quota;
+  final AppSession? session;
   final VoidCallback retry;
   const LookupNotice({
     super.key,
     required this.status,
     this.error,
     this.quota,
+    this.session,
     required this.retry,
   });
   @override
@@ -27,17 +32,25 @@ class LookupNotice extends StatelessWidget {
         : status == LookupStatus.processing
         ? l.pkProcessing
         : status == LookupStatus.denied
-        ? l.pkDenied
+        ? (error == 'quota_exceeded' &&
+                  session?.isAuthenticated == true &&
+                  quota?.ownerId == session?.userId
+              ? l.pkQuotaExhausted
+              : l.pkQuotaRateLimited)
         : l.pkError;
-    final reset = DateTime.tryParse(quota?['reset_at']?.toString() ?? '')?.toLocal();
     return Padding(
       padding: context.themeData.edgeInsetsData.pagePadding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(text, textAlign: TextAlign.center),
-          if (reset != null)
-            Text(MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(reset))),
+          if (!{'camera', 'invalid_barcode', 'no_barcode'}.contains(error))
+            QuotaStatus(
+              snapshot: quota,
+              session: session,
+              rateLimited: error == 'rate_limited',
+              unavailable: status == LookupStatus.error,
+            ),
           Gap(context.themeData.dimensionsData.spacingMd),
           FilledButton(onPressed: retry, child: Text(l.pkRetry)),
         ],

@@ -340,3 +340,11 @@ and billing OFF. Backend photos are request-local, with no files/Storage uploads
 Client success must still call existing transient-draft disposal when the Flutter
 submission/result handoff is connected. See [publication evidence](../docs/PICKWELL_PUBLICATION.md)
 for targeted native/hosted checks and the remaining partial acceptance.
+
+## T06.2 response quota metadata
+
+The protected analysis handler optionally attaches the existing server-only AI
+quota snapshot after authorization, with a bounded one-second read. Metadata
+failure never changes admission/publication/accounting. No new RPC, migration or
+model invocation is introduced. See [T06.2 evidence](../docs/PICKWELL_QUOTA_UI.md)
+for native and hosted checks; inference and billing remain disabled.

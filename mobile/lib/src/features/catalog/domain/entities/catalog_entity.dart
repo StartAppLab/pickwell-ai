@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'quota_snapshot.dart';
 
 enum LookupStatus { idle, scanning, checking, found, miss, processing, denied, error }
 
@@ -43,7 +44,7 @@ class CatalogEntity {
   final LookupStatus status;
   final String barcode;
   final ProductRecord? product;
-  final Map<String, dynamic>? quota;
+  final QuotaSnapshot? quota;
   final String? errorCode;
   final bool recentSaved;
   const CatalogEntity({

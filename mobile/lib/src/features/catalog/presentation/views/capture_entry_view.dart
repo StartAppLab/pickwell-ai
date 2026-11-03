@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/_core.dart';
+import '../../../../config/app_session.dart';
 import '../../domain/entities/label_photo.dart';
+import '../../domain/entities/quota_snapshot.dart';
+import '../widgets/quota_status.dart';
 import '../../domain/entities/analysis_entity.dart';
 import '../blocs/catalog/analysis_submission_cubit.dart';
 import '../widgets/analysis_submission_notice.dart';
@@ -12,7 +15,9 @@ import '../widgets/label_photo_card.dart';
 
 class CaptureEntryView extends StatelessWidget {
   final String barcode;
-  const CaptureEntryView({super.key, required this.barcode});
+  final AppSession? session;
+  final QuotaSnapshot? entryQuota;
+  const CaptureEntryView({super.key, required this.barcode, this.session, this.entryQuota});
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(),
@@ -22,7 +27,7 @@ class CaptureEntryView extends StatelessWidget {
           if (submission.phase == AnalysisPhase.ready &&
               submission.barcode == barcode &&
               context.mounted) {
-            context.replace('/product/$barcode');
+            context.replace('/product/$barcode', extra: submission.result?.quota);
           }
         },
         builder: (context, submission) => BlocBuilder<LabelCaptureCubit, LabelCaptureState>(
@@ -54,6 +59,7 @@ class CaptureEntryView extends StatelessWidget {
                     Text(l.pkUnknown, style: context.textTheme.headlineSmall),
                     Gap(d.spacingSm),
                     Text(state.barcode ?? barcode),
+                    if (entryQuota != null) QuotaStatus(snapshot: entryQuota, session: session),
                     Gap(d.spacingLg),
                     Wrap(
                       spacing: d.spacingXs,
@@ -143,6 +149,7 @@ class CaptureEntryView extends StatelessWidget {
                             submission.phase == AnalysisPhase.ready))
                       AnalysisSubmissionNotice(
                         state: submission,
+                        session: session,
                         retry: sender.retryAvailable ? () => sender.retry() : null,
                         cleanup: submission.phase == AnalysisPhase.cleanupFailed
                             ? () => sender.retryCleanup()

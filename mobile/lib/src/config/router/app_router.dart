@@ -119,15 +119,21 @@ class AppRouter {
       ),
       GoRoute(
         path: '/scan',
-        builder: (context, state) =>
-            BlocProvider(create: (_) => getIt<CatalogCubit>(), child: const CatalogView()),
+        builder: (context, state) => BlocProvider(
+          create: (_) => getIt<CatalogCubit>(),
+          child: CatalogView(session: getIt<AppSession>()),
+        ),
       ),
       GoRoute(
         path: '/product/:barcode',
         builder: (context, state) => BlocProvider(
-          create: (_) =>
-              getIt<CatalogCubit>()..check(state.pathParameters['barcode'] ?? '', local: true),
-          child: const ProductDetailView(),
+          create: (_) => getIt<CatalogCubit>()
+            ..check(
+              state.pathParameters['barcode'] ?? '',
+              local: true,
+              entryQuota: state.extra is QuotaSnapshot ? state.extra as QuotaSnapshot : null,
+            ),
+          child: ProductDetailView(session: getIt<AppSession>()),
         ),
       ),
       GoRoute(
@@ -167,10 +173,17 @@ class AppRouter {
                 BlocProvider.value(value: draft),
                 BlocProvider.value(value: getIt<AnalysisSubmissionCubit>()),
               ],
-              child: CaptureEntryView(barcode: barcode),
+              child: CaptureEntryView(
+                barcode: barcode,
+                session: getIt<AppSession>(),
+                entryQuota: state.extra is QuotaSnapshot ? state.extra as QuotaSnapshot : null,
+              ),
             );
           } catch (_) {
-            return BlocProvider(create: (_) => getIt<CatalogCubit>(), child: const CatalogView());
+            return BlocProvider(
+              create: (_) => getIt<CatalogCubit>(),
+              child: CatalogView(session: getIt<AppSession>()),
+            );
           }
         },
       ),

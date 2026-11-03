@@ -28,6 +28,7 @@ class CatalogCubit extends Cubit<CatalogState> {
     bool upce = false,
     bool retry = false,
     bool local = false,
+    QuotaSnapshot? entryQuota,
   }) async {
     if (isClosed || state.status == LookupStatus.checking) return;
     String code;
@@ -41,20 +42,28 @@ class CatalogCubit extends Cubit<CatalogState> {
       _key = requestKey();
     }
     _code = code;
+    final previous = state.barcode == code ? state.product : null;
     final generation = ++_generation;
     emit(CatalogState(status: LookupStatus.checking, barcode: code));
     final result = await lookup((code, _key!, local));
     if (isClosed || generation != _generation) return;
     result.fold(
       (failure) => emit(
-        CatalogState(status: LookupStatus.error, barcode: code, error: failure.error.statusCode),
+        CatalogState(
+          status: LookupStatus.error,
+          barcode: code,
+          error: failure.error.statusCode,
+          product: previous,
+        ),
       ),
       (entity) => emit(
         CatalogState(
           status: entity.status,
           barcode: code,
-          product: entity.product,
-          quota: entity.quota,
+          product:
+              entity.product ??
+              ({LookupStatus.denied, LookupStatus.error}.contains(entity.status) ? previous : null),
+          quota: entity.quota ?? (local && entity.product != null ? entryQuota : null),
           error: entity.errorCode,
           recentSaved: entity.recentSaved,
         ),

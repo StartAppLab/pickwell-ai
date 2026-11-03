@@ -6,3 +6,4 @@ export 'product_section.dart';
 export 'product_finding_card.dart';
 export 'nutrition_fact_row.dart';
 export 'product_result_content.dart';
+export 'quota_status.dart';

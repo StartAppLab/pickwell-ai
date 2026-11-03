@@ -747,4 +747,64 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get pkAnalysisDenied =>
       'An analysis limit is active. Please try later; your photos are retained temporarily.';
+
+  @override
+  String get pkQuotaAnalysis => 'New-product analysis allowance';
+
+  @override
+  String get pkQuotaBarcode => 'Barcode lookup allowance';
+
+  @override
+  String pkQuotaRemaining(int remaining, int limit) {
+    return '$remaining of $limit remaining';
+  }
+
+  @override
+  String pkQuotaReserved(int count) {
+    return '$count currently reserved for processing';
+  }
+
+  @override
+  String pkQuotaReset(String time) {
+    return 'Resets at $time (your local time)';
+  }
+
+  @override
+  String get pkQuotaReported => 'Last server report; other activity may change this allowance.';
+
+  @override
+  String get pkQuotaExhausted =>
+      'Daily allowance reached. New requests can resume after the server reset.';
+
+  @override
+  String get pkQuotaRateLimited =>
+      'Requests are temporarily limited. Please try later; this may be a network or service limit.';
+
+  @override
+  String get pkQuotaGuestFairUse =>
+      'Public lookups use fair-use and network rate limits. Guests do not have a guaranteed personal daily counter.';
+
+  @override
+  String get pkQuotaGuestLimited =>
+      'Public requests from this network are temporarily limited. This is not a personal daily allowance.';
+
+  @override
+  String get pkQuotaSignInAnalysis =>
+      'New analyses require verified email. No personal allowance is shown for a guest.';
+
+  @override
+  String get pkQuotaRefresh =>
+      'The previous report has passed its reset. Allowance will be checked on the next server request.';
+
+  @override
+  String get pkQuotaUnavailable =>
+      'Usage is unavailable. It will be checked on the next server request; no allowance is assumed.';
+
+  @override
+  String get pkQuotaLoadedAvailable =>
+      'Already loaded product information remains available without a new request.';
+
+  @override
+  String get pkQuotaHeld =>
+      'All slots are used or reserved. Processing may release a slot before the next reset.';
 }
