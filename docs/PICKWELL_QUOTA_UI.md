@@ -166,3 +166,69 @@ T06.3 is the next listed task and was not started.
 - `supabase/functions/_shared/analyze_product.mjs`
 - `supabase/tests/analysis_quota_response.test.mjs`
 - `supabase/tests/analyze_product.test.mjs`
+
+## 2026-11-03 — Authorized device-test activation
+
+After the T06.2 commit, the user explicitly requested enabling real analysis.
+Meta model discovery returned HTTP 200 and confirmed `muse-spark-1.3`; the three
+server-only Meta configuration values were refreshed from the protected existing
+local environment. No key was displayed or copied into Flutter.
+
+Cloud `quota_controls` version 2 now has inference enabled, approved model
+`muse-spark-1.3`, billing disabled, one concurrent provider call, three provider
+attempts per UTC day, USD 5 daily admission budget and USD 1.34 held per call.
+Free user quotas remain 30 lookups / 3 successful analyses. The three-call global
+test cap also counts failed/retake calls; it is separate from successful-user
+credits. At most three new calls are admitted by these daily test controls.
+
+The old USD 0.05 reserve was not a proven maximum. The new conservative reserve
+uses the documented full 1,048,576-token context at USD 1.25/M input plus the
+adapter's bounded 4,096 output tokens at USD 4.25/M (USD 1.328128, rounded up).
+This deliberately over-reserves small label requests. See official
+[model context](https://dev.meta.ai/docs/models) and
+[Standard pricing](https://dev.meta.ai/docs/pricing-rate-limits), checked today.
+No image formula or historical average is used as a guaranteed cost ceiling.
+
+Activation was read back from the hosted database. Guest and public-key-as-user
+analysis calls still returned 401. No new inference was deliberately invoked by
+this activation check; successful real extraction/publication remains for the
+device end-to-end test, and prior quality constraints remain open. Historical
+OFF-state results above describe their original test time.
+
+No app rebuild is required for the server switch. Retry Analyze from the existing
+capture flow; if its bounded request window expired, reopen the capture flow.
+A clearer-photo retake may still be required by the model/validator. To stop the
+test, an operator can set `public.quota_controls.inference_enabled=false` on its
+single `id=true` row, increment version and record a change reason. Billing must
+remain false. Do not change client counters or disable trusted-email enforcement.
+
+## 2026-11-03 — Hackathon test-cap increase (current configuration)
+
+The user explicitly requested increasing the temporary service testing limits.
+A guarded transaction updated only the existing server control row, version 2 → 3:
+
+| Control | Before | Current |
+| --- | --- | --- |
+| Global provider attempts / UTC day | 3 | 20 |
+| Conservative daily admission budget | USD 5 | USD 30 |
+| Provider attempts per user / UTC day | 9 | 20 |
+| Provider attempts per network / UTC day | 20 | 40 |
+| Provider attempts per barcode / UTC day | 3 | 5 |
+
+The USD 1.34 per-call hold is unchanged, so 20 admissions fit within the new daily
+budget (20 × 1.34 = USD 26.80). Holds are conservative admission accounting, not a
+claim that each small label request costs USD 1.34. Global/user/network concurrency
+remain one; model, auth, image limits, per-minute throttles and request idempotency
+are unchanged. Free remains 30 barcode lookups and 3 successful analyses/day;
+billing remains disabled and protected inference enabled.
+
+Hosted read-back verified every changed value, incremented audit version/change
+reason, unchanged Free limits and no deletion/reset of existing provider usage.
+Three prior calls were still recorded at verification, leaving 17 global attempts
+at that moment; per-barcode and other admission controls still apply. No inference
+was invoked for this settings change. No deployment, app rebuild, migration or
+secret change was required. Existing saved-draft retry can pick up the new limits.
+Earlier three-attempt reports above are historical and superseded by this change.
+Daily counters reset at 00:00 UTC (08:00 Manila); these configured caps remain in
+effect until an operator changes them. Restore conservative controls after the
+hackathon; do not erase the spend ledger or enable billing as part of that reset.
