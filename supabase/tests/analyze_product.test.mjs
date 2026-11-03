@@ -60,7 +60,8 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    if(behavior==='fail')return new Response('PRIVATE upstream',{status:429});
    if(behavior==='malformed')return modelResult({...candidate(),extra:'PRIVATE'});
    if(behavior==='unclassified')return modelResult(labelFixture({basis:'per_serving',portion:'100 g'}));
-   if(behavior==='contradiction'){const c=candidate();c.nutrition.nutrients[0].value=9000;return modelResult(c);}
+   if(behavior==='contradiction'){const c=candidate(),n=c.nutrition.nutrients[0];c.nutrition.raw=c.nutrition.raw.replace(n.source,'Energy 9000 kcal');n.value=9000;n.source='Energy 9000 kcal';return modelResult(c);}
+   if(behavior==='normalized'){const c=candidate();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Nutrition facts');return modelResult(c);}
    if(behavior==='ingredient-order'){const c=candidate();c.ingredients.items.reverse();return modelResult(c);}
    if(behavior==='retake'){const c=candidate();c.status='needs_retake';c.retake=['nutrition'];c.nutrition.basis='unknown';return modelResult(c);}
    return modelResult(candidate());
@@ -258,6 +259,13 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal(result.body.product.nutrition.basis,'per_serving');
    assert.ok(result.body.product.missing_information.some(v=>v.includes('No supported nutrition colour')));
   });
+  await t.test('uncertain facts publish as unknown and survive secure candidate revalidation',async()=>{
+   behavior='normalized';const barcode=code(),key=crypto.randomUUID();
+   const r=await submit(alice,barcode,key);behavior='success';
+   assert.equal(r.body.status,'ready',JSON.stringify(r.body));assert.equal(r.body.product.nutrition.basis,'unknown');
+   assert.equal(r.body.product.nutrition.nutrients[0].value,null);assert.deepEqual(r.body.product.findings,[]);
+   assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
+  });
   await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
    deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const staged=await submit(alice,barcode,key);assert.equal(staged.http,202);
@@ -300,8 +308,8 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const row=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
    row.candidate.nutrition.nutrients[0].value=9999;
    await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
-   deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'needs_retake');
-   assert.deepEqual(result.body.retake,['nutrition']);
+   deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
+   assert.equal(result.body.error,'invalid_model_output');
    assert.equal((await rest('analysis_candidates?job_id=eq.'+row.job_id)).length,0);
    assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,0);
    assert.equal((await rest('usage_reservations?job_id=eq.'+row.job_id))[0].state,'released');

@@ -108,6 +108,10 @@ function createAnalysisExecution(env,fetcher){
     const targets=extracted.validation.retake;
     return safe(await settle('retake',null,targets.length===1?targets[0]:'both'),422);
    }
+   // Persist only normalized known/unknown facts; publication revalidates the same candidate.
+   extracted.candidate.nutrition=extracted.validation.nutrition;
+   extracted.candidate.ingredients=extracted.validation.ingredients;
+   extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,now:extracted.validation.provenance.validated_at});
    // Stage first so a lost publication acknowledgement can resume without another model call.
    await rpc('pickwell_stage_analysis',{...identity,p_candidate:{...extracted.candidate,validation:extracted.validation},
     p_model:claim.model,p_prompt:PROMPT_VERSION});

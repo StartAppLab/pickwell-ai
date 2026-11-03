@@ -32,22 +32,27 @@ test('unknown optional facts remain null and unclassified; no allergen absence i
  const r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.nutrients.at(-1).value,null);
  assert.ok(!r.findings.some(f=>f.title.includes('salt')));assert.ok(r.missing_information.some(s=>s.includes('allergen-free')));
 });
-test('unreadable photo, essential unknown and explicit provider retakes target exact photo',()=>{
+test('unreadable photo and explicit provider retakes target exact photo; unknown core facts proceed',()=>{
  let c=labelFixture();c.ingredients.items=[];retake(c,'ingredients');c=labelFixture();c.nutrition.raw=null;retake(c,'nutrition');
- c=labelFixture();c.nutrition.nutrients[0].value=null;retake(c,'nutrition');
+ c=labelFixture();c.nutrition.nutrients[0].value=null;assert.equal(validate(c).status,'validated');assert.equal(validate(c).nutrition.nutrients[0].value,null);
  c=labelFixture();c.status='needs_retake';c.retake=['ingredients'];assert.deepEqual(validate(c).retake,['ingredients']);
 });
 test('mismatched discernible products never pass as validated',()=>{
- const c=labelFixture();c.identity.nutrition_name='Oats';c.identity.ingredients_name='Cookies';retake(c,'nutrition');retake(c,'ingredients');
+ const c=labelFixture();c.identity.nutrition_name='Oats';c.identity.ingredients_name='Cookies';c.identity.consistency='mismatch';retake(c,'nutrition');retake(c,'ingredients');
 });
 test('malformed and nonfinite fields, model-invented colour and unknown keys fail schema',()=>{
  for(const mutate of [c=>c.score=90,c=>c.nutrition.nutrients[0].value=NaN,c=>c.nutrition.nutrients[0].value=-1,
  c=>c.nutrition.basis='per_bag',c=>c.explanations[0].severity='green']){const c=labelFixture();mutate(c);assert.throws(()=>validate(c));}
 });
-test('numeric source mismatch, inequalities, wrong unit and missing basis fail safely',()=>{
- for(const mutate of [c=>c.nutrition.nutrients[0].value=19,c=>c.nutrition.nutrients[0].source='Energy <180 kcal',
- c=>change(c,'Total Fat',3,'kcal'),c=>c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Facts'),
- c=>c.nutrition.serving_size='90 g',c=>change(c,'Total Fat',102)]){const c=labelFixture();mutate(c);retake(c,'nutrition');}
+test('uncertain numeric evidence becomes unknown, while invalid units and impossible values fail',()=>{
+ for(const mutate of [c=>c.nutrition.nutrients[0].value=19,c=>c.nutrition.nutrients[0].source='Energy <180 kcal']){
+  const c=labelFixture();mutate(c);const r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.nutrients[0].value,null);
+ }
+ for(const mutate of [c=>change(c,'Total Fat',3,'kcal'),c=>change(c,'Total Fat',102)]){
+  const c=labelFixture();mutate(c);retake(c,'nutrition');
+ }
+ const c=labelFixture();c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Facts');c.nutrition.serving_size='90 g';
+ const r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.basis,'unknown');assert.equal(r.nutrition.serving_size,null);assert.deepEqual(r.findings,[]);
 });
 test('contradictory totals, duplicate nutrients and mass/energy discrepancies fail safely',()=>{
  for(const mutate of [c=>change(c,'Saturated Fat',8),c=>change(c,'Total Sugars',40),
@@ -80,10 +85,31 @@ test('legitimate repeated compound ingredients, printed mcg and added-sugar word
  c.nutrition.nutrients.push({name:'Vitamin D',value:0,unit:'ug',source:'Vitamin D 0 mcg'},
  {name:'Includes Added Sugars',value:2,unit:'g',source:'Includes 2 g Added Sugars'});
  c.nutrition.raw+=' Vitamin D 0 mcg; Includes 2 g Added Sugars';assert.equal(validate(c).status,'validated');
- c.nutrition.nutrients.at(-1).value=7;retake(c,'nutrition');
+ c.nutrition.nutrients.at(-1).value=7;assert.equal(validate(c).nutrition.nutrients.at(-1).value,null);
 });
 test('cropped markers and oversized structured handoff cannot pass a publication candidate',()=>{
  const c=labelFixture();c.ingredients.raw+=' [cropped]';retake(c,'ingredients');
  const large=labelFixture();large.ingredients.raw='a'.repeat(12000);large.ingredients.items=['a'.repeat(12000)];large.ingredients.declared_allergens='a'.repeat(12000);
  assert.throws(()=>validate(large),/invalid_model_output/);
+});
+
+test('contextually resolved nutrient names, punctuation and abbreviated identity do not force retakes',()=>{
+ const c=labelFixture();c.identity.nutrition_name='Oat Food';c.identity.ingredients_name='Oat Food - 200g';
+ c.ingredients.items[0]='OATS';
+ const protein=c.nutrition.nutrients.find(v=>v.name==='Protein');c.nutrition.raw=c.nutrition.raw.replace(protein.source,'Prot..n 5 g');protein.source='Prot..n 5 g';protein.value=5;
+ const before=structuredClone(c),r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.nutrients.find(v=>v.name==='Protein').value,5);
+ assert.deepEqual(c,before);assert.equal(r.provenance.extraction_policy,'contextual-label-words-v1');
+});
+test('a recognizable panel with no readable values still needs a nutrition retake',()=>{
+ const c=labelFixture();for(const n of c.nutrition.nutrients)n.value=null;retake(c,'nutrition');
+});
+test('unverifiable optional nutrient cannot produce a colour and remains unknown',()=>{
+ const c=labelFixture();c.nutrition.nutrients.find(n=>n.name==='Total Sugars').source='Sugars unclear';
+ const r=validate(c);assert.equal(r.status,'validated');assert.equal(r.nutrition.nutrients.find(n=>n.name==='Total Sugars').value,null);assert.ok(!r.findings.some(f=>f.title.includes('sugars')));
+});
+
+test('normalized unknown facts produce a stable revalidated publication handoff',()=>{
+ const c=labelFixture();c.nutrition.nutrients[0].value=19;c.nutrition.raw=c.nutrition.raw.replace('Per 100 g','Facts');c.nutrition.serving_size='90 g';
+ const first=validate(c);c.nutrition=first.nutrition;c.ingredients=first.ingredients;
+ const staged=validate(c),replay=validate(c);assert.deepEqual(staged,replay);assert.equal(staged.nutrition.basis,'unknown');assert.equal(staged.nutrition.nutrients[0].value,null);
 });

@@ -227,6 +227,8 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 **2026-11-03 — PARTIAL:** [Validation and real-call evidence](PICKWELL_ANALYSIS_VALIDATION.md). V2 source/unit/basis/consistency validation, photo-specific retakes, constrained Meta fact explanations and versioned deterministic nutrient rules integrated into the private handoff; no publication. **43 targeted native/mock/schema tests pass.** Three fresh protected two-image Meta calls returned retakes; corrected source-spelling checks were rerun on the saved candidates without more paid calls. Product A still needs ingredients; Product B needs both photos; the readable cookie mismatch is not an unreadable test. Two complete real products, genuine unreadable-image evidence and substantive ingredient explanations remain unmet, so the first two checkboxes remain open. Protected analyze-product updated with inference/billing OFF; spike disabled/token rotated after use. No Flutter or migration changes.
 
+**User-approved policy follow-up (2026-11-03):** Recognizable nutrition panels may proceed with contextually resolved nutrient words and explicit unknown amounts/basis; individual uncertain fields no longer force retakes. Publication preserves missing information and avoids unsupported findings. See [updated validation evidence](PICKWELL_ANALYSIS_VALIDATION.md). 58 backend and 12 client tests pass, analyzer clean; additive storage compatibility migration and protected handler deployed. Real-image success remains unverified; the existing three-attempt test cap was not increased.
+
 ### T05.3 Publish product and securely dispose photos
 
 - [x] Write accepted record and analysis/findings as an atomic published transition to `ready`; finalize one successful-analysis credit.

@@ -215,3 +215,64 @@ acceptance tests until the full flow is connected. T05.2 remains PARTIAL and its
 quality gates remain enforced; this deferral is not evidence that those tests pass.
 Keep targeted authorization, quota and validation checks for subsequent changes.
 T05.3 is the recommended next implementation task, not started by this commit.
+
+## 2026-11-03 — User-approved contextual label policy
+
+The user asked to accept recognizable nutrition panels and let Meta resolve
+partially obscured familiar nutrient words, rather than repeatedly require retakes.
+This supersedes the original all-core-nutrients-readable gate. The model now uses
+layout/context to resolve words such as protein/fat/carbohydrate. Unknown amounts,
+units or serving basis remain explicit unknowns; numerical amounts are not invented.
+One unknown core/optional value no longer rejects the entire panel. No manual-entry
+UI, extra model call, expanded output-token limit or automatic retry was added.
+
+The backend normalizes Unicode/case/spacing/punctuation for source comparisons,
+accepts standard nutrient names without requiring identical name spelling in the
+source span, and no longer treats different panel name strings as an automatic
+product mismatch. Explicit model-detected mismatch still rejects both photos.
+Ingredient order/completeness, declared allergen evidence, numeric physical bounds,
+contradictory totals and staged-publication integrity remain enforced. A panel
+with no readable numeric facts still requests a nutrition retake. Explicit model
+retakes are respected; this is a more permissive extraction policy, not proof that
+all real photos will pass.
+
+Unsupported numeric/source values become null and cannot generate colour findings.
+Unconfirmed basis/serving size are unknown, with no unsupported conversion or
+classification. Normalized facts are staged and revalidated before atomic
+publication; tampered candidates still fail. Provenance adds extraction policy
+`contextual-label-words-v1`; the compatible v2 schema/prompt family remains in use.
+Migration `20261103000300_pickwell_unknown_nutrition.sql` extends only the existing
+nutrition storage-shape validator to accept unknown basis/serving context. RLS,
+privileged publication grants, atomic credits and billing policy are unchanged.
+Flutter's existing unknown rendering is reused; its parser now accepts these facts.
+**Rebuild/relaunch the app for this parser change.**
+
+Observed validation:
+
+- 58 backend tests passed, zero skips, using disposable Native Runtime plus mocked
+  Meta: extraction/schema, relaxed words and sources, unknown values/basis, no
+  invented colours, physical contradictions, real local DB publication, concurrent
+  replay, modified candidate rejection, authorization, quotas and disposal.
+- 12 focused Flutter repository/results tests passed; analyzer found no issues.
+- Migration dry run identified exactly the one new migration; it applied to cloud.
+  Updated protected `analyze-product` deployed through CLI 2.122.0 API bundling.
+- Cloud read-back verifies migration, unknown-value support, negative-value denial,
+  client publication denial, inference on and billing off. Existing three daily
+  provider attempts remain recorded; no real Meta call was made by this fix.
+- Native stack stopped, diff whitespace and secret checks passed. No new package,
+  image retention, credentials in Flutter or test-cap increase.
+
+The three-attempt operator test cap is already exhausted today; this patch does not
+reset/delete usage or grant extra calls. It resets at 00:00 UTC (08:00 Manila).
+A new capture/request after reset will use the deployed policy; prior settled
+request keys intentionally retain their original outcome to prevent duplicate work.
+Real-device/live-image quality acceptance is still open; prior failed trials above
+are historical evidence, not newly successful extraction.
+
+Changed source/test files: `supabase/functions/_shared/analysis_validation.mjs`,
+`analyze_product.mjs` in the same folder, the new versioned migration,
+`supabase/tests/analysis_validation.test.mjs`, `analyze_product.test.mjs`,
+`mobile/lib/src/features/catalog/data/models/catalog_model.dart`, and
+`mobile/test/catalog/catalog_repository_test.dart`. The activation addendum in
+`PICKWELL_QUOTA_UI.md` also remains an uncommitted documentation change from the
+preceding server activation. No task's real-image acceptance checkbox was advanced.

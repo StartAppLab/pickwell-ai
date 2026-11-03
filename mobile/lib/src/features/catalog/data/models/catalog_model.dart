@@ -19,14 +19,14 @@ class CatalogModel {
       final nutrition = Map<String, dynamic>.from(p['nutrition'] as Map);
       final ingredients = Map<String, dynamic>.from(p['ingredients'] as Map);
       if (nutrition['raw'] is! String ||
-          !{'per_100g', 'per_100ml', 'per_serving'}.contains(nutrition['basis']) ||
+          !{'per_100g', 'per_100ml', 'per_serving', 'unknown'}.contains(nutrition['basis']) ||
           nutrition['nutrients'] is! List ||
           ingredients['raw'] is! String ||
           ingredients['items'] is! List ||
           !(ingredients['items'] as List).every((e) => e is String)) {
         throw const FormatException();
       }
-      if (nutrition['basis'] == 'per_serving' && nutrition['serving_size'] is! String) {
+      if (nutrition['serving_size'] != null && nutrition['serving_size'] is! String) {
         throw const FormatException();
       }
       for (final value in nutrition['nutrients'] as List) {

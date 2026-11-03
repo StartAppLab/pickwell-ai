@@ -133,6 +133,22 @@ void main() {
       expect(result.getOrElse((_) => throw StateError('unexpected')).recentSaved, false);
     },
   );
+  test('readable nutrition with unknown basis and amounts remains displayable', () async {
+    final json = await FakeApi().lookup('00000096385074', 'test');
+    final product = json['product'] as Map<String, dynamic>;
+    product['nutrition'] = {
+      'raw': 'Nutrition facts Protein unclear',
+      'basis': 'unknown',
+      'serving_size': null,
+      'nutrients': [
+        {'name': 'Protein', 'value': null, 'unit': 'g', 'source': null},
+      ],
+    };
+    final result = CatalogModel.parse(json, '00000096385074');
+    expect(result.status, LookupStatus.found);
+    expect(result.product!.nutrition['basis'], 'unknown');
+    expect((result.product!.nutrition['nutrients'] as List).first['value'], isNull);
+  });
   test('DTO parser rejects unknown/mismatched products and preserves denial/reset metadata', () {
     expect(
       () => CatalogModel.parse({'status': 'invented'}, '00000096385074'),
