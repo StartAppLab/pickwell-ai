@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
 import '../../../../core/_core.dart';
 import 'nutrition_fact_row.dart';
 import 'interpretation_explanation.dart';
@@ -14,12 +12,16 @@ class ProductNutritionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n, d = context.themeData.dimensionsData;
-    final nutrients = (nutrition['nutrients'] as List? ?? []).whereType<Map>().toList();
+    final nutrients = (nutrition['nutrients'] as List? ?? [])
+        .whereType<Map>()
+        .where(NutritionFactRow.hasKnownValue)
+        .toList();
+    if (nutrients.isEmpty) return const SizedBox.shrink();
     final basis = switch (nutrition['basis']) {
       'per_100g' => l.pkPer100g,
       'per_100ml' => l.pkPer100ml,
       'per_serving' => l.pkPerServing,
-      _ => l.pkUnknownValue,
+      _ => null,
     };
     Map? find(Set<String> names) => nutrients
         .where((n) => names.contains(n['name']?.toString().trim().toLowerCase()))
@@ -41,42 +43,29 @@ class ProductNutritionPanel extends StatelessWidget {
           spacing: d.spacingXs,
           runSpacing: d.spacingXxs,
           children: [
-            Text(
-              basis,
-              style: context.textTheme.labelLarge?.copyWith(
-                color: context.colorScheme.onSurfaceVariant,
+            if (basis != null)
+              Text(
+                basis,
+                style: context.textTheme.labelLarge?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            if (nutrition['serving_size'] case final String serving)
+            if (nutrition['serving_size'] case final String serving
+                when serving.trim().isNotEmpty && serving.trim().toLowerCase() != 'unknown')
               Text('${l.pkServingSize}: $serving', style: context.textTheme.bodySmall),
           ],
         ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final columns =
-                constraints.maxWidth >= 280 && MediaQuery.textScalerOf(context).scale(14) < 18
-                ? 4
-                : 2;
-            final width = (constraints.maxWidth - d.spacingSm * (columns - 1)) / columns;
-            return Wrap(
-              spacing: d.spacingSm,
-              runSpacing: d.spacingMd,
-              children: [
-                for (final (name, icon, nutrient) in metrics)
-                  SizedBox(
-                    width: width,
-                    child: _NutrientMetric(name: name, icon: icon, nutrient: nutrient),
-                  ),
-              ],
-            );
-          },
-        ),
+        for (final (name, icon, nutrient) in metrics)
+          if (nutrient != null)
+            NutritionFactRow(
+              nutrient: {...Map<String, dynamic>.from(nutrient), 'name': name},
+              icon: icon,
+            ),
         ExpansionTile(
           tilePadding: EdgeInsets.zero,
           title: Text(l.pkAllNutrition, style: context.textTheme.titleSmall),
           expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (nutrients.isEmpty) Text(l.pkUnknownValue),
             for (final nutrient in nutrients)
               NutritionFactRow(nutrient: Map<String, dynamic>.from(nutrient)),
             for (final explanation in explanations)
@@ -86,42 +75,6 @@ class ProductNutritionPanel extends StatelessWidget {
                 Text(explanation['text']?.toString() ?? l.pkUnknownValue),
           ],
         ),
-      ],
-    );
-  }
-}
-
-class _NutrientMetric extends StatelessWidget {
-  final String name;
-  final IconData icon;
-  final Map? nutrient;
-  const _NutrientMetric({required this.name, required this.icon, this.nutrient});
-  @override
-  Widget build(BuildContext context) {
-    final value = nutrient?['value'], unit = nutrient?['unit'];
-    final known = value is num && value.isFinite && unit is String && unit != 'unknown';
-    final formatter = NumberFormat.decimalPattern(Localizations.localeOf(context).toLanguageTag())
-      ..maximumFractionDigits = 12;
-    final label = known
-        ? '${(value != 0 && value.abs() < 1e-12 ? value.toString() : formatter.format(value))} ${unit.replaceFirst(RegExp(r'^ug\b'), 'µg').replaceFirst('%DV', '% DV')}'
-        : context.l10n.pkUnknownValue;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(
-              icon,
-              size: context.themeData.dimensionsData.iconMedium,
-              color: context.colorScheme.secondary,
-            ),
-            Gap(context.themeData.dimensionsData.spacingXxs),
-            Expanded(child: Text(name, style: context.textTheme.bodySmall)),
-          ],
-        ),
-        Gap(context.themeData.dimensionsData.spacingXs),
-        Text(label, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
       ],
     );
   }

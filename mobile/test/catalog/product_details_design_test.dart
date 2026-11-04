@@ -169,6 +169,13 @@ void main() {
       for (final text in ['120 kcal', '6 g', '55 mg', '12 g']) {
         expect(find.text(text), findsOneWidget);
       }
+      final values = ['120 kcal', '6 g', '55 mg', '12 g'];
+      for (var i = 1; i < values.length; i++) {
+        expect(
+          tester.getRect(find.text(values[i])).top,
+          greaterThanOrEqualTo(tester.getRect(find.text(values[i - 1])).bottom),
+        );
+      }
       expect(find.text('Vitamin D'), findsNothing);
       await tester.tap(find.text('All nutrition facts'));
       await tester.pumpAndSettle();
@@ -191,8 +198,70 @@ void main() {
         ),
       ),
     );
-    expect(find.text('Unknown'), findsOneWidget);
+    expect(find.text('Unknown'), findsNothing);
     expect(find.text('6 g'), findsNothing);
+  });
+  testWidgets('unknown amounts and units are hidden while a known zero remains visible', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 780);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      host(
+        Scaffold(
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: ProductNutritionPanel(
+                nutrition: {
+                  'basis': 'unknown',
+                  'serving_size': 'unknown',
+                  'nutrients': [
+                    {'name': 'Energy', 'value': 0, 'unit': 'kcal'},
+                    {'name': 'Total sugars', 'value': null, 'unit': 'g'},
+                    {'name': 'Sodium', 'value': 1, 'unit': 'unknown'},
+                    {'name': 'Protein', 'value': 12, 'unit': 'g'},
+                  ],
+                },
+                explanations: const [],
+              ),
+            ),
+          ),
+        ),
+        scale: 2,
+      ),
+    );
+    expect(find.text('0 kcal'), findsOneWidget);
+    expect(find.text('12 g'), findsOneWidget);
+    expect(find.text('Unknown'), findsNothing);
+    await tester.ensureVisible(find.text('All nutrition facts'));
+    await tester.tap(find.text('All nutrition facts'));
+    await tester.pumpAndSettle();
+    expect(find.text('Total sugars'), findsNothing);
+    expect(find.text('Sodium'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('entirely unknown nutrition hides the empty section', (tester) async {
+    await tester.pumpWidget(
+      host(
+        const Scaffold(
+          body: ProductNutritionPanel(
+            nutrition: {
+              'basis': 'unknown',
+              'nutrients': [
+                {'name': 'Protein', 'value': null, 'unit': 'g'},
+              ],
+            },
+            explanations: [],
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Nutrition'), findsNothing);
+    expect(find.text('All nutrition facts'), findsNothing);
+    expect(find.text('Unknown'), findsNothing);
   });
   for (final dark in [false, true]) {
     testWidgets('compact screen and large text keep findings and allergens readable dark=$dark', (

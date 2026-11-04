@@ -272,3 +272,18 @@ Details, hide the analysis-allowance panel and place the preliminary-result,
 retention and shared-publication notice/actions in a final rounded section after
 the product facts and analysis metadata. Owner scoping, private expiry, quota
 accounting and operator approval remain unchanged; this is presentation only.
+
+### 2026-11-05 — Vertical nutrition rows and unknown-value visibility
+
+Show the energy, total sugar, sodium and protein highlights as vertically stacked,
+full-width label/value rows rather than horizontal metric columns. Hide nutrient
+rows whose amount or unit is unknown, in both highlights and expanded facts;
+keep confirmed zero values and literal units. Omit an entirely unknown nutrition
+section and unknown basis/serving placeholders. This is presentation only: retain
+missing-information disclosures, raw label data and backend validation/provenance;
+never substitute zero or added sugar for an unknown total-sugar value. Previously
+recorded “Unknown” nutrition-row presentation is superseded by this owner request.
+
+Validation: 31 affected Flutter tests passed, covering vertical ordering, known
+zeroes, unknown amounts/units, empty sections, printed micronutrient units,
+private-result recovery and compact/large-text light/dark layouts.

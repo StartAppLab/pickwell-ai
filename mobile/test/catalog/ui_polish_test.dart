@@ -162,7 +162,7 @@ void main() {
       await tester.pumpAndSettle();
       await snapshot(tester, key, dark ? 'details-dark' : 'details-light');
       await tester.scrollUntilVisible(
-        find.text('Nutrition'),
+        find.text(dark ? 'About this analysis' : 'Nutrition'),
         300,
         scrollable: find.byType(Scrollable).first,
       );

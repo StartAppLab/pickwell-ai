@@ -188,7 +188,7 @@ void main() {
       findsOneWidget,
     );
   });
-  testWidgets('printed units and historical unknown source remain visible', (tester) async {
+  testWidgets('printed units remain literal and unknown nutrition rows are hidden', (tester) async {
     for (final entry in [
       ['IU', '71 IU'],
       ['ug RAE', '71 µg RAE'],
@@ -228,7 +228,9 @@ void main() {
         ),
       ),
     );
-    expect(find.text('“Vitamin D 71 IU”'), findsOneWidget);
+    expect(find.text('“Vitamin D 71 IU”'), findsNothing);
+    expect(find.text('Vitamin D'), findsNothing);
+    expect(find.text('Unknown'), findsNothing);
     expect(find.text('71 IU'), findsNothing); // Source quote, not a fabricated parsed amount.
     expect(tester.takeException(), isNull);
   });
@@ -372,13 +374,14 @@ void main() {
             .first,
       );
       await tester.scrollUntilVisible(
-        find.text('Nutrition'),
+        find.text('About this analysis'),
         200,
         scrollable: find
             .descendant(of: find.byType(ListView).first, matching: find.byType(Scrollable))
             .first,
       );
-      expect(find.text('Unknown'), findsWidgets);
+      expect(find.text('Nutrition'), findsNothing);
+      expect(find.text('Unknown'), findsNothing);
       expect(tester.takeException(), isNull);
       semantics.dispose();
     },
