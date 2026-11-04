@@ -334,3 +334,12 @@ publication/decision checks and actual operator CLI approval/rejection now pass.
 Hosted rollout is still absent and the release decision is BLOCKED; no new live
 three-photo inference or physical-device review handoff was performed. Historical
 results above remain unchanged.
+
+## 2026-11-04 — Later hosted rollout (T07.1D.1)
+
+[Hosted rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md) supersedes the
+missing-deployment caveat in this historical report. Both migrations and compatible
+functions are deployed and hosted security checks pass; inference is restored under
+unchanged testing limits, billing false. Real three-photo/Muse/device/operator
+approval validation was explicitly deferred by the owner. Testing-deployment
+decision: PASS WITH LIMITATIONS; no full real-product flow or T07.2 sign-off claimed.

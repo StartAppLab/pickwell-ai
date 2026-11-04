@@ -7,7 +7,7 @@
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
 **Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D is now BLOCKED by pending hosted trust rollout ([fresh release checks](PICKWELL_RELEASE_GATE.md)); billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -29,9 +29,9 @@ This section and the dated reconciliation notes below describe current status. E
 | T07.1 | COMPLETE for the owner-approved testing profile; [QA matrix and evidence](PICKWELL_END_TO_END_QA.md). |
 | T07.1A | UI polish implementation/regression evidence exists; remaining screen fidelity and fresh device visual review are pending. No new sign-off in this roadmap update. |
 | T07.1B | COMPLETE: read-only audit delivered; critical publication gaps remain. |
-| T07.1C.1 | Three-photo capture/identity observations implemented and locally verified; deployment/live/device checks remain. |
-| T07.1C | IMPLEMENTED / locally verified, restricted operator publication; hosted deployment and fresh device/native concurrency verification remain. [Evidence](PICKWELL_PRODUCT_TRUST.md). |
-| T07.1D | BLOCKED for hosted release: fresh local/native regression passes; hosted trust gate absent. Real three-photo/operator/device handoff remains unverified. [Release report](PICKWELL_RELEASE_GATE.md). |
+| T07.1C.1 | Three-photo capture/identity implemented and backend deployed; live three-photo/device validation deferred. |
+| T07.1C | IMPLEMENTED / deployed; restricted operator publication and hosted security checks verified. Real-product approval/device flow deferred. [Rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md). |
+| T07.1D / T07.1D.1 | Hosted rollout/security verified; PASS WITH LIMITATIONS for testing profile. Missing-gate blocker resolved; genuine three-photo/Muse/operator/device validation deferred explicitly by owner. [Rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md). |
 | T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
 | T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
@@ -394,7 +394,7 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1C.1 Front Packaging Capture & Identity Extraction
 
-**Status / dependencies:** IMPLEMENTED / locally verified; no hosted deployment, new live Muse call or device verification. Depends on completed T07.1B. Front observations do not implement T07.1C's publication gate.
+**Status / dependencies:** IMPLEMENTED / deployed in T07.1D.1; real three-photo Muse/device validation deferred by owner. Depends on completed T07.1B. Front observations do not implement T07.1C's publication gate.
 
 - [x] Require Front → Nutrition → Ingredients after a missing barcode; preserve independent retake, back/restart recovery, OTP resume and existing design. Known guest cache hits remain unchanged.
 - [x] Enforce three bounded distinct image inputs and include front bytes in idempotency; preserve auth, rates, quotas, one provider call/one successful-analysis charge and request-local image handling.
@@ -408,7 +408,7 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1C Minimum Product Trust Protection
 
-**Status / dependencies:** IMPLEMENTED / locally verified; hosted rollout and fresh device/native multi-connection checks remain unverified. Depends on T07.1B report, T07.1C.1 identity observations and prioritized critical findings.
+**Status / dependencies:** IMPLEMENTED / deployed; local/native and hosted boundary verification passed. Genuine real-product/operator/device validation deferred by owner. Depends on T07.1B report, T07.1C.1 identity observations and prioritized critical findings.
 
 - [x] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
 - [x] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
@@ -425,7 +425,7 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1D Targeted Regression and Release Gate
 
-**Status / dependencies:** BLOCKED for hosted release after fresh integrated regression; local checks pass. T07.1A remains paused by owner. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+**Status / dependencies:** PASS WITH LIMITATIONS for the protected testing deployment after T07.1D.1; genuine changed-flow real-product checks deferred by owner. T07.1A remains paused. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
 
 - [x] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
 - [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
@@ -439,6 +439,19 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 
 **2026-11-04 fresh verification:** [T07.1D report](PICKWELL_RELEASE_GATE.md): 150 Flutter, 181 backend/native, 142 pgTAP assertions and 21 tooling checks passed; 30 hosted boundary checks passed. Hosted C.1/C migrations and publication gate are absent while inference remains enabled. No new live three-photo or physical-device full-flow pass. Remaining boxes stay open; no T07.2 sign-off.
+
+### T07.1D.1 Hosted Deployment & Real Product Validation
+
+**Status:** Hosted rollout/security VERIFIED; real-product, live Muse, device and actual operator-approval/reuse checks DEFERRED at owner request. Testing deployment PASS WITH LIMITATIONS, not full real-product sign-off. [Report](PICKWELL_HOSTED_TRUST_ROLLOUT.md).
+
+- [x] Commit tested T07.1D baseline (`a9891ec`), verify target and exactly two pending forward migrations; preserve local work and data.
+- [x] Pause new inference, apply C.1 then C trust migration, deploy analysis/lookup/cancel/status handlers, verify guards, then restore protected inference without changing 1000/100 or billing false.
+- [x] Verify hosted authorization/private review, exact bindings, rollback-only rejection/cancellation/expiry/credit cleanup, existing guest cache and active maintenance; record actual results.
+- [ ] Execute genuine matching product/barcode/three-photo/Muse/device/OTP flow. **Explicitly deferred by owner; no live call performed.**
+- [ ] Review exact processed evidence with real operator CLI approval, owner same-key publication and guest reuse without extra Muse. **Deferred; no real candidate approved.**
+- [x] Record deployed revisions, tests, limitations and release decision. T07.2 preparation is permitted; a genuine new-flow demo/submission sign-off is not claimed. Do not begin automatically.
+
+**Next dependency:** Matching real evidence and honest operator/device verification before claiming the complete current real-product demo. No admin dashboard, automatic approval, fourth photo, billing or UI polish scope.
 
 ### T07.2 Hackathon submission handoff
 

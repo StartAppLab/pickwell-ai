@@ -293,3 +293,12 @@ Changed files: the two test files above; this report; current status links in PR
 DESIGN, SPEC, DATABASE, TASKS and AGENT_PROMPTS; dated cross-link in the T07.1C report.
 No application source, production migration, deployment or credential changes.
 Working-tree changes remain reviewable and uncommitted; `667aa34` is preserved.
+
+## 2026-11-04 — Later hosted rollout (T07.1D.1)
+
+[Hosted rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md) supersedes the
+missing-deployment caveat in this historical report. Both migrations and compatible
+functions are deployed and hosted security checks pass; inference is restored under
+unchanged testing limits, billing false. Real three-photo/Muse/device/operator
+approval validation was explicitly deferred by the owner. Testing-deployment
+decision: PASS WITH LIMITATIONS; no full real-product flow or T07.2 sign-off claimed.

@@ -139,3 +139,12 @@ Includes generated localization outputs and this report; source and generated fi
 - [supabase/tests/catalog_schema.test.mjs](../supabase/tests/catalog_schema.test.mjs)
 - [supabase/tests/fixtures/label_analysis.mjs](../supabase/tests/fixtures/label_analysis.mjs)
 - [supabase/tests/front_packaging.test.mjs](../supabase/tests/front_packaging.test.mjs)
+
+## 2026-11-04 — Later hosted rollout (T07.1D.1)
+
+[Hosted rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md) supersedes the
+missing-deployment caveat in this historical report. Both migrations and compatible
+functions are deployed and hosted security checks pass; inference is restored under
+unchanged testing limits, billing false. Real three-photo/Muse/device/operator
+approval validation was explicitly deferred by the owner. Testing-deployment
+decision: PASS WITH LIMITATIONS; no full real-product flow or T07.2 sign-off claimed.

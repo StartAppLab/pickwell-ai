@@ -4,7 +4,7 @@
 **Date:** 2026-11-04\
 **Sources:** PRD v1.7, DESIGN v1.5, SPEC v1.5, DATABASE v1.3, TASKS v1.4 and actual applicable repository `AGENTS.md`.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D is now BLOCKED by pending hosted trust rollout ([fresh release checks](PICKWELL_RELEASE_GATE.md)); billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -843,7 +843,7 @@ APPROVED FLOW AND SCOPE
 Unknown barcode → Front packaging → Nutrition → Ingredients → contextual Email OTP → one server-only Muse analysis → validation/current publication policy → result or exact-photo retake/safe failure. Guest known-barcode cache retrieval remains unchanged. Preserve UI, drafts, credentials, quota/rate/spend controls, image deletion and backward-compatible cached results. No identity certification, comparison, Passport, assistant or full T07.1C approval gate; no T07.2.
 
 EXACT TASK REQUIREMENTS
-**Status / dependencies:** IMPLEMENTED / locally verified; no hosted deployment, new live Muse call or device verification. Depends on completed T07.1B. Front observations do not implement T07.1C's publication gate.
+**Status / dependencies:** IMPLEMENTED / deployed in T07.1D.1; real three-photo Muse/device validation deferred by owner. Depends on completed T07.1B. Front observations do not implement T07.1C's publication gate.
 
 - [x] Require Front → Nutrition → Ingredients after a missing barcode; preserve independent retake, back/restart recovery, OTP resume and existing design. Known guest cache hits remain unchanged.
 - [x] Enforce three bounded distinct image inputs and include front bytes in idempotency; preserve auth, rates, quotas, one provider call/one successful-analysis charge and request-local image handling.
@@ -885,7 +885,7 @@ CURRENT IMPLEMENTED CONTRACT / FOLLOW-UP
 - Use docs/PICKWELL_PRODUCT_TRUST.md for implementation evidence, operator CLI dry runs and rollout prerequisites. No live deployment/provider call is authorized by the documentation.
 
 EXACT TASK REQUIREMENTS
-**Status / dependencies:** IMPLEMENTED / locally verified; hosted rollout and fresh device/native multi-connection checks remain unverified. Depends on T07.1B report and prioritized critical findings.
+**Status / dependencies:** IMPLEMENTED / deployed; local/native and hosted boundary verification passed. Genuine real-product/operator/device validation deferred by owner. Depends on T07.1B report and prioritized critical findings.
 
 - [x] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
 - [x] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
@@ -923,7 +923,7 @@ SCOPE / IMPLEMENT
 Work ONLY on T07.1D (pre-submission) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
 
 EXACT TASK REQUIREMENTS
-**Status / dependencies:** BLOCKED for hosted release after fresh integrated regression; local checks pass. T07.1A remains paused by owner. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+**Status / dependencies:** PASS WITH LIMITATIONS for the protected testing deployment after T07.1D.1; genuine changed-flow real-product checks deferred by owner. T07.1A remains paused. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
 
 - [x] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
 - [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
@@ -941,6 +941,19 @@ Report status, exact files changed, observed commands/test results, security/pri
 
 
 **2026-11-04 fresh verification:** [T07.1D report](PICKWELL_RELEASE_GATE.md): 150 Flutter, 181 backend/native, 142 pgTAP assertions and 21 tooling checks passed; 30 hosted boundary checks passed. Hosted C.1/C migrations and publication gate are absent while inference remains enabled. No new live three-photo or physical-device full-flow pass. Remaining boxes stay open; no T07.2 sign-off.
+
+## T07.1D.1 — Hosted Deployment & Real Product Validation
+
+**Status:** Hosted rollout/security VERIFIED; real-product, live Muse, device and actual operator-approval/reuse checks DEFERRED at owner request. Testing deployment PASS WITH LIMITATIONS, not full real-product sign-off. [Report](PICKWELL_HOSTED_TRUST_ROLLOUT.md).
+
+- [x] Commit tested T07.1D baseline (`a9891ec`), verify target and exactly two pending forward migrations; preserve local work and data.
+- [x] Pause new inference, apply C.1 then C trust migration, deploy analysis/lookup/cancel/status handlers, verify guards, then restore protected inference without changing 1000/100 or billing false.
+- [x] Verify hosted authorization/private review, exact bindings, rollback-only rejection/cancellation/expiry/credit cleanup, existing guest cache and active maintenance; record actual results.
+- [ ] Execute genuine matching product/barcode/three-photo/Muse/device/OTP flow. **Explicitly deferred by owner; no live call performed.**
+- [ ] Review exact processed evidence with real operator CLI approval, owner same-key publication and guest reuse without extra Muse. **Deferred; no real candidate approved.**
+- [x] Record deployed revisions, tests, limitations and release decision. T07.2 preparation is permitted; a genuine new-flow demo/submission sign-off is not claimed. Do not begin automatically.
+
+**Next dependency:** Matching real evidence and honest operator/device verification before claiming the complete current real-product demo. No admin dashboard, automatic approval, fourth photo, billing or UI polish scope.
 
 ## T07.2 — Hackathon submission handoff
 
