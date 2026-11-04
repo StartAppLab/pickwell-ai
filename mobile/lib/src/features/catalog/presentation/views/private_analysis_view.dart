@@ -1,5 +1,3 @@
-import '../widgets/quota_status.dart';
-import '../../domain/entities/quota_snapshot.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -11,6 +9,7 @@ import '../../domain/entities/pending_capture.dart';
 import '../../domain/use_cases/analyze_product_use_case.dart';
 import '../blocs/catalog/label_capture_cubit.dart';
 import '../widgets/product_result_content.dart';
+import '../widgets/product_section.dart';
 import '../widgets/product_detail_scaffold.dart';
 
 /// Owner-only preliminary analysis. Never enters CatalogCubit or public recents.
@@ -183,16 +182,9 @@ class _PrivateAnalysisViewState extends State<PrivateAnalysisView> {
                         errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported_outlined),
                       ),
                     ),
-              statusNotice: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              footerNotice: ProductSection(
+                title: l.pkPrivateReady,
                 children: [
-                  QuotaStatus(
-                    snapshot: result?.quota,
-                    session: widget.session,
-                    metric: QuotaMetric.aiAnalysis,
-                    loadedResult: true,
-                  ),
-                  Text(l.pkPrivateReady, style: context.textTheme.titleSmall),
                   Text(
                     result?.phase == AnalysisPhase.ready || result?.publicationStatus == 'published'
                         ? l.pkPrivatePublished

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../lib/src/features/catalog/presentation/widgets/quota_status.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../../lib/src/config/app_session.dart';
 import '../../lib/src/features/catalog/domain/_domain.dart';
@@ -129,12 +130,21 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(find.text('Product overview'), findsOneWidget);
+      expect(find.byType(QuotaStatus), findsNothing);
+      expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
+      expect(find.text('Check shared publication').hitTestable(), findsNothing);
+      await tester.scrollUntilVisible(
+        find.text('Analysis ready'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Analysis ready'), findsOneWidget);
       expect(
         find.text("This product hasn't been approved for the shared catalog yet."),
         findsOneWidget,
       );
-      expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
+      expect(find.byType(QuotaStatus), findsNothing);
       expect(find.byType(BottomNavigationBar), findsNothing);
       expect(tester.takeException(), null);
       session.switchTo(null);
@@ -162,13 +172,30 @@ void main() {
     );
     await tester.pumpAndSettle();
     fake.transportError = true;
-    await tester.ensureVisible(find.text('Check shared publication'));
+    await tester.scrollUntilVisible(
+      find.text('Check shared publication'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Check shared publication')),
+      alignment: .5,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Check shared publication'));
     await tester.pumpAndSettle();
-    await tester.drag(find.byType(ListView), const Offset(0, 1200));
+    await tester.scrollUntilVisible(
+      find.text('SYNTHETIC WIDGET FIXTURE'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Analysis ready'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Analysis ready'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await draft.close();

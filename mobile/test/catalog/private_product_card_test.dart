@@ -339,7 +339,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(CatalogWidget), findsOneWidget);
       expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
-      expect(find.text('Private analysis'), findsOneWidget);
+      expect(find.text('Private analysis'), findsNothing);
       expect(find.text('View analysis'), findsNothing);
       expect(find.text('Delete saved draft'), findsNothing);
       expect(find.text(item.barcode), findsNothing);

@@ -263,3 +263,12 @@ shared `MaterialAppBar`, whose fixed leading slot crowded the back button. Keep
 16dp horizontal control insets and 8dp vertical breathing room around a minimum
 48dp back target. Match the overflow inset to the page gutter. Preserve the
 edge fades, scroll-under clearance and transparent system bars.
+
+### 2026-11-05 — Keep private-result presentation focused on the product
+
+Completed owner-only Home cards omit the lock/“Private analysis” badge; keep
+loading, expired-result and recovery messages when relevant. In owner-private
+Details, hide the analysis-allowance panel and place the preliminary-result,
+retention and shared-publication notice/actions in a final rounded section after
+the product facts and analysis metadata. Owner scoping, private expiry, quota
+accounting and operator approval remain unchanged; this is presentation only.

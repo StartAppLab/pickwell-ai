@@ -11,12 +11,13 @@ import 'interpretation_explanation.dart';
 class ProductResultContent extends StatelessWidget {
   final ProductRecord product;
   final bool recentSaved;
-  final Widget? statusNotice, privateThumbnail;
+  final Widget? statusNotice, footerNotice, privateThumbnail;
   const ProductResultContent({
     super.key,
     required this.product,
     this.recentSaved = true,
     this.statusNotice,
+    this.footerNotice,
     this.privateThumbnail,
   });
   @override
@@ -153,6 +154,7 @@ class ProductResultContent extends StatelessWidget {
                   ],
                 ],
               ),
+              if (footerNotice != null) ...[Gap(d.spacingLg), footerNotice!],
               Gap(d.spacingLg),
             ],
           ),
