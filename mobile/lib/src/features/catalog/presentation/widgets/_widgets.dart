@@ -15,3 +15,8 @@ export 'barcode_scan_overlay.dart';
 export 'barcode_lookup_loading.dart';
 export 'barcode_scanner_page.dart';
 export 'scanner_circle_button.dart';
+export 'capture_page_scaffold.dart';
+export 'capture_step_timeline.dart';
+export 'capture_photo_preview.dart';
+export 'capture_analysis_loading.dart';
+export 'product_not_found_content.dart';

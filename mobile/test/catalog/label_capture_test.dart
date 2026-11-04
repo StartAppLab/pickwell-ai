@@ -319,7 +319,7 @@ void main() {
   );
 
   testWidgets(
-    'three-step wizard previews/retakes and preserves draft across replaced OTP handoff route',
+    'not-found entry and four-step wizard preserve draft across replaced OTP handoff route',
     (tester) async {
       final dir = await tester.runAsync(() => Directory.systemTemp.createTemp('capture_widget_'));
       final file = (await tester.runAsync(() => pngFixture(dir!)))!;
@@ -358,23 +358,24 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Barcode ✓'), findsOneWidget);
-      expect(find.text('Step 2 · Nutrition'), findsOneWidget);
-      expect(find.text('Step 3 · Ingredients'), findsOneWidget);
-      expect(find.text('Step 1 · Front'), findsOneWidget);
-      await tester.tap(find.text('Take photo: Front packaging'));
+      expect(find.text('Product not found'), findsOneWidget);
+      await tester.tap(find.text('Add this product'));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Take photo: Nutrition'), 180);
-      await tester.tap(find.text('Take photo: Nutrition'));
+      expect(find.byKey(const ValueKey('capture-step-0')), findsOneWidget);
+      expect(find.byKey(const ValueKey('capture-step-3')), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('capture-photo-action')));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Take photo: Ingredients'), 180);
-      await tester.tap(find.text('Take photo: Ingredients'));
+      expect(find.text('Take a photo of the nutrition facts'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('capture-photo-action')));
+      await tester.pumpAndSettle();
+      expect(find.text('Take a photo of the ingredients'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('capture-photo-action')));
       await tester.pumpAndSettle();
       expect(cubit.state.ready, true);
-      await tester.scrollUntilVisible(find.text('Retake photo: Nutrition'), -120);
-      expect(find.text('Retake photo: Nutrition'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Retake photo: Ingredients'), 120);
-      expect(find.text('Retake photo: Ingredients'), findsOneWidget);
+      expect(find.text('Review photos'), findsOneWidget);
+      expect(find.byTooltip('Retake photo: Nutrition'), findsOneWidget);
+      await tester.scrollUntilVisible(find.byTooltip('Retake photo: Ingredients'), 120);
+      expect(find.byTooltip('Retake photo: Ingredients'), findsOneWidget);
       final front = cubit.state.front,
           nutrition = cubit.state.nutrition,
           ingredients = cubit.state.ingredients;

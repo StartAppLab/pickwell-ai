@@ -1,8 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
 import '../../domain/entities/label_photo.dart';
+import 'capture_photo_preview.dart';
+import 'package:hugeicons/hugeicons.dart';
+import '../../../app/app.dart';
 
 class LabelPhotoCard extends StatelessWidget {
   final LabelKind kind;
@@ -26,27 +28,49 @@ class LabelPhotoCard extends StatelessWidget {
       LabelKind.ingredients => l.pkIngredients,
     };
     return Card(
+      elevation: 0,
+      color: context.colorScheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(d.cardCornerRadius),
+        side: BorderSide(color: context.colorScheme.outlineVariant),
+      ),
       margin: EdgeInsets.only(bottom: d.spacingSm),
       child: Padding(
         padding: EdgeInsets.all(d.paddingMd),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(title, style: context.textTheme.titleMedium),
-            Gap(d.spacingSm),
-            Image.file(
-              File(photo.path),
-              height: 180,
-              fit: BoxFit.contain,
-              cacheWidth: 600,
-              semanticLabel: title,
-              errorBuilder: (_, _, _) => Text(l.pkCapturePreviewMissing),
+            SizedBox(
+              width: 80,
+              height: 96,
+              child: CapturePhotoPreview(photo: photo, label: title, compact: true),
             ),
-            Gap(d.spacingSm),
-            TextButton.icon(
-              onPressed: busy ? null : onRetake,
-              icon: const Icon(Icons.camera_alt_outlined),
-              label: Text('${l.pkRetake}: $title'),
+            Gap(d.spacingMd),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  Gap(d.spacingXxs),
+                  Tooltip(
+                    message: '${l.pkRetake}: $title',
+                    child: TextButton.icon(
+                      onPressed: busy ? null : onRetake,
+                      icon: const AppIcon(icon: HugeIcons.strokeRoundedCamera01),
+                      label: Text(l.pkRetake),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gap(d.spacingXs),
+            Icon(
+              Icons.check_circle_rounded,
+              color: context.colorScheme.secondary,
+              semanticLabel: l.pkCapturePhotoCaptured,
             ),
           ],
         ),

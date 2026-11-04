@@ -1137,4 +1137,56 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pkRemoveLocalAnalysis => 'Remove from this device';
+
+  @override
+  String get pkProductNotFoundTitle => 'Product not found';
+
+  @override
+  String get pkProductNotFoundBody =>
+      'This product isn’t in Pickwell yet. Help us understand its label by adding photos.';
+
+  @override
+  String get pkAddProduct => 'Add this product';
+
+  @override
+  String get pkScanAnother => 'Scan another';
+
+  @override
+  String get pkAddProductTitle => 'Add product';
+
+  @override
+  String get pkCaptureFrontTitle => 'Take a photo of the front packaging';
+
+  @override
+  String get pkCaptureNutritionTitle => 'Take a photo of the nutrition facts';
+
+  @override
+  String get pkCaptureIngredientsTitle => 'Take a photo of the ingredients';
+
+  @override
+  String get pkCaptureReviewTitle => 'Review photos';
+
+  @override
+  String get pkCaptureReviewStep => 'Review';
+
+  @override
+  String get pkCaptureEmptyPhoto => 'No photo yet';
+
+  @override
+  String get pkCapturePhotoCaptured => 'Photo captured';
+
+  @override
+  String get pkCaptureFrontFirst => 'Take the front packaging photo first.';
+
+  @override
+  String get pkCaptureNutritionFirst => 'Take the nutrition photo first.';
+
+  @override
+  String get pkCapturePhotoPrivacy => 'About your photos';
+
+  @override
+  String get pkAnalysisLoadingTitle => 'Analyzing your product…';
+
+  @override
+  String get pkAnalysisLoadingBody => 'Reading the packaging, nutrition and ingredients.';
 }

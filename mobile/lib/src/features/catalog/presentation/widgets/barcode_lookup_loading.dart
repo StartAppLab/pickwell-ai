@@ -7,7 +7,16 @@ import '../../../app/app.dart';
 
 /// Indeterminate lookup feedback only: no artificial delay or claimed percentage.
 class BarcodeLookupLoading extends StatefulWidget {
-  const BarcodeLookupLoading({super.key});
+  final String? title, description;
+  final dynamic icon;
+  final bool showSweep;
+  const BarcodeLookupLoading({
+    super.key,
+    this.title,
+    this.description,
+    this.icon = HugeIcons.strokeRoundedBarcodeScan,
+    this.showSweep = true,
+  });
   @override
   State<BarcodeLookupLoading> createState() => _BarcodeLookupLoadingState();
 }
@@ -23,7 +32,7 @@ class _BarcodeLookupLoadingState extends State<BarcodeLookupLoading>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _reducedMotion = MediaQuery.disableAnimationsOf(context);
-    if (_reducedMotion) {
+    if (_reducedMotion || !widget.showSweep) {
       _sweep.stop();
       _sweep.value = .5;
     } else if (!_sweep.isAnimating) {
@@ -71,24 +80,25 @@ class _BarcodeLookupLoadingState extends State<BarcodeLookupLoading>
                           alignment: Alignment.center,
                           children: [
                             AppIcon(
-                              icon: HugeIcons.strokeRoundedBarcodeScan,
+                              icon: widget.icon,
                               size: illustration * .58,
                               color: colors.primary,
                             ),
-                            AnimatedBuilder(
-                              animation: _sweep,
-                              builder: (context, _) => Align(
-                                alignment: Alignment(0, -.4 + _sweep.value * .8),
-                                child: Container(
-                                  width: illustration * .62,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: colors.tertiaryContainer,
-                                    borderRadius: BorderRadius.circular(d.nestedCornerRadius),
+                            if (widget.showSweep)
+                              AnimatedBuilder(
+                                animation: _sweep,
+                                builder: (context, _) => Align(
+                                  alignment: Alignment(0, -.4 + _sweep.value * .8),
+                                  child: Container(
+                                    width: illustration * .62,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                      color: colors.tertiaryContainer,
+                                      borderRadius: BorderRadius.circular(d.nestedCornerRadius),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -97,7 +107,7 @@ class _BarcodeLookupLoadingState extends State<BarcodeLookupLoading>
                     Semantics(
                       liveRegion: true,
                       child: Text(
-                        context.l10n.pkChecking,
+                        widget.title ?? context.l10n.pkChecking,
                         textAlign: TextAlign.center,
                         style: context.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w700,
@@ -105,6 +115,17 @@ class _BarcodeLookupLoadingState extends State<BarcodeLookupLoading>
                         ),
                       ),
                     ),
+                    if (widget.description != null) ...[
+                      Gap(d.spacingSm),
+                      Text(
+                        widget.description!,
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.bodyLarge?.copyWith(
+                          height: 1.5,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                     Gap(d.spacingLg),
                     ExcludeSemantics(
                       child: TickerMode(

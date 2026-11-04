@@ -965,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkNutritionHint.
   ///
   /// In en, this message translates to:
-  /// **'Capture the complete nutrition panel with serving size and units, then the ingredients and allergen statement.'**
+  /// **'Capture the complete nutrition panel clearly, including serving size, values and units.'**
   String get pkNutritionHint;
 
   /// No description provided for @pkCapture.
@@ -1163,7 +1163,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCaptureReviewHint.
   ///
   /// In en, this message translates to:
-  /// **'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.'**
+  /// **'Make sure all three photos are clear and readable. Retake any photo without losing the others.'**
   String get pkCaptureReviewHint;
 
   /// No description provided for @pkCaptureSubmissionPending.
@@ -1175,7 +1175,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkDiscardPhotos.
   ///
   /// In en, this message translates to:
-  /// **'Discard both photos'**
+  /// **'Discard photos'**
   String get pkDiscardPhotos;
 
   /// No description provided for @pkAnalyzeProduct.
@@ -2137,6 +2137,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove from this device'**
   String get pkRemoveLocalAnalysis;
+
+  /// No description provided for @pkProductNotFoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found'**
+  String get pkProductNotFoundTitle;
+
+  /// No description provided for @pkProductNotFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This product isn’t in Pickwell yet. Help us understand its label by adding photos.'**
+  String get pkProductNotFoundBody;
+
+  /// No description provided for @pkAddProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Add this product'**
+  String get pkAddProduct;
+
+  /// No description provided for @pkScanAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan another'**
+  String get pkScanAnother;
+
+  /// No description provided for @pkAddProductTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add product'**
+  String get pkAddProductTitle;
+
+  /// No description provided for @pkCaptureFrontTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of the front packaging'**
+  String get pkCaptureFrontTitle;
+
+  /// No description provided for @pkCaptureNutritionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of the nutrition facts'**
+  String get pkCaptureNutritionTitle;
+
+  /// No description provided for @pkCaptureIngredientsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of the ingredients'**
+  String get pkCaptureIngredientsTitle;
+
+  /// No description provided for @pkCaptureReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review photos'**
+  String get pkCaptureReviewTitle;
+
+  /// No description provided for @pkCaptureReviewStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get pkCaptureReviewStep;
+
+  /// No description provided for @pkCaptureEmptyPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo yet'**
+  String get pkCaptureEmptyPhoto;
+
+  /// No description provided for @pkCapturePhotoCaptured.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo captured'**
+  String get pkCapturePhotoCaptured;
+
+  /// No description provided for @pkCaptureFrontFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the front packaging photo first.'**
+  String get pkCaptureFrontFirst;
+
+  /// No description provided for @pkCaptureNutritionFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the nutrition photo first.'**
+  String get pkCaptureNutritionFirst;
+
+  /// No description provided for @pkCapturePhotoPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'About your photos'**
+  String get pkCapturePhotoPrivacy;
+
+  /// No description provided for @pkAnalysisLoadingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing your product…'**
+  String get pkAnalysisLoadingTitle;
+
+  /// No description provided for @pkAnalysisLoadingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading the packaging, nutrition and ingredients.'**
+  String get pkAnalysisLoadingBody;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
