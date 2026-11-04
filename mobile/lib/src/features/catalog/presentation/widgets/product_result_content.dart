@@ -63,6 +63,14 @@ class ProductResultContent extends StatelessWidget {
                     children: [
                       Text(p.name ?? l.pkFoodProduct, style: context.textTheme.headlineSmall),
                       if (p.brand?.trim().isNotEmpty == true) Text(p.brand!),
+                      if (p.provenance['identity'] case final Map identity) ...[
+                        if (identity['front'] case final Map front) ...[
+                          if (front['variant'] case final String variant)
+                            Text('${l.pkVariant}: $variant'),
+                          if (front['net_quantity'] case final String quantity)
+                            Text('${l.pkNetQuantity}: $quantity'),
+                        ],
+                      ],
                       SelectableText(p.barcode, style: context.textTheme.bodySmall),
                     ],
                   ),
@@ -78,6 +86,8 @@ class ProductResultContent extends StatelessWidget {
               title: l.pkOverview,
               children: [
                 Text(p.summary),
+                if (p.provenance['identity'] is Map)
+                  Text(l.pkIdentityUnverified, style: context.textTheme.bodySmall),
                 Text(l.pkCaveat, style: context.textTheme.bodySmall),
                 if (hasInterpretation)
                   Text(l.pkTranscriptionCaveat, style: context.textTheme.bodySmall),

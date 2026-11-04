@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {createServer} from 'node:http';
 import {deflateSync} from 'node:zlib';
 import {createAnalyzeProductHandler} from '../functions/_shared/analyze_product.mjs';
-import {labelFixture} from './fixtures/label_analysis.mjs';
+import {frontLabelFixture as labelFixture} from './fixtures/label_analysis.mjs';
 import {createGetProductHandler} from '../functions/_shared/get_product.mjs';
 import {META_URL} from '../spikes/meta-vision/core.mjs';
 import {INGREDIENT_REFERENCES,NUTRITION_TOPICS,emptyInterpretationPlan,refreshInterpretationRecord} from '../functions/_shared/interpretation.mjs';
@@ -16,7 +16,7 @@ function png(color=0,width=1){
  return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',header),chunk('IDAT',deflateSync(pixels)),chunk('IEND',Buffer.alloc(0))]);
 }
 function form(barcode,key=crypto.randomUUID(),overrides={}){
- const f=new FormData();f.set('barcode',barcode);f.set('idempotency_key',key);
+ const f=new FormData();f.set('front_image',new Blob([png(30)],{type:'image/png'}),'front.png');f.set('barcode',barcode);f.set('idempotency_key',key);
  f.set('nutrition_image',new Blob([png(10)],{type:'image/jpeg'}),'misleading.jpg');
  f.set('ingredients_image',new Blob([png(20)],{type:'image/png'}),'ingredients.png');
  for(const [k,v]of Object.entries(overrides))f.set(k,v);return f;
@@ -55,7 +55,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   if(url===META_URL){
    providerCalls++;assert.equal(options.redirect,'error');assert.ok(options.signal);
    assert.equal(options.headers.Authorization,'Bearer fixture-no-real-provider');
-   const p=JSON.parse(options.body);assert.equal(p.messages[1].content.filter(v=>v.type==='image_url').length,2);
+   const p=JSON.parse(options.body);assert.equal(p.messages[1].content.filter(v=>v.type==='image_url').length,3);
    assert.equal(p.max_completion_tokens,4096);assert.equal(p.store,false);
    if(behavior==='timeout')throw new DOMException('PRIVATE upstream','TimeoutError');
    if(behavior==='fail')return new Response('PRIVATE upstream',{status:429});
@@ -153,7 +153,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const jobs=await rest(`analysis_jobs?barcode=eq.${barcode.padStart(14,'0')}`);assert.equal(jobs.length,1);
    assert.equal((await rest(`products?barcode=eq.${barcode.padStart(14,'0')}`)).length,0,'No premature publication');
    const stored=await rest('analysis_candidates?job_id=eq.'+jobs[0].id);assert.equal(stored.length,1);
-   assert.equal(stored[0].candidate.validation.status,'validated');assert.equal(stored[0].prompt_version,'label-analysis-v2');
+   assert.equal(stored[0].candidate.validation.status,'validated');assert.equal(stored[0].prompt_version,'label-analysis-v3');
    assert.equal(stored[0].candidate.validation.provenance.rules_version,'uk-fop-2016-conservative-v1');
    await cleanup(owner,keys[winner]);
    const shared=await submit(winner%2?alice:bob,barcode,keys[winner%2?0:1]);assert.equal(shared.body.status,'analysis_failed');
@@ -266,7 +266,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const quotaBefore=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
    snapshotDown=true;const output=await submit(alice,barcode,key);snapshotDown=false;assert.equal(output.http,200);assert.equal(output.body.status,'ready');assert.equal(output.body.quota_unavailable,true);
    const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(product.findings.length,4);
-   assert.equal(product.explanations.length,2);assert.equal(product.provenance.prompt_version,'label-analysis-v2');
+   assert.equal(product.explanations.length,0);assert.equal(product.provenance.prompt_version,'label-analysis-v3');
    assert.ok(product.findings.every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
    assert.equal(providerCalls-before,1);
    assert.equal((await rest('analysis_candidates')).length,0);
@@ -279,7 +279,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const lookup=createGetProductHandler(env,fetcher),request=()=>new Request('http://127.0.0.1/get-product',{
     method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})});
    for(let n=0;n<2;n++){const response=await lookup(request());assert.equal(response.status,200);const body=await response.json();
-    assert.equal(body.status,'ready');assert.equal(body.product.id,product.id);assert.equal(body.product.explanations.length,2);
+    assert.equal(body.status,'ready');assert.equal(body.product.id,product.id);assert.equal(body.product.explanations.length,0);
     assert.ok(!/contributor_id|user_id|email|data:image|input_digest|refresh_token/.test(JSON.stringify(body.product)));}
    const retries=await Promise.all(Array.from({length:12},()=>submit(alice,barcode,key)));
    assert.ok(retries.every(r=>r.body.status==='already_exists'));assert.equal(providerCalls-before,1);

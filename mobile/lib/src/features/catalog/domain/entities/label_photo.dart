@@ -1,4 +1,4 @@
-enum LabelKind { nutrition, ingredients }
+enum LabelKind { front, nutrition, ingredients }
 
 // App-private working photo. Only the expiring pending draft may persist a copy;
 // never store this in published recents or account/cloud history.

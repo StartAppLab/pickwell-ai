@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {validateAnalysis,RULES_VERSION,analysisProfile} from '../functions/_shared/analysis_validation.mjs';
 import {invokeMetaLabels,META_URL} from '../spikes/meta-vision/core.mjs';
-import {labelFixture} from './fixtures/label_analysis.mjs';
+import {labelFixture,frontLabelFixture} from './fixtures/label_analysis.mjs';
 const validate=c=>validateAnalysis(c,{model:'fixture:mock',now:'2026-11-03T00:00:00Z'});
 const retake=(c,photo)=>{const r=validate(c);assert.equal(r.status,'needs_retake');assert.ok(r.retake.includes(photo));assert.equal(r.findings,undefined);};
 const change=(c,name,value,unit='g')=>{const v=c.nutrition.nutrients.find(v=>v.name===name),old=v.source;
@@ -83,12 +83,12 @@ test('unsupported model claims or invented numbers are omitted, never determine 
  {photo:'nutrition',source:'Total Fat 3 g',text:'Zero calories.'}];
  const r=validate(c);assert.equal(r.explanations.length,0);assert.equal(r.findings.length,4);
 });
-test('v2 adapter uses the approved endpoint and one bounded two-image request',async()=>{
- let calls=0;const c=labelFixture(),metadata={};
+test('v3 adapter uses the approved endpoint and one bounded three-image request',async()=>{
+ let calls=0;const c=frontLabelFixture(),metadata={};
  const r=await invokeMetaLabels({META_API_KEY:'mock-only',META_MODEL:'muse-spark-1.3'},
- {nutrition_image:'private nutrition',ingredients_image:'private ingredients'},metadata,async(url,options)=>{
- calls++;assert.equal(url,META_URL);const body=JSON.parse(options.body);assert.equal(body.response_format.json_schema.name,'label_analysis_v2');
- assert.equal(body.messages[1].content.filter(v=>v.type==='image_url').length,2);assert.equal(body.max_completion_tokens,4096);
+ {front_image:'private front',nutrition_image:'private nutrition',ingredients_image:'private ingredients'},metadata,async(url,options)=>{
+ calls++;assert.equal(url,META_URL);const body=JSON.parse(options.body);assert.equal(body.response_format.json_schema.name,'label_analysis_v3');
+ assert.equal(body.messages[1].content.filter(v=>v.type==='image_url').length,3);assert.equal(body.max_completion_tokens,4096);
  assert.ok(body.messages[0].content.includes('must proceed'));
  assert.ok(!body.messages[0].content.includes('Use null/unknown and needs_retake for unreadable/mismatched labels.'));
  assert.ok(body.response_format.json_schema.schema.properties.retake_reasons);

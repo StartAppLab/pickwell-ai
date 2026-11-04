@@ -1091,7 +1091,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCaptureStepBarcode.
   ///
   /// In en, this message translates to:
-  /// **'Step 1 · Barcode ✓'**
+  /// **'Barcode ✓'**
   String get pkCaptureStepBarcode;
 
   /// No description provided for @pkCaptureStepNutrition.
@@ -1139,7 +1139,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCaptureExpired.
   ///
   /// In en, this message translates to:
-  /// **'Your capture draft expired. Please capture both labels again.'**
+  /// **'Your capture draft expired. Please capture the front and both labels again.'**
   String get pkCaptureExpired;
 
   /// No description provided for @pkCaptureCleanupError.
@@ -1163,7 +1163,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCaptureReviewHint.
   ///
   /// In en, this message translates to:
-  /// **'Check that both labels are readable. You can retake either photo without losing the other.'**
+  /// **'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.'**
   String get pkCaptureReviewHint;
 
   /// No description provided for @pkCaptureSubmissionPending.
@@ -1271,7 +1271,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkAnalysisSubmitHint.
   ///
   /// In en, this message translates to:
-  /// **'Both label photos will be sent securely for analysis. Sign in only when you submit.'**
+  /// **'All three photos will be sent securely for analysis. Sign in only when you submit.'**
   String get pkAnalysisSubmitHint;
 
   /// No description provided for @pkAnalysisAuthenticating.
@@ -1975,6 +1975,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear search'**
   String get pkClearSearch;
+
+  /// No description provided for @pkFrontPackaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Front packaging'**
+  String get pkFrontPackaging;
+
+  /// No description provided for @pkFrontPackagingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture the front of this package with its name, brand, variant and net quantity visible.'**
+  String get pkFrontPackagingHint;
+
+  /// No description provided for @pkCaptureStepFront.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1 · Front'**
+  String get pkCaptureStepFront;
+
+  /// No description provided for @pkIdentityUnverified.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode ownership has not been independently verified. Identity is read from the submitted packaging.'**
+  String get pkIdentityUnverified;
+
+  /// No description provided for @pkVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant'**
+  String get pkVariant;
+
+  /// No description provided for @pkNetQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Net quantity'**
+  String get pkNetQuantity;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

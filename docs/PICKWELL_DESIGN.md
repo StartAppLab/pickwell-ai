@@ -1,12 +1,14 @@
 # PICKWELL AI V2 — DESIGN SPECIFICATION
 
 **File:** `PICKWELL_DESIGN.md`  
-**Version:** 1.3 — Preserved UI and planned trust presentation\
+**Version:** 1.4 — Preserved UI and planned trust presentation\
 **Date:** November 4, 2026\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework / DESIGN  
 **Status:** Final visual direction approved through iterative reference mockups; platform fidelity and real product-photo sources remain implementation checks.  
-**Source of truth:** `PICKWELL_PRD.md` v1.5. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
+**Source of truth:** `PICKWELL_PRD.md` v1.6. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
+
+> **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
 ## 1. Design goals and scope boundaries
 
@@ -14,7 +16,7 @@ Pickwell is a premium-feeling yet approachable product label intelligence app. A
 
 **Approved mockup patterns:** home with product cards and real photos; no permanently expanded search, no recently scanned section heading, no list/grid switch; product details without bottom tab bar or center-logo title; camera-first barcode/label capture; compact OTP, failure/retake, quota, search, settings and empty states.
 
-**Important:** Images are design references, not reliable product data. Several concepts showed Chat, cosmetics, a 92/100 score or Add to List—these are **not** approved hackathon functions. Do not ship dead-end or misleading controls. No user-scanned front/package product photo is currently required in the approved 3-step flow; image thumbnail must be legitimately available, or use an attractive neutral placeholder. Food-only active category in hackathon; cosmetics is visually explored for V2 later.
+**Important:** Images are design references, not reliable product data. Several concepts showed Chat, cosmetics, a 92/100 score or Add to List—these are **not** approved hackathon functions. Do not ship dead-end or misleading controls. T07.1C.1 now requires a transient front-package photo for unknown barcodes; it must not be reused as permanent thumbnail art; image thumbnail must be legitimately available, or use an attractive neutral placeholder. Food-only active category in hackathon; cosmetics is visually explored for V2 later.
 
 ## 2. Visual system — 60/30/10
 
@@ -49,7 +51,7 @@ App launch
        ├─ Settings → account, usage, privacy, sign-out
        └─ Separate rightmost Scan action → camera barcode scanner
              ├─ ready → Product Details; append local recent reference
-             ├─ not_found → Product Not Found → Nutrition capture → Ingredients capture
+             ├─ not_found → Product Not Found → Front packaging → Nutrition capture → Ingredients capture
              │    → Review Photos → OTP if guest → AI Processing
              │    → Product Details OR needs_retake / failure
              ├─ processing → bounded status / retry
@@ -69,6 +71,7 @@ App launch
 | B01 | Barcode camera | P0 | Real camera, scanning corners, torch and cancel |
 | B02 | Lookup loading / found | P0 | No invented fake progress; cached ready goes to details |
 | B03 | Product Not Found | P0 | Show barcode and Add This Product |
+| C00 | Front packaging capture | P0 | First required photo; visible identity, nullable observations, preview/retake |
 | C01 | Nutrition photo capture | P0 | Actual camera, capture/preview/retake |
 | C02 | Ingredients photo capture | P0 | Actual camera, capture/preview/retake |
 | C03 | Review captured labels | P0 | Check photo clarity, can retake one, submit |
@@ -102,10 +105,11 @@ App launch
 
 ## 7. C01–C03 Guided capture and review
 
-- Fixed three-step **Barcode ✓ → Nutrition → Ingredients**. Photo review is confirmation after step 3, **not a new numbered fourth step**.
+- Barcode is complete before capture. Fixed three-photo progress: **Step 1 Front → Step 2 Nutrition → Step 3 Ingredients**. Review confirms step 3; it is not a fourth photo step.
+- Front: capture the package front with visible name, brand, variant and net quantity. Unknown text may stay unknown; the photo is mandatory, a readable name is not.
 - Nutrition: capture full readable nutrition panel with units, servings and serving size. Ingredients: capture entire ordered ingredient text and allergen statements. Distinct brief guidance and same camera components.
 - Large genuine camera preview, legibility corner brackets, optional gallery import, retake and Use Photo. Avoid giant decorative illustrations in the camera stage.
-- Review: two thumbnail cards labeled Nutrition Facts and Ingredients, clear edit/retake per photo, optional Name and Brand fields if accurate/desired, primary `Analyze Product` at bottom. This primary action triggers OTP for a guest, preserving all captures.
+- Review: three thumbnail cards labeled Front packaging, Nutrition and Ingredients, clear edit/retake per photo, optional Name and Brand fields if accurate/desired, primary `Analyze Product` at bottom. This primary action triggers OTP for a guest, preserving all captures.
 
 ## 8. A01–A02 OTP
 
@@ -177,3 +181,10 @@ CKD-related copy supports educational label awareness for Filipinos. It must not
 Processing photos (including future front-package evidence) remain transient, never permanent card art. Existing private pending drafts remain bounded for recovery; successful processing clears them. UI provenance may expose minimal safe evidence descriptions/revision dates, never contributor emails, private tokens or image payloads. T06.3 remains deferred and billing disabled.
 
 **v1.3:** Roadmap presentation boundaries and current approved Home reconciled; no new UI implemented or mockup/device verification claimed.
+
+
+## 15. T07.1C.1 presentation and remaining trust gap
+
+Reuse the existing capture screen, camera adapter, independent previews/retakes, saved-draft recovery and contextual OTP; no unrelated UI polish. A legacy two-photo draft keeps its labels and requests the missing front. Front-specific failures identify the affected image; clear pair conflicts preserve the other photo. Missing/unreadable names do not by themselves force a retake. Results show front-observed name/brand, variant/net quantity when available, and a color-independent statement that barcode ownership has not been independently verified. Known cached records without identity metadata remain readable. No front image becomes product art; placeholders stay honest. The full T07.1C operator gate remains pending.
+
+**v1.4:** Mandatory front capture supersedes section 14's earlier prohibition on a required front step. Future T08.3 enhances verification of the three-photo evidence; it does not introduce this already-approved capture requirement anew. No independent identity verification or fresh device sign-off claimed.

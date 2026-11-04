@@ -535,7 +535,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -562,7 +562,8 @@ class AppLocalizationsJa extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -577,7 +578,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -638,7 +639,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1050,4 +1051,22 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pkClearSearch => '検索をクリア';
+
+  @override
+  String get pkFrontPackaging => 'パッケージ前面';
+
+  @override
+  String get pkFrontPackagingHint => '商品名、ブランド、種類、内容量が見えるようにパッケージの前面を撮影してください。';
+
+  @override
+  String get pkCaptureStepFront => '手順1 · 前面';
+
+  @override
+  String get pkIdentityUnverified => 'バーコードとの対応は独立に確認されていません。商品情報は送信されたパッケージから読み取られています。';
+
+  @override
+  String get pkVariant => '種類';
+
+  @override
+  String get pkNetQuantity => '内容量';
 }

@@ -68,7 +68,15 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
       if (session == null) return {'status': 'auth_required'};
     }
     final owner = session.user.id;
-    Uint8List nutrition, ingredients;
+    Uint8List front, nutrition, ingredients;
+    try {
+      front = await _bytes(request.front).timeout(const Duration(seconds: 10));
+    } catch (_) {
+      return {
+        'status': 'needs_retake',
+        'retake': ['front'],
+      };
+    }
     try {
       nutrition = await _bytes(request.nutrition).timeout(const Duration(seconds: 10));
     } catch (_) {
@@ -105,6 +113,7 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
               'idempotency_key': request.requestId,
             },
             files: [
+              MultipartFile.fromBytes('front_image', front, filename: 'front'),
               MultipartFile.fromBytes('nutrition_image', nutrition, filename: 'nutrition'),
               MultipartFile.fromBytes('ingredients_image', ingredients, filename: 'ingredients'),
             ],

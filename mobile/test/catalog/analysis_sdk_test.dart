@@ -11,7 +11,7 @@ import 'label_capture_test.dart' show pngFixture;
 
 void main() {
   test(
-    'SDK submits binary two-file multipart only with user session, reuses key and parses safe failures',
+    'SDK submits binary three-file multipart only with user session, reuses key and parses safe failures',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       final url = 'http://127.0.0.1:${server.port}',
@@ -62,6 +62,7 @@ void main() {
         final request = AnalysisRequest(
           barcode: '00000096385074',
           requestId: 'stable-request',
+          front: photo(file.path),
           nutrition: photo(file.path),
           ingredients: LabelPhoto(
             path: other.path,
@@ -93,6 +94,7 @@ void main() {
         expect((await api.submit(request))['status'], 'processing');
         expect(calls.length, 2);
         for (final body in bodies) {
+          expect(body, contains('name="front_image"'));
           expect(body, contains('name="nutrition_image"'));
           expect(body, contains('name="ingredients_image"'));
           expect(body, contains('stable-request'));
@@ -105,6 +107,7 @@ void main() {
         status = 401;
         expect((await api.submit(request))['status'], 'auth_required');
         final invalid = AnalysisRequest(
+          front: request.front,
           barcode: request.barcode,
           requestId: request.requestId,
           nutrition: LabelPhoto(
@@ -119,6 +122,22 @@ void main() {
         );
         final before = calls.length;
         expect((await api.submit(invalid))['retake'], ['nutrition']);
+        expect(calls.length, before);
+        final missingFront = AnalysisRequest(
+          barcode: request.barcode,
+          requestId: request.requestId,
+          front: LabelPhoto(
+            path: 'missing-front',
+            mimeType: 'image/png',
+            byteLength: 100,
+            width: 16,
+            height: 16,
+            capturedAt: DateTime.now(),
+          ),
+          nutrition: request.nutrition,
+          ingredients: request.ingredients,
+        );
+        expect((await api.submit(missingFront))['retake'], ['front']);
         expect(calls.length, before);
         final off = SupabaseAnalysisApiService.withClient(config(url, enabled: false), sdk);
         expect((await off.submit(request))['status'], 'auth_required');
@@ -177,6 +196,7 @@ void main() {
         AnalysisRequest(
           barcode: '00000096385074',
           requestId: createCatalogRequestId(),
+          front: photo,
           nutrition: photo,
           ingredients: photo,
         ),

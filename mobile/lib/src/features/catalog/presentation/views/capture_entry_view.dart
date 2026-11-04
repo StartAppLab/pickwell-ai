@@ -40,7 +40,16 @@ class CaptureEntryView extends StatelessWidget {
                 state.busy ||
                 submission.busy ||
                 (submission.phase == AnalysisPhase.cleanupFailed && submission.barcode == barcode);
-            final next = state.nutrition == null ? LabelKind.nutrition : LabelKind.ingredients;
+            final next = state.front == null
+                ? LabelKind.front
+                : state.nutrition == null
+                ? LabelKind.nutrition
+                : LabelKind.ingredients;
+            final nextTitle = switch (next) {
+              LabelKind.front => l.pkFrontPackaging,
+              LabelKind.nutrition => l.pkNutrition,
+              LabelKind.ingredients => l.pkIngredients,
+            };
             final error = switch (state.error) {
               null => null,
               'image_size' => l.pkCaptureSizeError,
@@ -80,13 +89,17 @@ class CaptureEntryView extends StatelessWidget {
                     ],
                     if (draft.attempts >= 3) Text(l.pkAnalysisRetryLimit),
                     Gap(d.spacingLg),
+                    Text(l.pkCaptureStepBarcode),
+                    Gap(d.spacingSm),
                     Wrap(
                       spacing: d.spacingXs,
                       runSpacing: d.spacingXs,
                       children: [
                         Chip(
-                          avatar: const Icon(Icons.check_circle_outline, size: 18),
-                          label: Text(l.pkCaptureStepBarcode),
+                          backgroundColor: next == LabelKind.front && !state.ready
+                              ? context.colorScheme.primaryContainer
+                              : null,
+                          label: Text('${l.pkCaptureStepFront}${state.front != null ? ' ✓' : ''}'),
                         ),
                         Chip(
                           backgroundColor: next == LabelKind.nutrition && !state.ready
@@ -108,14 +121,27 @@ class CaptureEntryView extends StatelessWidget {
                     ),
                     Gap(d.spacingSm),
                     LinearProgressIndicator(
-                      value: (1 + state.count) / 3,
+                      value: state.count / 3,
                       semanticsLabel: l.pkCaptureProgress,
                     ),
                     Gap(d.spacingLg),
                     if (!state.ready) ...[
-                      Text(next == LabelKind.nutrition ? l.pkNutritionHint : l.pkIngredientsHint),
+                      Text(
+                        next == LabelKind.front
+                            ? l.pkFrontPackagingHint
+                            : next == LabelKind.nutrition
+                            ? l.pkNutritionHint
+                            : l.pkIngredientsHint,
+                      ),
                       Gap(d.spacingMd),
                     ],
+                    if (state.front case final photo?)
+                      LabelPhotoCard(
+                        kind: LabelKind.front,
+                        photo: photo,
+                        busy: busy,
+                        onRetake: () => draft.capture(LabelKind.front),
+                      ),
                     if (state.nutrition case final photo?)
                       LabelPhotoCard(
                         kind: LabelKind.nutrition,
@@ -141,9 +167,7 @@ class CaptureEntryView extends StatelessWidget {
                     if (!state.ready)
                       FilledButton(
                         onPressed: busy ? null : () => draft.capture(next),
-                        child: Text(
-                          '${l.pkCapture}: ${next == LabelKind.nutrition ? l.pkNutrition : l.pkIngredients}',
-                        ),
+                        child: Text('${l.pkCapture}: $nextTitle'),
                       ),
                     if (state.ready) ...[
                       Gap(d.spacingMd),

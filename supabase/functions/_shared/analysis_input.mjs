@@ -1,7 +1,7 @@
 import { normalizeBarcode } from './get_product.mjs';
 import { validateImage } from '../../spikes/meta-vision/core.mjs';
 export const IMAGE_BYTES = 5*1024*1024;
-export const BODY_BYTES = 2*IMAGE_BYTES+65536;
+export const BODY_BYTES = 3*IMAGE_BYTES+65536;
 export class AnalysisInputError extends Error {}
 const bad = () => { throw new AnalysisInputError('invalid_input'); };
 async function boundedBody(request) {
@@ -52,12 +52,12 @@ export async function readAnalysisInput(request){
  if(!type.toLowerCase().startsWith('multipart/form-data;'))bad();
  const bytes=await boundedBody(request);let form;
  try{form=await new Response(bytes,{headers:{'content-type':type}}).formData();}catch{bad();}
- if([...form.keys()].sort().join(',')!=='barcode,idempotency_key,ingredients_image,nutrition_image')bad();
+ if([...form.keys()].sort().join(',')!=='barcode,front_image,idempotency_key,ingredients_image,nutrition_image')bad();
  let barcode;try{barcode=normalizeBarcode(form.get('barcode'));}catch{bad();}
  const key=form.get('idempotency_key');if(typeof key!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key))bad();
  if(request.headers.has('idempotency-key')&&request.headers.get('idempotency-key')!==key)bad();
- const nutrition=await image(form.get('nutrition_image')),ingredients=await image(form.get('ingredients_image'));
- if(nutrition.digest===ingredients.digest)bad();
- return {barcode,key,digest:await hash(new TextEncoder().encode(`${barcode}|${nutrition.digest}|${ingredients.digest}`)),
-  images:{nutrition_image:nutrition.url,ingredients_image:ingredients.url}};
+ const front=await image(form.get('front_image')),nutrition=await image(form.get('nutrition_image')),ingredients=await image(form.get('ingredients_image'));
+ if(new Set([front.digest,nutrition.digest,ingredients.digest]).size!==3)bad();
+ return {barcode,key,digest:await hash(new TextEncoder().encode(`${barcode}|${front.digest}|${nutrition.digest}|${ingredients.digest}`)),
+  images:{front_image:front.url,nutrition_image:nutrition.url,ingredients_image:ingredients.url}};
 }

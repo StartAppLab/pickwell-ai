@@ -37,6 +37,34 @@ Widget host(Widget child, {bool dark = false, double scale = 1}) => MaterialApp(
 );
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('front identity observations show variant and quantity without a verification claim', (
+    tester,
+  ) async {
+    final p = resultFixture();
+    p.provenance['identity'] = {
+      'front': {'variant': 'Original', 'net_quantity': '500 g'},
+    };
+    p.provenance['identity_verification'] = 'unverified';
+    await tester.pumpWidget(host(Scaffold(body: ProductResultContent(product: p))));
+    await tester.pumpAndSettle();
+    expect(find.text('Variant: Original'), findsOneWidget);
+    expect(find.text('Net quantity: 500 g'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(
+        'Barcode ownership has not been independently verified. Identity is read from the submitted packaging.',
+      ),
+      100,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.text(
+        'Barcode ownership has not been independently verified. Identity is read from the submitted packaging.',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('reviewed ingredient explanations expand with sources, limitations and uncertainty', (
     tester,
   ) async {
@@ -338,6 +366,10 @@ void main() {
     final media = DraftMedia()..next = photo(file.path);
     final actual = LabelCaptureCubit(CaptureLabelUseCase(media));
     await actual.begin('96385074');
+    final previousPhoto = media.next;
+    media.next = photo('front');
+    await actual.capture(LabelKind.front);
+    media.next = previousPhoto;
     await actual.capture(LabelKind.nutrition);
     media.next = photo('${file.path}-separate-mock-reference');
     await actual.capture(LabelKind.ingredients);
@@ -398,7 +430,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(ProductResultContent), findsOneWidget);
     expect(actual.state.count, 0);
-    expect(media.deleted.length, 2);
+    expect(media.deleted.length, 3);
     expect(repo.requests.length, 1);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());

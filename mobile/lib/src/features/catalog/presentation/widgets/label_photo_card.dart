@@ -20,7 +20,11 @@ class LabelPhotoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l = context.l10n;
     final d = context.themeData.dimensionsData;
-    final title = kind == LabelKind.nutrition ? l.pkNutrition : l.pkIngredients;
+    final title = switch (kind) {
+      LabelKind.front => l.pkFrontPackaging,
+      LabelKind.nutrition => l.pkNutrition,
+      LabelKind.ingredients => l.pkIngredients,
+    };
     return Card(
       margin: EdgeInsets.only(bottom: d.spacingSm),
       child: Padding(

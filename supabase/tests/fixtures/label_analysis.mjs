@@ -11,3 +11,12 @@ export function labelFixture({basis='per_100g',fat=3,sugars=5,salt=0.3,portion='
   explanations:[{photo:'ingredients',source:'Oats',text:'The ingredient label states: Oats'},
    {photo:'nutrition',source:nutrients[0].source,text:`The nutrition label states: ${nutrients[0].source}`}]};
 }
+
+export function frontLabelFixture(options={}){
+ const c=labelFixture(options);
+ const observed=(product_name=null)=>({product_name,brand:null,variant:null,net_quantity:null});
+ c.identity={front:observed('Synthetic oats'),nutrition:observed(),ingredients:observed(),
+  consistency:'unknown',food_form:'solid',conflicts:[]};
+ c.interpretation={ingredients:[],nutrition:[],summary_ingredients:[],summary_nutrients:[]};
+ return c;
+}

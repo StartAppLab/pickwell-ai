@@ -1,11 +1,13 @@
 # PICKWELL AI V2 — IMPLEMENTATION TASKS
 
 **Document:** `PICKWELL_TASKS.md`  
-**Version:** 1.2 — Trust gates and post-submission product roadmap\
+**Version:** 1.3 — Trust gates and post-submission product roadmap\
 **Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
 **Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
+
+> **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
 ## Current status — reconciled 2026-11-04
 
@@ -24,7 +26,9 @@ This section and the dated reconciliation notes below describe current status. E
 | T06.4 | OPTIONAL / DECISION PENDING after UI polish. Existing sign-in/sign-out fixes do not complete the broader Settings task. |
 | T07.1 | COMPLETE for the owner-approved testing profile; [QA matrix and evidence](PICKWELL_END_TO_END_QA.md). |
 | T07.1A | UI polish implementation/regression evidence exists; remaining screen fidelity and fresh device visual review are pending. No new sign-off in this roadmap update. |
-| T07.1B–T07.1D | NOT STARTED; new pre-submission identity/data-integrity audit, conditional critical protection and targeted release gate. |
+| T07.1B | COMPLETE: read-only audit delivered; critical publication gaps remain. |
+| T07.1C.1 | Three-photo capture/identity observations implemented and locally verified; deployment/live/device checks remain. |
+| T07.1C / T07.1D | NOT COMPLETE: operator publication protections and targeted release gate remain pending. |
 | T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
 | T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
@@ -36,7 +40,7 @@ This section and the dated reconciliation notes below describe current status. E
 
 **Remaining release checks:** Signed store/iOS release artifacts and production signing ownership remain outside this sign-off. The first naturally scheduled daily telemetry-retention run was not observed during T07.1; registration and accelerated execution were verified. This reconciliation does not claim a new scheduler observation or configured CI/staging deployment.
 
-**Agreed order (updated 2026-11-04):** completed T07.1 baseline → T07.1A remaining UI review and T07.1B audit (may proceed alongside review) → T07.1C critical mitigation/disposition → T07.1D release gate → T07.2 submission → T08.1 Passport → T08.2 comparison / T08.3 enhanced identity → T08.4 investigator after T08.3. T06.4 requires an explicit implement/defer decision before handoff; T06.3 remains deferred.
+**Agreed order (updated 2026-11-04):** completed T07.1 baseline → T07.1A remaining UI review and T07.1B audit (complete) → T07.1C.1 front capture → T07.1C critical mitigation/disposition → T07.1D release gate → T07.2 submission → T08.1 Passport → T08.2 comparison / T08.3 enhanced identity → T08.4 investigator after T08.3. T06.4 requires an explicit implement/defer decision before handoff; T06.3 remains deferred.
 
 ## 0. Source of truth and non-goals
 
@@ -373,26 +377,40 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1B Product Identity & Data Integrity Audit
 
-**Status / dependencies:** Pre-submission P0 audit; NOT STARTED. Depends on completed T07.1 and the current T07.1A implementation baseline. Finish remaining UI review before the final release gate.
+**Status / dependencies:** Pre-submission audit COMPLETE; [evidence and remaining risks](PICKWELL_PRODUCT_IDENTITY_AUDIT.md). Depends on completed T07.1 and the current T07.1A implementation baseline. Finish remaining UI review before the final release gate.
 
-- [ ] Audit barcode belonging to Product A with photos belonging to Product B; conflicting nutrition/ingredient images; inconsistent names, brands, variants and package sizes.
-- [ ] Trace schema-valid publication with missing/unverifiable identity evidence, trusted-record overwrite paths, and the distinction between model uncertainty, cross-photo consistency and actual identity verification.
-- [ ] Audit simultaneous submissions/publication races, duplicate barcodes, reformulations and barcode reuse; distinguish current tested safeguards from untested assumptions.
-- [ ] Evaluate deliberate data poisoning, prompt injection in labels and repeat abuse without bypassing auth/RLS or exposing secrets/image payloads.
-- [ ] Produce an evidence-based report with actual code/schema paths, reproducible observations, severity, affected paths, unknowns and a minimal safe mitigation plan for T07.1C; do not implement protections in the audit task.
+- [x] Audit barcode belonging to Product A with photos belonging to Product B; conflicting nutrition/ingredient images; inconsistent names, brands, variants and package sizes.
+- [x] Trace schema-valid publication with missing/unverifiable identity evidence, trusted-record overwrite paths, and the distinction between model uncertainty, cross-photo consistency and actual identity verification.
+- [x] Audit simultaneous submissions/publication races, duplicate barcodes, reformulations and barcode reuse; distinguish current tested safeguards from untested assumptions.
+- [x] Evaluate deliberate data poisoning, prompt injection in labels and repeat abuse without bypassing auth/RLS or exposing secrets/image payloads.
+- [x] Produce an evidence-based report with actual code/schema paths, reproducible observations, severity, affected paths, unknowns and a minimal safe mitigation plan for T07.1C; do not implement protections in the audit task.
 
 **Acceptance:** Every listed threat has an evidence-backed finding or explicit unverified result; critical risks and the smallest safely testable mitigations are identified. Schema validity or model certainty is never reported as barcode/package verification.
 
 **Targeted validation:** Targeted adversarial fixtures and transaction/concurrency inspection or isolated tests; record observed outcomes and evidence gaps. No destructive production experiments or unapproved paid calls.
 
+### T07.1C.1 Front Packaging Capture & Identity Extraction
+
+**Status / dependencies:** IMPLEMENTED / locally verified; no hosted deployment, new live Muse call or device verification. Depends on completed T07.1B. Front observations do not implement T07.1C's publication gate.
+
+- [x] Require Front → Nutrition → Ingredients after a missing barcode; preserve independent retake, back/restart recovery, OTP resume and existing design. Known guest cache hits remain unchanged.
+- [x] Enforce three bounded distinct image inputs and include front bytes in idempotency; preserve auth, rates, quotas, one provider call/one successful-analysis charge and request-local image handling.
+- [x] Extract nullable name, brand, variant and net quantity per photo; detect explicit/conservative identity conflicts with exact affected-photo retakes, retain uncertainty and unverified barcode association.
+- [x] Preserve legacy result readability and saved label photos, add bounded non-image identity provenance/public projection, and version the backend migration/prompt contracts.
+- [x] Update planning/prompts and run targeted mocked capture/API/model/SQL/cleanup/regression tests; record deployment/live/device limitations and remaining T07.1C work.
+
+**Acceptance:** Three-photo capture resumes safely through OTP/restart, missing front cannot submit, supported observations reach results with explicit uncertainty, clear conflicts cannot publish, and legacy cache reads/atomic quota behavior remain intact. No claim of independently verified barcode ownership or completed operator gate.
+
+**Targeted validation:** Capture/retake/navigation/OTP/disk recovery tests; three-image parser/hash/model-schema tests; conflict/unknown/size tests; publication/credit/replay/front-retake SQL; existing cached/result regressions. See [implementation evidence](PICKWELL_FRONT_PACKAGING.md).
+
 ### T07.1C Minimum Product Trust Protection
 
-**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report and prioritized critical findings.
+**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report, T07.1C.1 identity observations and prioritized critical findings.
 
 - [ ] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
 - [ ] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
 - [ ] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
-- [ ] Preserve guest cached lookup, two-label capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
+- [ ] Preserve guest cached lookup, the approved three-photo capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
 - [ ] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
 
 **Acceptance:** Each critical audit finding has a verified mitigation or an explicit release-blocking/restricted-path disposition; no false identity assurance or unsafe trusted-record overwrite. Deadline pressure does not waive a P0 blocker.
@@ -517,7 +535,7 @@ These tasks do not block T07.2. Reuse the existing pipeline and immutable revisi
 
 **Status / dependencies:** POST-SUBMISSION; NOT STARTED. Depends on T08.1 and T07.1B/C findings. Does not require T08.2.
 
-- [ ] Introduce conditional front-package evidence and product identity cross-checks where current evidence is insufficient; keep the existing two-label path unless a justified additional request is needed.
+- [ ] Extend the mandatory three-photo evidence with conditional additional package/barcode evidence and product identity cross-checks where needed; preserve the approved capture path unless further evidence is justified.
 - [ ] Define identity methods, evidence requirements and explicit unknown/conflict/verified semantics; model uncertainty or a matching barcode format alone cannot establish verification.
 - [ ] Implement dispute resolution with authorized review and safe formulation/barcode-reuse handling; no contributor overwrite of trusted records or silent loss of prior revisions.
 - [ ] Validate new evidence and revision transitions server-side with auth/RLS, idempotency, concurrency protection and sanitized public status; preserve guest reads and authenticated contributions.
@@ -542,3 +560,5 @@ These tasks do not block T07.2. Reuse the existing pipeline and immutable revisi
 **Targeted validation:** Mock action/schema/state/ownership/prompt-injection tests, bounded-loop/cost/cancel/expiry tests and authorized real-model evidence-request integration; no success claim based only on mocks.
 
 **Revision history addition — v1.2 (2026-11-04):** Preserved all existing completion checkboxes and historical evidence; added the T07.1A status pointer, proposed T07.1B–D and T08.1–T08.4, and strengthened the existing T07.2 handoff. Documentation only; no task newly marked complete.
+
+**v1.3 (2026-11-04):** Audit delivery recorded; T07.1C.1 inserted as an explicitly approved prerequisite before the still-pending T07.1C gate. Existing completed QA remains historical; no new live/deployment sign-off.

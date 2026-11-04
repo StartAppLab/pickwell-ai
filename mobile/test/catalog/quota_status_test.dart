@@ -400,6 +400,10 @@ void main() {
       final current = LabelCaptureCubit(CaptureLabelUseCase(media));
       await current.begin('96385074');
       media.next = photo('nutrition');
+      final previousPhoto = media.next;
+      media.next = photo('front');
+      await current.capture(LabelKind.front);
+      media.next = previousPhoto;
       await current.capture(LabelKind.nutrition);
       media.next = photo('ingredients');
       await current.capture(LabelKind.ingredients);

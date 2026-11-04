@@ -101,6 +101,8 @@ void main() {
       expect(cubit.state.barcode, '00000096385074');
       await cubit.capture(LabelKind.ingredients);
       expect(media.calls, 0);
+      media.next = photo('front1');
+      await cubit.capture(LabelKind.front);
       media.next = photo('nutrition1');
       await cubit.capture(LabelKind.nutrition);
       final nutrition = cubit.state.nutrition;
@@ -120,7 +122,7 @@ void main() {
       await cubit.capture(LabelKind.ingredients);
       expect(cubit.state.nutrition, same(replaced));
       expect(media.deleted, contains(ingredients));
-      expect(cubit.state.count, 2);
+      expect(cubit.state.count, 3);
       await cubit.close();
     },
   );
@@ -131,17 +133,19 @@ void main() {
       final media = DraftMedia()..next = photo('nutrition');
       final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
       await cubit.begin('96385074');
+      await cubit.capture(LabelKind.front);
+      media.next = photo('nutrition');
       await cubit.capture(LabelKind.nutrition);
       for (final failure in ['camera', 'image_format', 'image_size', 'image_dimensions']) {
         media.failure = failure;
         await cubit.capture(LabelKind.ingredients);
         expect(cubit.state.error, failure);
-        expect(cubit.state.nutrition!.path, 'nutrition');
+        expect(cubit.state.front!.path, 'nutrition');
         expect(cubit.state.ingredients, isNull);
       }
       await cubit.discard();
       expect(cubit.state.count, 0);
-      expect(media.deleted.single.path, 'nutrition');
+      expect(media.deleted.map((p) => p.path), everyElement('nutrition'));
       await cubit.close();
     },
   );
@@ -150,7 +154,7 @@ void main() {
     final media = DraftMedia()..next = photo('nutrition');
     final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
     await cubit.begin('96385074');
-    await cubit.capture(LabelKind.nutrition);
+    await cubit.capture(LabelKind.front);
     final original = cubit.state;
     await cubit.begin('00000096385074');
     expect(cubit.state, same(original));
@@ -159,7 +163,7 @@ void main() {
     expect(cubit.state.pending.single.barcode, '00000096385074');
     expect(media.deleted, isEmpty);
     await cubit.begin('96385074');
-    expect(cubit.state.nutrition?.path, 'nutrition');
+    expect(cubit.state.front?.path, 'nutrition');
     await cubit.discard();
     await cubit.begin('036000291452');
     expect(cubit.state.count, 0);
@@ -174,9 +178,9 @@ void main() {
       final media = DraftMedia()..pending = Completer();
       final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
       await cubit.begin('96385074');
-      final capture = cubit.capture(LabelKind.nutrition);
+      final capture = cubit.capture(LabelKind.front);
       await Future<void>.delayed(Duration.zero);
-      await cubit.capture(LabelKind.nutrition);
+      await cubit.capture(LabelKind.front);
       expect(media.calls, 1);
       await cubit.discard();
       media.pending!.complete(Right(photo('late')));
@@ -191,16 +195,16 @@ void main() {
     final media = DraftMedia()..next = photo('old');
     final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
     await cubit.begin('96385074');
-    await cubit.capture(LabelKind.nutrition);
+    await cubit.capture(LabelKind.front);
     media.deletionFails = true;
     await cubit.discard();
-    await cubit.capture(LabelKind.nutrition);
+    await cubit.capture(LabelKind.front);
     expect(cubit.state.error, 'cleanup');
     expect(media.calls, 1);
     media.deletionFails = false;
     media.next = photo('new');
-    await cubit.capture(LabelKind.nutrition);
-    expect(cubit.state.nutrition!.path, 'new');
+    await cubit.capture(LabelKind.front);
+    expect(cubit.state.front!.path, 'new');
     expect(media.deleted.single.path, 'old');
     await cubit.close();
   });
@@ -209,7 +213,7 @@ void main() {
     final media = DraftMedia()..pending = Completer();
     final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
     await cubit.begin('96385074');
-    final capture = cubit.capture(LabelKind.nutrition);
+    final capture = cubit.capture(LabelKind.front);
     await Future<void>.delayed(Duration.zero);
     await cubit.close();
     media.pending!.complete(Right(photo('closed-late')));
@@ -247,7 +251,7 @@ void main() {
     final media = DraftMedia()..next = photo('expired');
     final cubit = LabelCaptureCubit(CaptureLabelUseCase(media));
     await cubit.begin('96385074');
-    await cubit.capture(LabelKind.nutrition);
+    await cubit.capture(LabelKind.front);
     await tester.pump(LabelCaptureCubit.draftLifetime);
     expect(cubit.state.error, 'draft_expired');
     expect(cubit.state.count, 0);
@@ -354,9 +358,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Step 1 · Barcode ✓'), findsOneWidget);
+      expect(find.text('Barcode ✓'), findsOneWidget);
       expect(find.text('Step 2 · Nutrition'), findsOneWidget);
       expect(find.text('Step 3 · Ingredients'), findsOneWidget);
+      expect(find.text('Step 1 · Front'), findsOneWidget);
+      await tester.tap(find.text('Take photo: Front packaging'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Take photo: Nutrition'), 180);
       await tester.tap(find.text('Take photo: Nutrition'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text('Take photo: Ingredients'), 180);
@@ -367,12 +375,15 @@ void main() {
       expect(find.text('Retake photo: Nutrition'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Retake photo: Ingredients'), 120);
       expect(find.text('Retake photo: Ingredients'), findsOneWidget);
-      final nutrition = cubit.state.nutrition, ingredients = cubit.state.ingredients;
+      final front = cubit.state.front,
+          nutrition = cubit.state.nutrition,
+          ingredients = cubit.state.ingredients;
       router.go('/otp-fixture');
       await tester.pumpAndSettle();
       expect(cubit.isClosed, false);
       router.go('/capture');
       await tester.pumpAndSettle();
+      expect(cubit.state.front, same(front));
       expect(cubit.state.nutrition, same(nutrition));
       expect(cubit.state.ingredients, same(ingredients));
       expect(cubit.state.barcode, '00000096385074');

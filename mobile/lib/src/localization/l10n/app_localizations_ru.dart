@@ -535,7 +535,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -562,7 +562,8 @@ class AppLocalizationsRu extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -577,7 +578,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -638,7 +639,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1050,4 +1051,24 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pkClearSearch => 'Очистить поиск';
+
+  @override
+  String get pkFrontPackaging => 'Лицевая сторона упаковки';
+
+  @override
+  String get pkFrontPackagingHint =>
+      'Снимите лицевую сторону так, чтобы были видны название, бренд, вариант и количество нетто.';
+
+  @override
+  String get pkCaptureStepFront => 'Шаг 1 · Упаковка';
+
+  @override
+  String get pkIdentityUnverified =>
+      'Связь со штрихкодом не проверена независимо. Данные о товаре прочитаны с присланной упаковки.';
+
+  @override
+  String get pkVariant => 'Вариант';
+
+  @override
+  String get pkNetQuantity => 'Количество нетто';
 }

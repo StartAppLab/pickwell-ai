@@ -36,6 +36,8 @@ void main() {
   late AnalysisSubmissionCubit sender;
   Future<void> capture() async {
     await draft.begin('96385074');
+    media.next = photo('front');
+    await draft.capture(LabelKind.front);
     media.next = photo('nutrition');
     await draft.capture(LabelKind.nutrition);
     media.next = photo('ingredients');
@@ -112,6 +114,9 @@ void main() {
     final sending = AnalysisSubmissionCubit(AnalyzeProductUseCase(endpoint), current);
     try {
       await current.begin('96385074');
+      final front = await File('${directory.path}/front').writeAsBytes([7, 8, 9]);
+      files.next = photo(front.path);
+      await current.capture(LabelKind.front);
       files.next = photo(nutrition.path);
       await current.capture(LabelKind.nutrition);
       files.next = photo(ingredients.path);
@@ -119,6 +124,7 @@ void main() {
       sending.beginAuthorization();
       await sending.finishAuthorization(true);
       expect(sending.state.phase, AnalysisPhase.ready);
+      expect(await front.exists(), false);
       expect(await nutrition.exists(), false);
       expect(await ingredients.exists(), false);
       expect(endpoint.requests.length, 1);
@@ -199,7 +205,7 @@ void main() {
     await sender.retryCleanup();
     expect(sender.state.phase, AnalysisPhase.ready);
     expect(repository.requests.length, 1);
-    expect(media.deleted.length, 2);
+    expect(media.deleted.length, 3);
   });
   test('late accepted response never deletes a newer unrelated draft', () async {
     repository.pending = Completer();
@@ -277,6 +283,7 @@ void main() {
       final request = AnalysisRequest(
         barcode: '00000096385074',
         requestId: createCatalogRequestId(),
+        front: draft.state.nutrition!,
         nutrition: draft.state.nutrition!,
         ingredients: draft.state.ingredients!,
       );
@@ -325,6 +332,7 @@ void main() {
       AnalysisRequest(
         barcode: '00000096385074',
         requestId: createCatalogRequestId(),
+        front: draft.state.nutrition!,
         nutrition: draft.state.nutrition!,
         ingredients: draft.state.ingredients!,
       ),

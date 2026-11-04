@@ -1,3 +1,5 @@
+import { frontLabelFixture } from './fixtures/label_analysis.mjs';
+import { validateAnalysis, PROMPT_VERSION } from '../functions/_shared/analysis_validation.mjs';
 // Targeted PostgreSQL-engine tests; not a substitute for Docker-backed Supabase.
 // Uses the same pinned PGlite version as the existing subscription SQL tests.
 import { test } from 'node:test';
@@ -190,6 +192,38 @@ test('T02.1 additive migrations and catalog/job invariants', async t => {
       assert.equal(await scalar(`select contributor_id as value from public.product_analyses where id='${revision}'`), null);
       assert.equal(await scalar(`select count(*)::int as value from public.analysis_jobs where user_id='${alice}'`), 0);
       assert.equal(await scalar('select count(*)::int as value from public.product_analyses'), 4);
+    });
+    await t.test('three-photo publication preserves unverified identity, one credit, replay and front retake',async()=>{
+      const user=id(),key=id(),code='05901234123457',bucket='a'.repeat(64);
+      await db.query('insert into auth.users(id,email,raw_user_meta_data) values($1,$2,$3)',[user,'front@example.invalid',{}]);
+      await db.exec("update public.quota_controls set inference_enabled=true,approved_model='muse-spark-1.3',change_reason='isolated test only' where id");
+      const rpc=async(name,args,types)=>(await db.query(`select public.${name}(${args.map((_,i)=>'$'+(i+1)+'::'+types[i]).join(',')}) as value`,args)).rows[0].value;
+      const admitted=await rpc('pickwell_admit_analysis',[user,key,code,'b'.repeat(64)],['uuid','uuid','text','text']);
+      assert.equal(admitted.status,'reserved');
+      const attempt=await rpc('pickwell_begin_provider',[admitted.reservation_id,bucket],['uuid','text']);assert.equal(attempt.call_allowed,true);
+      await rpc('pickwell_record_provider',[attempt.attempt_id,'succeeded',0,100,200,10],['uuid','text','numeric','bigint','bigint','integer']);
+      const candidate=frontLabelFixture();candidate.identity.front.brand='Synthetic fixture';candidate.identity.front.net_quantity='500 g';
+      const validated=validateAnalysis(candidate,{model:'muse-spark-1.3',requireFront:true});
+      await rpc('pickwell_stage_analysis',[user,key,{...candidate,validation:validated},'muse-spark-1.3',PROMPT_VERSION],['uuid','uuid','jsonb','text','text']);
+      const published=await rpc('pickwell_publish_analysis',[user,key,validated],['uuid','uuid','jsonb']);
+      assert.equal(published.status,'ready');assert.equal(published.product.name,'Synthetic oats');assert.equal(published.product.brand,'Synthetic fixture');
+      assert.equal(published.product.provenance.identity.front.net_quantity,'500 g');assert.equal(published.product.provenance.identity_verification,'unverified');
+      const usage=await rpc('pickwell_quota_snapshot',[user,'ai_analysis'],['uuid','text']);assert.equal(usage.used,1);assert.equal(usage.reserved,0);
+      assert.equal((await rpc('pickwell_publish_analysis',[user,key,validated],['uuid','uuid','jsonb'])).status,'already_exists');
+      const retry=await rpc('pickwell_admit_analysis',[user,id(),code,'c'.repeat(64)],['uuid','uuid','text','text']);assert.equal(retry.status,'already_exists');
+      assert.equal((await rpc('pickwell_quota_snapshot',[user,'ai_analysis'],['uuid','text'])).used,1);
+      const guest=await rpc('pickwell_get_product',[null,id(),code],['uuid','uuid','text']);assert.equal(guest.status,'ready');assert.equal(guest.product.name,'Synthetic oats');
+      assert.equal(await scalar('select count(*)::int as value from public.analysis_candidates'),0);
+      // Another isolated product: front-only retake releases the reservation.
+      const k2=id();const second=await rpc('pickwell_admit_analysis',[user,k2,'04006381333931','d'.repeat(64)],['uuid','uuid','text','text']);
+      const a2=await rpc('pickwell_begin_provider',[second.reservation_id,bucket],['uuid','text']);
+      await rpc('pickwell_record_provider',[a2.attempt_id,'succeeded',0,10,20,1],['uuid','text','numeric','bigint','bigint','integer']);
+      const details=[{photo:'front',source:'validation',code:'product_mismatch',field:'product_identity'}];
+      const retake=await rpc('pickwell_record_analysis_retake',[user,k2,'front',details],['uuid','uuid','text','jsonb']);
+      assert.equal(retake.status,'needs_retake');assert.equal(retake.retake_target,'front');
+      const after=await rpc('pickwell_quota_snapshot',[user,'ai_analysis'],['uuid','text']);assert.equal(after.used,1);assert.equal(after.reserved,0);
+      assert.equal(await scalar("select count(*)::int as value from public.published_products where barcode='04006381333931'"),0);
+      for(const role of ['anon','authenticated'])assert.equal(await scalar(`select has_function_privilege('${role}','public.pickwell_publish_analysis(uuid,uuid,jsonb)','EXECUTE') as value`),false);
     });
     t.diagnostic(`${assertions} expected SQL rejection checks executed on a real PostgreSQL engine`);
     t.diagnostic(`Isolated engine PostgreSQL ${await scalar("select current_setting('server_version') as value")}; Supabase target is PostgreSQL 15`);

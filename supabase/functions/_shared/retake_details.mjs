@@ -18,3 +18,12 @@ export function sanitizeRetakeDetails(value,photos){
  }
  return result.slice(0,12);
 }
+
+// Preserve legacy two-label targets while supporting exact three-photo subsets.
+const retakeGroups={front:['front'],nutrition:['nutrition'],ingredients:['ingredients'],both:['nutrition','ingredients'],
+ front_nutrition:['front','nutrition'],front_ingredients:['front','ingredients'],all:['front','nutrition','ingredients']};
+export const retakePhotos=target=>retakeGroups[target]?[...retakeGroups[target]]:[];
+export function retakeTarget(photos){
+ const key=[...new Set(photos)].sort().join(',');
+ return Object.keys(retakeGroups).find(target=>[...retakeGroups[target]].sort().join(',')===key)??null;
+}

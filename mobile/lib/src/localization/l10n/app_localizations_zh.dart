@@ -535,7 +535,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -562,7 +562,8 @@ class AppLocalizationsZh extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -577,7 +578,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -638,7 +639,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1050,4 +1051,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkClearSearch => '清空搜索';
+
+  @override
+  String get pkFrontPackaging => '包装正面';
+
+  @override
+  String get pkFrontPackagingHint => '请拍摄包装正面，确保产品名称、品牌、口味或型号及净含量清晰可见。';
+
+  @override
+  String get pkCaptureStepFront => '第1步 · 正面';
+
+  @override
+  String get pkIdentityUnverified => '条形码与产品的对应关系尚未经过独立核实。产品身份信息来自提交的包装照片。';
+
+  @override
+  String get pkVariant => '口味或型号';
+
+  @override
+  String get pkNetQuantity => '净含量';
 }

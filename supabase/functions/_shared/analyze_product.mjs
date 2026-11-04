@@ -1,4 +1,4 @@
-import { sanitizeRetakeDetails } from './retake_details.mjs';
+import { sanitizeRetakeDetails, retakePhotos, retakeTarget } from './retake_details.mjs';
 import { attachAnalysisQuota } from './analysis_quota_response.mjs';
 import { requireVerifiedEmail, IdentityError } from './analysis_authorization.mjs';
 import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mjs';
@@ -60,7 +60,7 @@ function createAnalysisExecution(env,fetcher){
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.
    if(['ready','already_exists'].includes(result.status))body.product=sanitizePublishedProduct(result.product);
    if(result.status==='needs_retake'){
-    body.retake=result.retake_target==='both'?['nutrition','ingredients']:[result.retake_target];
+    body.retake=retakePhotos(result.retake_target);if(!body.retake.length)throw Error();
     body.retake_details=sanitizeRetakeDetails(result.retake_details,body.retake);
     body.allow_diagnostic_reanalysis=Array.isArray(result.retake_details)&&(
      result.retake_details.length===0||body.retake_details.some(d=>d.source==='validation'&&d.code==='numeric_source'));
@@ -108,7 +108,7 @@ function createAnalysisExecution(env,fetcher){
    const metadata={model:claim.model,usage:null};let extracted;
    try{
     extracted=await invokeMetaLabels(env,input.images,metadata,fetcher,analysisProfile);
-    extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model});
+    extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,requireFront:true});
    }catch(error){
     const uncertain=['TimeoutError','AbortError','TypeError'].includes(error?.name)||!metadata.provider_status;
     await q.recordProvider(claim.attempt_id,uncertain?'unknown':'failed',null,
@@ -125,7 +125,7 @@ function createAnalysisExecution(env,fetcher){
     metadata.usage?.output_tokens??null,metadata.duration_ms??null);
    if(extracted.validation.status==='needs_retake'){
     const targets=extracted.validation.retake;
-    return safe(await settle('retake',null,targets.length===1?targets[0]:'both',extracted.validation.reason_details),422);
+    return safe(await settle('retake',null,retakeTarget(targets),extracted.validation.reason_details),422);
    }
    // Persist only normalized known/unknown facts; publication revalidates the same candidate.
    // Advisory model retakes with usable text were accepted by the OCR-first
@@ -135,7 +135,7 @@ function createAnalysisExecution(env,fetcher){
    extracted.candidate.retake_reasons=[];
    extracted.candidate.nutrition=extracted.validation.nutrition;
    extracted.candidate.ingredients=extracted.validation.ingredients;
-   extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,now:extracted.validation.provenance.validated_at});
+   extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,now:extracted.validation.provenance.validated_at,requireFront:true});
    // Stage first so a lost publication acknowledgement can resume without another model call.
    await rpc('pickwell_stage_analysis',{...identity,p_candidate:{...extracted.candidate,validation:extracted.validation},
     p_model:claim.model,p_prompt:PROMPT_VERSION});

@@ -1,9 +1,11 @@
 # PICKWELL AI V2 — SUPABASE DATABASE & BACKEND DATA DESIGN
 
-**Version:** 1.1 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
-**Source of truth:** `PICKWELL_PRD.md` v1.5, `PICKWELL_DESIGN.md` v1.3, `PICKWELL_SPEC.md` v1.3.\
+**Version:** 1.2 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
+**Source of truth:** `PICKWELL_PRD.md` v1.6, `PICKWELL_DESIGN.md` v1.4, `PICKWELL_SPEC.md` v1.4.\
 **Status:** Original illustrative SQL remains a blueprint; later implementation references and TASKS record actual migrations/verification. Section 16 is proposed data design only. This revision creates/applies no SQL migration and makes no deployment claim.\
 **Goal:** Shared barcode product catalog, authenticated Meta AI contributions, server-enforced adjustable daily quotas, RevenueCat-ready Premium entitlements, no active purchase flow.
+
+> **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
 ## 1. Product rules / schema invariants
 
@@ -433,3 +435,14 @@ Choose concrete column names/enums, retention limits and compatibility migration
 - CKD context does not require patient/diagnosis/prescription tables. T06.3 remains deferred; billing disabled. No entitlement or plan change is part of this roadmap update.
 
 **v1.1:** Added planned trust/Passport data boundaries; no SQL or deployment changes.
+
+
+## 17. T07.1C.1 migration and identity provenance
+
+New migration `20261104000100_pickwell_front_packaging.sql` changes existing contracts only; no new table/image column. It extends `analysis_jobs.retake_target` and diagnostic validation with front and exact pair/all-photo targets, permits v2/v3 staged prompt versions, retains new unverified structured observations in `product_analyses.provenance`, raises that bounded JSON allowance from 4 to 8 KiB, and populates name/brand on newly created products from front observations. Existing rows/revisions remain intact; service-only RPC grants, RLS, atomic publication and credit settlement remain.
+
+Only non-image model observations are retained: nullable name/brand/variant/net quantity per photo, cross-photo consistency, unverified status and policy/model/prompt versions. This is not a trusted catalog or proof that the scanned barcode belongs to the package. Explicit conflict output cannot publish through the new v3 RPC contract. Existing current-record/duplicate protection stays in place; no contributor overwrite rights are added. Reference-only refresh preserves original observations rather than accepting altered identity from refresh payloads. Old cache results and legacy accepted candidates remain compatible.
+
+The migration has clean/replay and actual publication/front-retake/credit tests in isolated PGlite PostgreSQL 17.5; Supabase's PostgreSQL 15/native/hosted application is not claimed. Apply through the migration runner before deploying updated handlers/client; no cloud push was performed. T07.1C's approval gate, durable review/dispute schema and historical identity review remain outside this implementation.
+
+**v1.2:** Three-photo input/provenance/retake support only; the audit's first-contribution poisoning gap remains until T07.1C.

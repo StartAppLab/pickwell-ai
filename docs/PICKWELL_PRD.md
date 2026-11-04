@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — PRODUCT REQUIREMENTS DOCUMENT
 
 **File:** `PICKWELL_PRD.md`  
-**Version:** 1.5 — Consumer product intelligence and trust roadmap\
+**Version:** 1.6 — Consumer product intelligence and trust roadmap\
 **Date:** November 4, 2026\
 **Project / repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2, PRD  
@@ -13,6 +13,8 @@
 > **Scope authority:** This PRD supersedes Pickwell PRD v1.1 wherever it excluded accounts or left backend choices undecided. It preserves the user's barcode-first seven-step experience, while adding optional sign-in for guests and mandatory verified authentication only when requesting a new AI analysis.
 
 ---
+
+> **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
 ## 1. Product vision and positioning
 
@@ -36,7 +38,7 @@ Primary audience: everyday shoppers in the Philippines and other markets with pa
 4. AI: Meta AI performs server-side image extraction and plain-language interpretation.
 5. Barcode-first flow: check the shared database before prompting for any label images.
 6. Existing validated product: display saved nutrition, ingredients and analysis **without an AI call**.
-7. Unknown barcode: guide through **three steps — Barcode ✓ → Nutrition facts → Ingredients**.
+7. Unknown barcode: after Barcode ✓, guide through **three photo steps — Front packaging → Nutrition facts → Ingredients**.
 8. Optional product name and brand: infer if reliable, allow correction, never block on missing names.
 9. Analysis classifications use **Meta AI explanations + deterministic, documented validation/rules**.
 10. Publish shared product result **after automated validation**; rejected or low-confidence results require retake and must not become public `ready` records.
@@ -86,12 +88,12 @@ No chat assistant, numeric food score, cosmetic analysis, comparisons, favorites
 ### 4.2 Guest scans an unknown barcode and contributes a product
 
 1. Server confirms `not_found`; UI says **“Product not found — let’s add it.”**
-2. Wizard displays **Step 1/3: Barcode ✓** already done; **Step 2/3: Nutrition facts**: take or select a readable photo, preview and retake as needed.
-3. **Step 3/3: Ingredients**: take or select a readable photo, preview and retake as needed.
-4. Preserve barcode and both captures locally while moving through steps; simple one-image-per-panel is sufficient for hackathon, with extra photo input only when necessary and technically stable.
+2. Barcode is already captured. Wizard photo steps are **1/3 Front packaging → 2/3 Nutrition → 3/3 Ingredients**, with preview and independent retake.
+3. Front captures visible name, brand, variant and net quantity; missing/unreadable fields remain unknown. Nutrition/ingredients extraction remains unchanged.
+4. Preserve the barcode and all three photos in the existing bounded private pending draft across navigation, restart and OTP; no rescan or permanent product-photo storage.
 5. On **Analyze product**, check session:
    - Verified signed-in user: continue to server-side quota and submission checks.
-   - Guest: show an in-context **Email OTP sign-in** gate, retaining both captures and the barcode. After successful verification, resume submission without starting over.
+   - Guest: show an in-context **Email OTP sign-in** gate, retaining all three captures and the barcode. After successful verification, resume submission without starting over.
 6. Backend rechecks barcode (another user may have already contributed it). If it now exists, return the cached ready result without AI.
 7. Otherwise submit images for Meta AI extraction, validation, interpretation, controlled persistence and display.
 8. If extraction is incomplete/unreadable, identify **which label must be retaken**; never publish the invalid record.
@@ -133,7 +135,7 @@ Same three-step capture, but skip sign-in gate. User quota and abuse checks stil
 
 ### F03 — Three-step capture
 
-- Status indicator: Barcode complete → Nutrition capture → Ingredient capture.
+- Barcode complete remains visible; photo progress: Front packaging → Nutrition → Ingredients. All three photos are required to submit.
 - Camera gallery import, preview, retake; clear photo guidance for legibility.
 - User may optionally correct/enter name and brand; do not create an extra compulsory wizard step.
 - Never lose captured images when authentication is required; warn if leaving the flow would discard them.
@@ -416,3 +418,12 @@ If a critical issue cannot be mitigated and verified before submission, restrict
 - T07.2 must truthfully distinguish pre-existing template, hackathon-built functionality, remaining limitations and proposed roadmap; provide a runnable public repository and a genuine three-minute demo of actual behavior.
 
 **Revision history addition — v1.5 (Nov 4, 2026):** Approved platform mission, pre-submission trust audit/mitigation/regression gates and post-submission T08.1–T08.4. No implementation or new verification claimed.
+
+
+## 14. T07.1C.1 — Mandatory front packaging and identity observations
+
+Approved before submission, implemented/tested locally; no deployment or new live-model/hardware proof. Capture front packaging for every unknown code; known guest lookups stay immediate and model-free. Extract nullable product name, brand, variant and printed net quantity per image. Distinguish package quantity from nutrition serving size. Preserve unknown identity and forgiving nutrition OCR. Explicit model conflicts and conservative brand/variant/comparable-size contradictions return an affected-photo retake; matching observations never prove barcode ownership.
+
+Names/brands on new records come from front observations, not trusted client fields. Public results expose the limited observations and unverified status. Photo bytes stay transient; device recovery remains five drafts/24 hours, cleared on success/discard/expiry. Three photos are one analysis, one provider request and at most one successful-analysis credit. T07.1C must still control shared publication and address the remaining audit findings; a readable front alone does not fix poisoning. T06.3 deferred, billing disabled. See implementation report for deployment ordering and limits.
+
+**v1.6:** Mandatory front-photo requirement supersedes earlier two-photo flow; no identity certification or full publication gate claimed.

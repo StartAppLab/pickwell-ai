@@ -538,7 +538,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -565,7 +565,8 @@ class AppLocalizationsPt extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -580,7 +581,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -641,7 +642,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1053,4 +1054,24 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pkClearSearch => 'Limpar pesquisa';
+
+  @override
+  String get pkFrontPackaging => 'Frente da embalagem';
+
+  @override
+  String get pkFrontPackagingHint =>
+      'Fotografe a frente com nome, marca, variante e quantidade líquida visíveis.';
+
+  @override
+  String get pkCaptureStepFront => 'Etapa 1 · Frente';
+
+  @override
+  String get pkIdentityUnverified =>
+      'A associação ao código de barras não foi verificada de forma independente. A identidade é lida da embalagem enviada.';
+
+  @override
+  String get pkVariant => 'Variante';
+
+  @override
+  String get pkNetQuantity => 'Quantidade líquida';
 }

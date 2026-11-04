@@ -19,7 +19,7 @@ class AnalysisModel {
       final targets = json['retake'];
       if (targets is! List ||
           targets.isEmpty ||
-          !targets.every((e) => ['nutrition', 'ingredients'].contains(e))) {
+          !targets.every((e) => ['front', 'nutrition', 'ingredients'].contains(e))) {
         throw const FormatException();
       }
       final details = <RetakeDetail>[];
@@ -40,9 +40,7 @@ class AnalysisModel {
         retakeDetails: List.unmodifiable(details),
         canReanalyzeSaved: json['allow_diagnostic_reanalysis'] == true,
         quota: quota,
-        retake: targets
-            .map((v) => v == 'nutrition' ? LabelKind.nutrition : LabelKind.ingredients)
-            .toSet(),
+        retake: targets.map((v) => LabelKind.values.byName(v as String)).toSet(),
       );
     }
     if (status == 'processing') {

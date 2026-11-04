@@ -55,6 +55,8 @@ void main() {
       final store = MemoryDraft(), media = DraftMedia()..next = photo('nutrition');
       var c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
       await c.begin('96385074');
+      await c.capture(LabelKind.front);
+      media.next = photo('nutrition');
       await c.capture(LabelKind.nutrition);
       media.next = photo('ingredients');
       await c.capture(LabelKind.ingredients);
@@ -77,8 +79,8 @@ void main() {
       expect(store.value, isNull);
       expect(c.state.count, 0);
       media.next = photo('new');
-      await c.capture(LabelKind.nutrition);
-      expect(store.value?.nutrition?.path, 'new');
+      await c.capture(LabelKind.front);
+      expect(store.value?.front?.path, 'new');
       await c.close();
     },
   );
@@ -86,8 +88,8 @@ void main() {
     final store = MemoryDraft()..fail = true, media = DraftMedia()..next = photo('kept');
     final c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
     await c.begin('96385074');
-    await c.capture(LabelKind.nutrition);
-    expect(c.state.nutrition?.path, 'kept');
+    await c.capture(LabelKind.front);
+    expect(c.state.front?.path, 'kept');
     expect(c.state.error, 'draft_save');
     expect(await c.recordAttempts(1), false);
     store.fail = false;
@@ -157,6 +159,8 @@ void main() {
       final store = MemoryDraft(), media = DraftMedia()..next = photo('nutrition');
       final c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
       await c.begin('96385074');
+      await c.capture(LabelKind.front);
+      media.next = photo('nutrition');
       await c.capture(LabelKind.nutrition);
       media.next = photo('ingredients');
       await c.capture(LabelKind.ingredients);
@@ -169,7 +173,7 @@ void main() {
       expect(await c.discardSubmitted(submitted), true);
       expect(store.value, isNull);
       expect(c.state.count, 0);
-      expect(media.deleted.length, 2);
+      expect(media.deleted.length, 3);
       await c.close();
     },
   );
@@ -191,7 +195,7 @@ void main() {
       final media = DraftMedia()..next = photo('kept'), store = MemoryDraft();
       final draft = LabelCaptureCubit(CaptureLabelUseCase(media), store);
       await draft.begin('96385074');
-      await draft.capture(LabelKind.nutrition);
+      await draft.capture(LabelKind.front);
       final router = GoRouter(
         routes: [
           GoRoute(
@@ -244,8 +248,10 @@ void main() {
       for (var n = 1; n <= 5; n++) {
         await c.begin(code(n));
         media.next = photo('nutrition-$n');
-        await c.capture(LabelKind.nutrition);
+        await c.capture(LabelKind.front);
         media.next = photo('ingredients-$n');
+        media.next = photo('nutrition');
+        await c.capture(LabelKind.nutrition);
         await c.capture(LabelKind.ingredients);
         await c.recordAttempts(n % 3);
         keys[code(n)] = c.requestId!;
@@ -253,7 +259,7 @@ void main() {
       expect(c.state.pending.length, 5);
       final calls = media.calls;
       await c.begin(code(1));
-      expect(c.state.nutrition?.path, 'nutrition-1');
+      expect(c.state.front?.path, 'nutrition-1');
       expect(c.requestId, keys[code(1)]);
       expect(c.attempts, 1);
       await c.begin(code(1));
@@ -268,7 +274,7 @@ void main() {
       expect(store.values.containsKey(code(1)), true);
       await c.begin(code(6));
       media.next = photo('six');
-      await c.capture(LabelKind.nutrition);
+      await c.capture(LabelKind.front);
       expect(store.values.length, 5);
       await c.close();
       final restored = LabelCaptureCubit(CaptureLabelUseCase(media), store);
@@ -288,17 +294,19 @@ void main() {
           c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
       await c.begin(code(1));
       media.next = photo('a-n');
-      await c.capture(LabelKind.nutrition);
+      await c.capture(LabelKind.front);
       media.next = photo('a-i');
+      media.next = photo('nutrition');
+      await c.capture(LabelKind.nutrition);
       await c.capture(LabelKind.ingredients);
       final submitted = c.state;
       await c.begin(code(2));
       media.next = photo('b-n');
-      await c.capture(LabelKind.nutrition);
+      await c.capture(LabelKind.front);
       final key = c.requestId;
       expect(await c.discardSubmitted(submitted), true);
       expect(c.state.barcode, code(2));
-      expect(c.state.nutrition?.path, 'b-n');
+      expect(c.state.front?.path, 'b-n');
       expect(c.requestId, key);
       expect(c.state.pending.single.barcode, code(2));
       expect(store.values.containsKey(code(1)), false);
@@ -312,14 +320,14 @@ void main() {
         c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
     await c.begin(code(1));
     media.next = photo('first');
-    await c.capture(LabelKind.nutrition);
+    await c.capture(LabelKind.front);
     await tester.pump(const Duration(hours: 1));
     await c.begin(code(2));
     media.next = photo('later');
-    await c.capture(LabelKind.nutrition);
+    await c.capture(LabelKind.front);
     await tester.pump(const Duration(hours: 23));
     expect(c.state.pending.single.barcode, code(2));
-    expect(c.state.nutrition?.path, 'later');
+    expect(c.state.front?.path, 'later');
     await c.close();
   });
   test(
@@ -379,7 +387,7 @@ void main() {
     final store = MemoryDraft(), media = DraftMedia()..next = photo('kept');
     var c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
     await c.begin(code(1));
-    await c.capture(LabelKind.nutrition);
+    await c.capture(LabelKind.front);
     await c.close();
     store.failLoad = true;
     c = LabelCaptureCubit(CaptureLabelUseCase(media), store);
@@ -391,7 +399,7 @@ void main() {
     store.failLoad = false;
     await c.retryRestore();
     expect(c.state.pending.single.barcode, code(1));
-    expect(c.state.nutrition?.path, 'kept');
+    expect(c.state.front?.path, 'kept');
     await c.close();
   });
   testWidgets('multiple pending cards resume and delete independently', (tester) async {
@@ -400,11 +408,11 @@ void main() {
         draft = LabelCaptureCubit(CaptureLabelUseCase(media), store);
     await draft.begin(code(1));
     media.next = photo('first');
-    await draft.capture(LabelKind.nutrition);
+    await draft.capture(LabelKind.front);
     final firstKey = draft.requestId;
     await draft.begin(code(2));
     media.next = photo('second');
-    await draft.capture(LabelKind.nutrition);
+    await draft.capture(LabelKind.front);
     final router = GoRouter(
       routes: [
         GoRoute(
@@ -419,7 +427,7 @@ void main() {
             await draft.begin(s.pathParameters['barcode']!);
             return null;
           },
-          builder: (_, _) => Scaffold(body: Text('ACTIVE ${draft.state.nutrition?.path}')),
+          builder: (_, _) => Scaffold(body: Text('ACTIVE ${draft.state.front?.path}')),
         ),
       ],
     );

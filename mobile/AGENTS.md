@@ -451,7 +451,7 @@ and remaining device/service checks. Analysis alone does not prove runtime behav
 - Project is **Pickwell AI V2**, repository `pickwell-ai`; this is a lasting product revival, not a disposable hackathon demo.
 - Flutter iOS and Android, reusing existing StartAppLab boilerplate. Cubit/Bloc is preferred when already established in the template.
 - **Barcode-first:** scan → secure Supabase lookup. For a `ready` barcode, return saved product data with **zero Meta AI calls**.
-- Missing barcode: guided three-step flow **Barcode ✓ → Nutrition facts image → Ingredients image**. Support preview and retake. Product name and brand are optional.
+- Missing barcode (T07.1C.1): Barcode ✓ is already captured; mandatory photo steps **Front packaging → Nutrition facts → Ingredients**. Preserve all three across retake, navigation/restart and OTP. Missing identity text remains unknown; front observations do not independently verify barcode ownership. No permanent photo storage. T07.1C publication gate remains separate.
 - Guests may barcode-scan and view published cached results **without signing in**.
 - A user may capture labels as a guest, but **must sign in using verified Supabase Email OTP before submitting new AI analysis**; retain photos and barcode through the auth interruption.
 - New-product analysis runs **through authenticated Supabase Edge Functions**, calling an approved Meta multimodal model, then validating extracted ingredient/nutrition facts and reasoned findings on the server.

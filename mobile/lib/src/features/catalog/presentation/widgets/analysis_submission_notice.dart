@@ -75,7 +75,11 @@ class AnalysisSubmissionNotice extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        '${l.pkRetake}: ${target == LabelKind.nutrition ? l.pkNutrition : l.pkIngredients}',
+                        '${l.pkRetake}: ${target == LabelKind.front
+                            ? l.pkFrontPackaging
+                            : target == LabelKind.nutrition
+                            ? l.pkNutrition
+                            : l.pkIngredients}',
                       ),
                       if (state.result!.retakeDetails.where((d) => d.photo == target).isEmpty)
                         Text(l.pkRetakeCauseReasonUnavailable),

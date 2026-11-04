@@ -19,10 +19,11 @@ enum AnalysisPhase {
 
 class AnalysisRequest {
   final String barcode, requestId;
-  final LabelPhoto nutrition, ingredients;
+  final LabelPhoto front, nutrition, ingredients;
   const AnalysisRequest({
     required this.barcode,
     required this.requestId,
+    required this.front,
     required this.nutrition,
     required this.ingredients,
   });

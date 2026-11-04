@@ -27,7 +27,7 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
   int _attempts = 0;
   AnalysisSubmissionCubit(this.analyze, this.draft) : super(const AnalysisSubmissionState());
   String _fingerprint(LabelCaptureState s) =>
-      '${s.barcode}|${s.nutrition?.path}|${s.nutrition?.capturedAt.toIso8601String()}|${s.ingredients?.path}|${s.ingredients?.capturedAt.toIso8601String()}';
+      '${s.barcode}|${s.front?.path}|${s.front?.capturedAt.toIso8601String()}|${s.nutrition?.path}|${s.nutrition?.capturedAt.toIso8601String()}|${s.ingredients?.path}|${s.ingredients?.capturedAt.toIso8601String()}';
   bool get current => _stamp == _fingerprint(draft.state);
   bool get canStart =>
       !isClosed &&
@@ -90,6 +90,7 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
       AnalysisRequest(
         barcode: snapshot.barcode!,
         requestId: _key!,
+        front: snapshot.front!,
         nutrition: snapshot.nutrition!,
         ingredients: snapshot.ingredients!,
       ),

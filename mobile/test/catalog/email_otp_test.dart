@@ -257,6 +257,7 @@ void main() {
         final repository = OtpFixture(), media = DraftMedia()..next = photo(file.path);
         final draft = LabelCaptureCubit(CaptureLabelUseCase(media));
         await draft.begin('96385074');
+        await draft.capture(LabelKind.front);
         await draft.capture(LabelKind.nutrition);
         await draft.capture(LabelKind.ingredients);
         final before = draft.state;

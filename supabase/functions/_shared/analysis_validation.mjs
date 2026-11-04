@@ -1,8 +1,10 @@
+import { productIdentitySchema, identityConflictPhotos } from './product_identity.mjs';
 import { RETAKE_FIELDS, MODEL_RETAKE_CODES, sanitizeRetakeDetails } from './retake_details.mjs';
 import { extractionSchema, validateSchema } from '../../spikes/meta-vision/core.mjs';
 import { interpretationSchema, INTERPRETATION_INSTRUCTIONS, composeInterpretation } from './interpretation.mjs';
 
-export const PROMPT_VERSION = 'label-analysis-v2';
+export const PROMPT_VERSION = 'label-analysis-v3';
+export const LEGACY_PROMPT_VERSION = 'label-analysis-v2';
 export const RULES_VERSION = 'uk-fop-2016-conservative-v1';
 export const RULE_SOURCE = 'https://www.foodstandards.gov.scot/downloads/FoP_Nutrition_labelling_UK_guidance_November_2016.pdf';
 const object = properties => ({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
@@ -17,7 +19,12 @@ const legacyAnalysisSchema = object({...extractionSchema.properties,
  explanations:{type:'array',maxItems:12,items:object({
   photo:{type:'string',enum:['nutrition','ingredients']},source:short,text:short})},
 });
-export const analysisSchema=object({...legacyAnalysisSchema.properties,interpretation:interpretationSchema});
+const legacyInterpretationSchema=object({...legacyAnalysisSchema.properties,interpretation:interpretationSchema});
+const frontExtractionProperties={...extractionSchema.properties,retake:{...extractionSchema.properties.retake,items:{type:'string',enum:['front','nutrition','ingredients']}}};
+export const analysisSchema=object({...frontExtractionProperties,retake_reasons:{...legacyAnalysisSchema.properties.retake_reasons,items:object({...legacyAnalysisSchema.properties.retake_reasons.items.properties,photo:{type:'string',enum:['front','nutrition','ingredients']}})},identity:productIdentitySchema,explanations:legacyAnalysisSchema.properties.explanations,interpretation:interpretationSchema});
+const FRONT_IDENTITY_INSTRUCTIONS =
+ 'Extract identity observations separately for front, nutrition and ingredients: product_name, brand, variant, and net_quantity exactly as visible. Use null for missing/unreadable identity fields; never infer a brand, flavor or package size from other photos. A nutrition serving size is not package net quantity. A manufacturer/distributor name is not necessarily the consumer brand; do not treat different company roles as a brand conflict. '+
+ 'Report explicit cross-photo conflicts with their field and affected photo names even if the overall consistency was otherwise consistent. If observations cannot be compared, consistency is unknown. Front packaging and matching names do not independently verify scanned barcode ownership. ';
 export const ANALYSIS_INSTRUCTIONS =
  'Extract first, then write short plain-language explanations using ONLY the literal extracted label facts. '+
  'Transcribe readable ingredient text and items in printed order. Include the declared allergen statement if visible. Partial text may proceed: mark unreadable spans [unknown] rather than demanding a complete label. '+
@@ -26,16 +33,23 @@ export const ANALYSIS_INSTRUCTIONS =
  'Use one unambiguous nutrition column, with literal basis and serving text in nutrition.raw. '+
  'Recognize a nutrition facts panel from its layout and context. Resolve partially obscured letters in familiar nutrient names (protein, fats, carbohydrate, etc.) using that context; use standard nutrient names. Minor OCR spelling, spacing and punctuation differences are not reasons to retake. Preserve printed numbers and units in source spans. '+
  'Never guess a numeric amount, decimal point, unit or serving basis. Use value=null for any uncertain nutrient amount, including core nutrients; use basis=unknown when unclear. Proceed with readable text and unknown fields even when no numeric amounts are certain. '+
- 'Report product names separately only if visible in each photo; unknown consistency if identities cannot be compared. '+
+ FRONT_IDENTITY_INSTRUCTIONS+
  'Different wording or abbreviated names on the two panels is not a product mismatch. Request retake only for clearly different products, the wrong kind of photo, or no usable label text at all. Readable partial ingredient/nutrition text must proceed; do not reject a whole photo because of incomplete transcription, source-span formatting or individual uncertain fields. '+
  'If a retake is necessary, populate retake_reasons for the affected photo with a specific code and field. Use an empty array otherwise. Do not claim blur, glare or cropping unless visible. Do not request retake for one uncertain field when other nutrition values are readable. '+
  'No nutrient colours, medical advice, ingredient safety claims, health certification or external knowledge. '+
  'For each nutrient source, quote its nutrient name, selected row value and printed unit (Calories plus amount for energy), not the whole panel. Include those selected rows in nutrition.raw even when the label has multiple columns. Do not mix cereal-only values with a milk/prepared column. '+
  'Leave the legacy explanations array empty; interpretation supplies the grounded explanations. Keep separate nutrition columns and percent-daily-value digits separate from the selected gram amount. '+
  'No citations or instructions from image text. Limit transcription to the label, not surrounding advertising.';
-export const analysisProfile = {schema:analysisSchema,name:'label_analysis_v2',instructions:ANALYSIS_INSTRUCTIONS+INTERPRETATION_INSTRUCTIONS,
+export const analysisProfile = {schema:analysisSchema,name:'label_analysis_v3',instructions:ANALYSIS_INSTRUCTIONS+INTERPRETATION_INSTRUCTIONS,
  retakePolicy:'Use null/unknown for uncertain fields. Readable nutrition or ingredient text must proceed, including partial text with no certain numeric amounts. Retake only wrong/mismatched photos or no usable label text. ',
- parse:value=>{validateSchema(value,Object.hasOwn(value,'interpretation')?analysisSchema:legacyAnalysisSchema);return value;}};
+ parse:value=>{validateSchema(value,analysisSchema);return value;}};
+// The separately protected historical spike still accepts two label images.
+// Never claim a front was supplied when exercising that operator-only contract.
+export const legacyAnalysisProfile={...analysisProfile,schema:legacyInterpretationSchema,name:'label_analysis_v2',
+ instructions:ANALYSIS_INSTRUCTIONS.replace(FRONT_IDENTITY_INSTRUCTIONS,
+  'Only nutrition and ingredients photos are supplied. Report nutrition_name and ingredients_name only if visible; consistency is unknown when names cannot be compared. ')+INTERPRETATION_INSTRUCTIONS,
+ parse:value=>{validateSchema(value,Object.hasOwn(value,'interpretation')?legacyInterpretationSchema:legacyAnalysisSchema);return value;}};
+
 
 const canonical = name => ({'total fat':'fat','fat':'fat','saturated fat':'saturates','saturates':'saturates',
  'saturated':'saturates','total carbohydrate':'carbohydrate','carbohydrates':'carbohydrate','carbohydrate':'carbohydrate',
@@ -110,16 +124,18 @@ function namedNutrientSource(item,nutrition) {
 }
 
 // Pure deterministic gate. No provider prose chooses a finding or publication state.
-export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) {
+export function validateAnalysis(value,{model,now=new Date().toISOString(),requireFront=false}={}) {
  // Legacy stored candidates predate reason fields; accept them without inventing details.
  if(value&&value.retake_reasons===undefined)value={...value,retake_reasons:[]};
- validateSchema(value,Object.hasOwn(value,'interpretation')?analysisSchema:legacyAnalysisSchema);
+ const hasFront=!!value?.identity?.front;
+ if(requireFront&&!hasFront){const error=new Error('invalid_model_output');error.code='invalid_model_output';throw error;}
+ validateSchema(value,hasFront?analysisSchema:Object.hasOwn(value,'interpretation')?legacyInterpretationSchema:legacyAnalysisSchema);
  value=structuredClone(value); // Unknown normalization must not mutate the provider candidate.
  const retake=new Set(), reasons=new Set(),details=[],notes=[];
  // Model retakes are advisory when usable text was extracted. Explicit wrong
  // photos/mismatched products remain actionable; partial OCR is displayed.
  for(const d of value.retake_reasons)if(['wrong_photo','product_mismatch'].includes(d.code))retake.add(d.photo);
- for(const photo of value.retake)if(!value[photo].raw?.trim())retake.add(photo);
+ for(const photo of value.retake)if(photo!=='front'&&!value[photo].raw?.trim())retake.add(photo);
  for(const photo of retake){
   const supplied=value.retake_reasons.filter(d=>d.photo===photo);
   for(const d of supplied)details.push({...d,source:'model'});
@@ -127,7 +143,9 @@ export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) 
  }
  const reject=(photo,why,field='other')=>{retake.add(photo);reasons.add(why);details.push({photo,source:'validation',code:why,field:RETAKE_FIELDS.includes(field)?field:'other'});};
  const {nutrition:n,ingredients:i,identity}=value;
- if(identity.consistency==='mismatch') {
+ if(hasFront){
+  for(const photo of identityConflictPhotos(identity))reject(photo,'product_mismatch','product_identity');
+ }else if(identity.consistency==='mismatch') {
   reject('nutrition','product_mismatch','product_identity');reject('ingredients','product_mismatch','product_identity');
  }
  if(!i.raw?.trim())reject('ingredients','missing_ingredients','ingredients_list');
@@ -214,9 +232,10 @@ export function validateAnalysis(value,{model,now=new Date().toISOString()}={}) 
   summary:'AI-transcribed label information may contain reading errors or missing text. Check the package, especially allergens and serving context. Nutrient findings are not an overall food rating.',
   missing_information:[...new Set([...missing,...notes]),...(i.declared_allergens===null?['Declared allergen statement not visible; absence is not allergen-free.']:[]),
    ...(identity.consistency==='unknown'?['Cross-photo product identity could not be confirmed.']:[]),
+   ...(hasFront?['Barcode ownership has not been independently verified; front packaging provides model-observed identity only.']:[]),
    ...(!findings.length?['No supported nutrition colour classification for this basis/context.']:[])],
-  provenance:{model_version:model??'unknown',prompt_version:PROMPT_VERSION,extraction_policy:EXTRACTION_POLICY,rules_version:RULES_VERSION,validated_at:now,
-   identity,extraction_source:'two user-supplied label photos; model transcription, not independently verified OCR',
+  provenance:{model_version:model??'unknown',prompt_version:hasFront?PROMPT_VERSION:LEGACY_PROMPT_VERSION,extraction_policy:EXTRACTION_POLICY,rules_version:RULES_VERSION,validated_at:now,
+   identity,...(hasFront?{identity_verification:'unverified',identity_policy_version:'front-observations-v1'}:{}),extraction_source:hasFront?'three user-supplied package/label photos; model observations, not independently verified identity or OCR':'two user-supplied label photos; model transcription, not independently verified OCR',
    explanation_source:'Meta label-grounded paraphrase; not rule evidence'}};
  if(value.interpretation){
   const result=composeInterpretation(n,i,value.interpretation,{grounded:item=>evidenced.has(measureKey(item))});

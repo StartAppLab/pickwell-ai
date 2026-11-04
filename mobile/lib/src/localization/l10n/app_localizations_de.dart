@@ -538,7 +538,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -565,7 +565,8 @@ class AppLocalizationsDe extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -580,7 +581,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -641,7 +642,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1053,4 +1054,24 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pkClearSearch => 'Suche löschen';
+
+  @override
+  String get pkFrontPackaging => 'Verpackungsvorderseite';
+
+  @override
+  String get pkFrontPackagingHint =>
+      'Fotografiere die Vorderseite mit sichtbarem Namen, Marke, Variante und Nettofüllmenge.';
+
+  @override
+  String get pkCaptureStepFront => 'Schritt 1 · Vorderseite';
+
+  @override
+  String get pkIdentityUnverified =>
+      'Die Zuordnung zum Barcode wurde nicht unabhängig geprüft. Die Identität wird von der eingesandten Verpackung abgelesen.';
+
+  @override
+  String get pkVariant => 'Variante';
+
+  @override
+  String get pkNetQuantity => 'Nettofüllmenge';
 }

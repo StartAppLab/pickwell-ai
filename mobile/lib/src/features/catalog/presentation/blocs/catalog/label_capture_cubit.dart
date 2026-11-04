@@ -5,12 +5,13 @@ import '../../../domain/_domain.dart';
 
 class LabelCaptureState {
   final String? barcode, error;
-  final LabelPhoto? nutrition, ingredients;
+  final LabelPhoto? front, nutrition, ingredients;
   final LabelKind? capturing;
   final bool saving;
   final List<PendingCapture> pending;
   const LabelCaptureState({
     this.barcode,
+    this.front,
     this.nutrition,
     this.ingredients,
     this.capturing,
@@ -19,8 +20,9 @@ class LabelCaptureState {
     this.error,
   });
   bool get busy => capturing != null || saving;
-  bool get ready => nutrition != null && ingredients != null;
-  int get count => (nutrition == null ? 0 : 1) + (ingredients == null ? 0 : 1);
+  bool get ready => front != null && nutrition != null && ingredients != null;
+  int get count =>
+      (front == null ? 0 : 1) + (nutrition == null ? 0 : 1) + (ingredients == null ? 0 : 1);
 }
 
 // App-owned bounded queue. Switching the active product never discards another draft.
@@ -49,6 +51,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     emit(
       LabelCaptureState(
         barcode: next.barcode,
+        front: next.front,
         nutrition: next.nutrition,
         ingredients: next.ingredients,
         capturing: next.capturing,
@@ -66,6 +69,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     _show(
       LabelCaptureState(
         barcode: item.barcode,
+        front: item.front,
         nutrition: item.nutrition,
         ingredients: item.ingredients,
       ),
@@ -97,6 +101,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         _show(
           LabelCaptureState(
             barcode: state.barcode,
+            front: state.front,
             nutrition: state.nutrition,
             ingredients: state.ingredients,
             error: 'draft_load',
@@ -114,6 +119,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       barcode: code,
       requestId: _requestId!,
       expiresAt: _expiresAt!,
+      front: state.front,
       nutrition: state.nutrition,
       ingredients: state.ingredients,
       attempts: _attempts,
@@ -124,6 +130,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _show(
         LabelCaptureState(
           barcode: state.barcode,
+          front: state.front,
           nutrition: state.nutrition,
           ingredients: state.ingredients,
           saving: state.saving,
@@ -137,6 +144,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         barcode: code,
         requestId: _requestId!,
         expiresAt: _expiresAt!,
+        front: state.front,
         nutrition: state.nutrition,
         ingredients: state.ingredients,
         attempts: _attempts,
@@ -146,6 +154,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         _show(
           LabelCaptureState(
             barcode: state.barcode,
+            front: state.front,
             nutrition: state.nutrition,
             ingredients: state.ingredients,
             error: 'draft_save',
@@ -178,6 +187,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _show(
         LabelCaptureState(
           barcode: state.barcode,
+          front: state.front,
           nutrition: state.nutrition,
           ingredients: state.ingredients,
           error: 'draft_limit',
@@ -224,6 +234,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     if (isClosed ||
         state.busy ||
         state.barcode == null ||
+        (kind != LabelKind.front && state.front == null) ||
         (kind == LabelKind.ingredients && state.nutrition == null)) {
       return;
     }
@@ -234,6 +245,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     _show(
       LabelCaptureState(
         barcode: previous.barcode,
+        front: previous.front,
         nutrition: previous.nutrition,
         ingredients: previous.ingredients,
         capturing: kind,
@@ -248,6 +260,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         _show(
           LabelCaptureState(
             barcode: previous.barcode,
+            front: previous.front,
             nutrition: previous.nutrition,
             ingredients: previous.ingredients,
             error: 'cleanup',
@@ -264,7 +277,11 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       return;
     }
     final error = result.fold((failure) => failure.error.statusCode, (_) => null);
-    final replaced = kind == LabelKind.nutrition ? previous.nutrition : previous.ingredients;
+    final replaced = switch (kind) {
+      LabelKind.front => previous.front,
+      LabelKind.nutrition => previous.nutrition,
+      LabelKind.ingredients => previous.ingredients,
+    };
     if (photo != null && replaced != null) await _delete([replaced]);
     if (isClosed || generation != _generation) {
       if (photo != null) await _delete([photo]);
@@ -278,6 +295,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     _show(
       LabelCaptureState(
         barcode: previous.barcode,
+        front: kind == LabelKind.front ? photo ?? previous.front : previous.front,
         nutrition: kind == LabelKind.nutrition ? photo ?? previous.nutrition : previous.nutrition,
         ingredients: kind == LabelKind.ingredients
             ? photo ?? previous.ingredients
@@ -291,6 +309,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _show(
         LabelCaptureState(
           barcode: state.barcode,
+          front: state.front,
           nutrition: state.nutrition,
           ingredients: state.ingredients,
           error: state.error,
@@ -309,8 +328,12 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     if (isClosed) return;
     final active = state.barcode == code;
     final old = active
-        ? [state.nutrition, state.ingredients].whereType<LabelPhoto>().toList()
-        : [_pending[code]?.nutrition, _pending[code]?.ingredients].whereType<LabelPhoto>().toList();
+        ? [state.front, state.nutrition, state.ingredients].whereType<LabelPhoto>().toList()
+        : [
+            _pending[code]?.front,
+            _pending[code]?.nutrition,
+            _pending[code]?.ingredients,
+          ].whereType<LabelPhoto>().toList();
     try {
       await drafts?.clear(code);
     } catch (_) {
@@ -318,6 +341,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         _show(
           LabelCaptureState(
             barcode: state.barcode,
+            front: state.front,
             nutrition: state.nutrition,
             ingredients: state.ingredients,
             error: 'cleanup',
@@ -338,6 +362,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _show(
         LabelCaptureState(
           barcode: state.barcode,
+          front: state.front,
           nutrition: state.nutrition,
           ingredients: state.ingredients,
           error: state.error,
@@ -349,6 +374,7 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _show(
         LabelCaptureState(
           barcode: state.barcode,
+          front: state.front,
           nutrition: state.nutrition,
           ingredients: state.ingredients,
           error: 'cleanup',
@@ -358,19 +384,27 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
   }
 
   bool _inUse(LabelPhoto photo) =>
+      identical(photo, state.front) ||
       identical(photo, state.nutrition) ||
       identical(photo, state.ingredients) ||
-      _pending.values.any((d) => identical(photo, d.nutrition) || identical(photo, d.ingredients));
+      _pending.values.any(
+        (d) =>
+            identical(photo, d.front) ||
+            identical(photo, d.nutrition) ||
+            identical(photo, d.ingredients),
+      );
   // A late completion clears only the submitted version of its product, not a
   // switched active product or a newer retake of the same barcode.
   Future<bool> discardSubmitted(LabelCaptureState submitted) async {
     final saved = _pending[submitted.barcode];
     final matchesSaved =
         saved != null &&
+        identical(saved.front, submitted.front) &&
         identical(saved.nutrition, submitted.nutrition) &&
         identical(saved.ingredients, submitted.ingredients);
     final matchesActive =
         state.barcode == submitted.barcode &&
+        identical(state.front, submitted.front) &&
         identical(state.nutrition, submitted.nutrition) &&
         identical(state.ingredients, submitted.ingredients);
     if (matchesSaved || matchesActive) {
@@ -378,13 +412,18 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     } else {
       await _delete(
         [
+          submitted.front,
           submitted.nutrition,
           submitted.ingredients,
         ].whereType<LabelPhoto>().where((p) => !_inUse(p)),
       );
     }
     return _pendingCleanup.isEmpty &&
-        ![submitted.nutrition, submitted.ingredients].whereType<LabelPhoto>().any(_inUse);
+        ![
+          submitted.front,
+          submitted.nutrition,
+          submitted.ingredients,
+        ].whereType<LabelPhoto>().any(_inUse);
   }
 
   @override
@@ -396,8 +435,10 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     }
     if (drafts == null) {
       await _delete({
-        ..._pending.values.expand((d) => [d.nutrition, d.ingredients]).whereType<LabelPhoto>(),
-        ...([state.nutrition, state.ingredients].whereType<LabelPhoto>()),
+        ..._pending.values
+            .expand((d) => [d.front, d.nutrition, d.ingredients])
+            .whereType<LabelPhoto>(),
+        ...([state.front, state.nutrition, state.ingredients].whereType<LabelPhoto>()),
       });
     }
     await super.close();

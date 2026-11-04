@@ -535,7 +535,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get pkRetake => 'Retake photo';
 
   @override
-  String get pkCaptureStepBarcode => 'Step 1 · Barcode ✓';
+  String get pkCaptureStepBarcode => 'Barcode ✓';
 
   @override
   String get pkCaptureStepNutrition => 'Step 2 · Nutrition';
@@ -562,7 +562,8 @@ class AppLocalizationsKo extends AppLocalizations {
       'This photo is too large. Retake it with a maximum dimension of 2400 pixels.';
 
   @override
-  String get pkCaptureExpired => 'Your capture draft expired. Please capture both labels again.';
+  String get pkCaptureExpired =>
+      'Your capture draft expired. Please capture the front and both labels again.';
 
   @override
   String get pkCaptureCleanupError =>
@@ -577,7 +578,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pkCaptureReviewHint =>
-      'Check that both labels are readable. You can retake either photo without losing the other.';
+      'Check the front packaging, nutrition and ingredients photos. You can retake one without losing the others.';
 
   @override
   String get pkCaptureSubmissionPending =>
@@ -638,7 +639,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pkAnalysisSubmitHint =>
-      'Both label photos will be sent securely for analysis. Sign in only when you submit.';
+      'All three photos will be sent securely for analysis. Sign in only when you submit.';
 
   @override
   String get pkAnalysisAuthenticating => 'Verifying your email session…';
@@ -1050,4 +1051,22 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pkClearSearch => '검색 지우기';
+
+  @override
+  String get pkFrontPackaging => '포장 앞면';
+
+  @override
+  String get pkFrontPackagingHint => '제품명, 브랜드, 종류와 내용량이 보이도록 포장 앞면을 촬영하세요.';
+
+  @override
+  String get pkCaptureStepFront => '1단계 · 앞면';
+
+  @override
+  String get pkIdentityUnverified => '바코드와의 연결은 독립적으로 검증되지 않았습니다. 제품 정보는 제출된 포장에서 읽은 것입니다.';
+
+  @override
+  String get pkVariant => '종류';
+
+  @override
+  String get pkNetQuantity => '내용량';
 }

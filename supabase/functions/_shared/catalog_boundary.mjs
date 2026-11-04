@@ -1,4 +1,5 @@
-import { sanitizeRetakeDetails } from './retake_details.mjs';
+import { sanitizeIdentityObservations } from './product_identity.mjs';
+import { sanitizeRetakeDetails, retakePhotos } from './retake_details.mjs';
 // T02.2 read boundaries. No Meta calls, quota mutation, purchases or public writes.
 const reply = (body, status = 200) => Response.json(body, {
   status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
@@ -80,7 +81,7 @@ export function createAnalysisStatusHandler(env, fetcher = fetch) {
       const row = rows[0];
       const job=pick(row, ['id', 'barcode', 'state', 'retake_target', 'error_code',
         'result_product_id', 'result_analysis_id', 'updated_at']);
-      if(row.state==='needs_retake')job.retake_details=sanitizeRetakeDetails(row.retake_details,row.retake_target==='both'?['nutrition','ingredients']:[row.retake_target]);
+      if(row.state==='needs_retake')job.retake_details=sanitizeRetakeDetails(row.retake_details,retakePhotos(row.retake_target));
       return reply({job});
     } catch { return reply({ error: 'service_unavailable' }, 503); }
   };
@@ -114,6 +115,8 @@ export function sanitizePublishedProduct(row) {
   result.missing_information=(row.missing_information??[]).filter(v=>typeof v==='string');
   result.provenance=pick(row.provenance,['model_version','prompt_version','rules_version','validated_at','extraction_source','explanation_source',
     'interpretation_version','reference_version','interpretation_method','interpretation_reviewed_at','nutrition_context_rules_version']);
+  const identity=sanitizeIdentityObservations(row.provenance?.identity);
+  if(identity){result.provenance.identity=identity;result.provenance.identity_verification='unverified';result.provenance.identity_policy_version='front-observations-v1';}
   return result;
 }
 

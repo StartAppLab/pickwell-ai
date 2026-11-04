@@ -49,10 +49,10 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
       }
       await dir.create();
       if (!await File('${dir.path}/manifest.json').exists()) {
-        for (final kind in ['nutrition', 'ingredients']) {
+        for (final kind in ['front', 'nutrition', 'ingredients']) {
           if (j[kind] == null) continue;
           final name = (j[kind] as Map)['file'] as String;
-          if (!RegExp(r'^(nutrition|ingredients)-[0-9]+\.(png|jpg)$').hasMatch(name)) {
+          if (!RegExp(r'^(front|nutrition|ingredients)-[0-9]+\.(png|jpg)$').hasMatch(name)) {
             throw FormatException();
           }
           final path = '${root.path}/$name';
@@ -144,11 +144,12 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
     }
 
     final value = {
-      'v': 1,
+      'v': 2,
       'barcode': draft.barcode,
       'request_id': draft.requestId,
       'expires_at': draft.expiresAt.toUtc().toIso8601String(),
       'attempts': draft.attempts,
+      'front': await photo(draft.front, 'front'),
       'nutrition': await photo(draft.nutrition, 'nutrition'),
       'ingredients': await photo(draft.ingredients, 'ingredients'),
     };
@@ -198,7 +199,7 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
       if (await manifest.length() > 4096) throw FormatException();
       final j = jsonDecode(await manifest.readAsString()) as Map;
       final expires = DateTime.parse(j['expires_at'] as String).toUtc();
-      if (j['v'] != 1 ||
+      if (![1, 2].contains(j['v']) ||
           !expires.isAfter(DateTime.now().toUtc()) ||
           expires.difference(DateTime.now().toUtc()) > const Duration(hours: 24)) {
         throw FormatException();
@@ -213,7 +214,7 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
       Future<LabelPhoto?> photo(Object? value) async {
         if (value == null) return null;
         final p = value as Map, name = p['file'] as String;
-        if (!RegExp(r'^(nutrition|ingredients)-[0-9]+\.(png|jpg)$').hasMatch(name)) {
+        if (!RegExp(r'^(front|nutrition|ingredients)-[0-9]+\.(png|jpg)$').hasMatch(name)) {
           throw FormatException();
         }
         final path = '${root.path}/$name';
@@ -233,11 +234,14 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
         return result;
       }
 
-      final n = await photo(j['nutrition']), i = await photo(j['ingredients']);
+      final f = await photo(j['front']),
+          n = await photo(j['nutrition']),
+          i = await photo(j['ingredients']);
       return PendingCapture(
         barcode: code,
         requestId: key,
         expiresAt: expires,
+        front: f,
         nutrition: n,
         ingredients: i,
         attempts: j['attempts'],

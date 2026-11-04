@@ -6,12 +6,13 @@ class PendingCapture {
   final bool saved;
   final String barcode, requestId;
   final DateTime expiresAt;
-  final LabelPhoto? nutrition, ingredients;
+  final LabelPhoto? front, nutrition, ingredients;
   final int attempts;
   const PendingCapture({
     required this.barcode,
     required this.requestId,
     required this.expiresAt,
+    this.front,
     this.nutrition,
     this.ingredients,
     this.attempts = 0,

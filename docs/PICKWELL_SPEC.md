@@ -1,15 +1,17 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
 **File:** `PICKWELL_SPEC.md`  
-**Version:** 1.3 — Product trust gates and post-submission architecture\
+**Version:** 1.4 — Product trust gates and post-submission architecture\
 **Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (PRD → DESIGN → SPEC → DATABASE → TASKS → AGENTS)  
 **Status:** Existing implementation/verification is recorded in TASKS and T07.1 evidence. Section 18 is an approved future contract, not implemented by this documentation revision; earlier feasibility caveats remain historical planning context.
 
+> **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
+
 ## 1. Source of truth, principles and scope
 
-Read `PICKWELL_PRD.md` (canonical v1.5), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
+Read `PICKWELL_PRD.md` (canonical v1.6), then `PICKWELL_DESIGN.md`, before this spec. If they disagree, apply later **user-approved decisions** and flag discrepancies instead of silently changing scope.
 
 **App promise:** Barcode-first packaged food scanning. Guests can scan and view previously published nutrition/ingredient analysis immediately without AI. Unknown products enter a **Barcode ✓ → Nutrition photo → Ingredients photo** capture. Verified Email OTP user can submit. Meta AI analyzes labels in Supabase Edge Functions; validated structured results and documented red/yellow/green findings are published and reused by all subsequent scanners.
 
@@ -107,17 +109,16 @@ Prefer multipart image upload or time-limited **private** upload references. Req
 ```json
 {
   "barcode": "...",
+  "front_image": "<binary multipart upload>",
   "nutrition_image": "<binary multipart upload or temporary private file reference>",
   "ingredients_image": "<binary multipart upload or temporary private file reference>",
-  "name": null,
-  "brand": null,
   "idempotency_key": "client-generated-uuid"
 }
 ```
 
-JSON shown only to illustrate fields; do not literally serialize images using this placeholder. Do not accept arbitrary external image URLs for model processing (SSRF). Validate content type from inspected file signature rather than trusting filename/MIME alone. Reject out-of-scope files, very large images, excessive dimensions or duplicate/reused submissions before invoking AI. Client-side compression must preserve text legibility. **Initial engineering defaults** (not approved business limits): max 2 required images, 5 MiB compressed per image, max one active job per user, default 5 new analyses/user/day; configuration must make limits easy to change, and deployment/runtime envelope must be tested.
+JSON shown only to illustrate fields; do not literally serialize images using this placeholder. Do not accept arbitrary external image URLs for model processing (SSRF). Validate content type from inspected file signature rather than trusting filename/MIME alone. Reject out-of-scope files, very large images, excessive dimensions or duplicate/reused submissions before invoking AI. Client-side compression must preserve text legibility. **Initial engineering defaults** (not approved business limits): exactly 3 required images, 5 MiB per image, dimensions <=2400 px / <=2400² pixels, multipart body <=15 MiB +64 KiB, with existing server-controlled user/concurrency/Free 3-success policy; configuration must make limits easy to change, and deployment/runtime envelope must be tested.
 
-Possible outcomes: `ready` with product, `processing` with job ID, `already_exists` with cached product, `needs_retake` with `nutrition` or `ingredients` target, `quota_exceeded`, `rate_limited`, `invalid_input`, `unauthorized`, `analysis_failed`. Return a stable idempotent result when same user/key retries; recheck ready barcode before charging quota or calling Meta.
+Possible outcomes: `ready` with product, `processing` with job ID, `already_exists` with cached product, `needs_retake` with `front`, `nutrition`, `ingredients`, or an exact affected-photo subset, `quota_exceeded`, `rate_limited`, `invalid_input`, `unauthorized`, `analysis_failed`. Return a stable idempotent result when same user/key retries; recheck ready barcode before charging quota or calling Meta.
 
 **Authorization:** valid user JWT in `Authorization: Bearer <JWT>`; server must verify actual session and a **verified non-anonymous** email identity, not just `authenticated` role. Prefer `verify_jwt = true` and explicit user authorization in handler. Never allow a publishable key on its own to pass analysis authentication. Use server-owned elevated DB client only for tightly scoped operation after auth/authorization checks; avoid accidentally forwarding caller JWT to admin client.
 
@@ -129,7 +130,7 @@ Only required if async processing is introduced or Meta request times out; `GET/
 
 - Supabase **Email OTP numeric code** only. Supabase passwordless API may send a magic link by default unless the email template is configured with `{{ .Token }}`. Confirm template and SMTP/test delivery. OTP code entry should use platform autofill when available. Guard resends and failures.
 - Allow guest scanning and `get-product` without creating an anonymous Auth account. No compulsory sign-in screen on app launch.
-- On unknown barcode, allow both photo steps before sign-in. At Analyze, show Email OTP; after verified session, resume same draft.
+- On unknown barcode, allow all three photo steps before sign-in. At Analyze, show Email OTP; after verified session, resume same draft.
 - Guest submitting to backend is rejected even if the client somehow bypasses OTP UI. No elevated catalogue permissions attached to user tokens.
 - Session expiry while submitting → `unauthorized` → refresh/re-auth without losing current draft (as long as app remains running).
 - Sign out clears Auth state but not public product access.
@@ -403,3 +404,16 @@ CKD-related educational explanations must use reviewed, versioned sources with r
 Maintain guest lookup and verified Email OTP for new analysis, deterministic classifications, server-only Meta and no inference on cache hits. Additional evidence is conditional future work, not a new mandatory capture step now. Delete original images after processing; private pending drafts keep the existing five-item/24-hour recovery bound. Preserve only justified non-image provenance, not permanent evidence photos, raw model logs or contributor emails. New data contracts must be versioned with least-privilege migrations and targeted tests when their implementation task begins. No migration, deployment or new runtime dependency is authorized by this revision. T06.3 stays deferred, `billing_enabled=false`; optional T06.4 is not started.
 
 **v1.3:** Added planned trust/release and Passport/comparison/identity/investigator contracts; preserved existing implementation and historical evidence.
+
+
+## 19. T07.1C.1 — Three-image contract (implemented locally)
+
+- New `analyze-product` requests have exactly `barcode`, `idempotency_key`, `front_image`, `nutrition_image`, `ingredients_image`; every file receives the existing signature/structure/size/dimension checks and all image byte hashes must differ. The server digest is SHA-256 of canonical barcode plus ordered front/nutrition/ingredients hashes. A front retake renews the client key; same-key changed bytes are rejected by existing admission. Older two-file unknown-product requests fail safely.
+- `label_analysis_v3` / `label-analysis-v3` uses the same `muse-spark-1.3` adapter and one bounded call: front first, nutrition second, ingredients third. 30-second provider timeout, `store=false`, 4096 completion-token cap, auth/quota/spend/rate controls remain. No new live capability/latency/token-cost claim; third-image input costs and hosted body envelope require later deployment/live verification.
+- `identity` contains `front`, `nutrition`, `ingredients` observations, each with nullable `product_name`, `brand`, `variant`, `net_quantity`, plus `consistency`, `food_form`, and bounded `{field,photos}` conflicts. Literal net quantity is not serving size. A model conflict cannot be canceled by `consistent`; brand/variant contradictions and comparable simple g/kg/mg or ml/l amounts have conservative deterministic backstops. General name semantics/aliases and intentionally falsified observations are not independently verified.
+- Wrong-photo/conflict reasons target `front`, nutrition, ingredients or exact subsets using bounded diagnostics. Missing names alone remain unknown; nutrition OCR/rules are unchanged. Old two-photo candidates can still be revalidated under the legacy v2 contract; old published results remain readable.
+- New identity provenance is `identity_verification=unverified`, `identity_policy_version=front-observations-v1`. Public projection allowlists only observation fields; new product name/brand are observed values. Interpretation-only refresh preserves existing identity and cannot accept replacement verification authority from its payload.
+- `20261104000100_pickwell_front_packaging.sql` is required before deploying the new handler: v3 publication, precise front retake groups and bounded identity provenance. No approval queue/table or operator publication gate is implemented. Do not describe current auto-publication as poisoning-resistant; T07.1C/D remain necessary.
+- Flutter pending manifests write v2 and read v1/v2. V1 drafts keep both labels but are not submission-ready until front capture, which renews their key. All three photos survive OTP/navigation/restart and are included in cleanup, stale-result protection, independent retake and five-item/24-hour retention. No permanent photo storage or public image URL.
+
+**v1.4:** New mandatory three-image contract and backward-compatible observations; original two-image spike/QA evidence remains historical.

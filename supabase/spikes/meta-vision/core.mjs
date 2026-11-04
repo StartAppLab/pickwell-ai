@@ -155,7 +155,8 @@ export async function invokeMetaLabels(env, body, metadata = {}, fetcher = fetch
               (profile.retakePolicy ?? 'Use null/unknown and needs_retake for unreadable/mismatched labels. ') +
               'Preserve raw text and literal source spans. No health score, claims or citations. ' + (profile.instructions ?? '') },
             { role: 'user', content: [
-              { type: 'text', text: 'Image 1: nutrition facts. Image 2: ingredients for the same product. Extract both.' },
+              { type: 'text', text: body.front_image ? 'Image 1: front packaging. Image 2: nutrition facts. Image 3: ingredients. These images are submitted together but may belong to different products. Extract only visible observations and report contradictions; barcode ownership is not independently verified.' : 'Image 1: nutrition facts. Image 2: ingredients. Check for visible product conflicts; do not assume product identity.' },
+              ...(body.front_image ? [{ type: 'image_url', image_url: { url: body.front_image } }] : []),
               { type: 'image_url', image_url: { url: body.nutrition_image } },
               { type: 'image_url', image_url: { url: body.ingredients_image } },
             ] }],
