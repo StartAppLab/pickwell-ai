@@ -7,7 +7,7 @@
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
 **Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D is now BLOCKED by pending hosted trust rollout ([fresh release checks](PICKWELL_RELEASE_GATE.md)); billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -31,7 +31,7 @@ This section and the dated reconciliation notes below describe current status. E
 | T07.1B | COMPLETE: read-only audit delivered; critical publication gaps remain. |
 | T07.1C.1 | Three-photo capture/identity observations implemented and locally verified; deployment/live/device checks remain. |
 | T07.1C | IMPLEMENTED / locally verified, restricted operator publication; hosted deployment and fresh device/native concurrency verification remain. [Evidence](PICKWELL_PRODUCT_TRUST.md). |
-| T07.1D | NOT STARTED; deployment-profile and affected full-flow release sign-off remain pending. |
+| T07.1D | BLOCKED for hosted release: fresh local/native regression passes; hosted trust gate absent. Real three-photo/operator/device handoff remains unverified. [Release report](PICKWELL_RELEASE_GATE.md). |
 | T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
 | T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
@@ -425,17 +425,20 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1D Targeted Regression and Release Gate
 
-**Status / dependencies:** Pre-submission P0 gate; NOT STARTED. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+**Status / dependencies:** BLOCKED for hosted release after fresh integrated regression; local checks pass. T07.1A remains paused by owner. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
 
-- [ ] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
+- [x] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
 - [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
 - [ ] Verify identity/conflict protections from the audit, races/duplicates, trusted revision protection, auth/RLS, quota settlement, rate/spend controls and absence of secret/PII/image leaks.
 - [ ] Check affected UI/navigation/accessibility and owner/device observations. Record exact deployed/configured version and testing versus production limits; preserve owner-approved 1,000/100 testing allowances unless changed explicitly, and require 30/3 restoration before production public release.
-- [ ] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
+- [x] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
 
 **Acceptance:** Affected end-to-end and security/privacy paths have recorded results, no regressions against T07.1, and no known unresolved P0 blockers. Untested capabilities are explicitly excluded/restricted; the approved deployment profile is clear.
 
 **Targeted validation:** Run affected integration/regression suites and necessary live/device checks; distinguish automated, provider, hosted and owner-reported evidence. Broaden regression only when impact requires it.
+
+
+**2026-11-04 fresh verification:** [T07.1D report](PICKWELL_RELEASE_GATE.md): 150 Flutter, 181 backend/native, 142 pgTAP assertions and 21 tooling checks passed; 30 hosted boundary checks passed. Hosted C.1/C migrations and publication gate are absent while inference remains enabled. No new live three-photo or physical-device full-flow pass. Remaining boxes stay open; no T07.2 sign-off.
 
 ### T07.2 Hackathon submission handoff
 

@@ -4,7 +4,7 @@
 **Date:** 2026-11-04\
 **Sources:** PRD v1.7, DESIGN v1.5, SPEC v1.5, DATABASE v1.3, TASKS v1.4 and actual applicable repository `AGENTS.md`.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D is now BLOCKED by pending hosted trust rollout ([fresh release checks](PICKWELL_RELEASE_GATE.md)); billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -923,13 +923,13 @@ SCOPE / IMPLEMENT
 Work ONLY on T07.1D (pre-submission) and directly necessary prerequisites after checking its dependencies. Do not start the next task automatically or alter unrelated behavior. Obtain actual evidence before claiming tests or completion.
 
 EXACT TASK REQUIREMENTS
-**Status / dependencies:** Pre-submission P0 gate; NOT STARTED. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
+**Status / dependencies:** BLOCKED for hosted release after fresh integrated regression; local checks pass. T07.1A remains paused by owner. Depends on T07.1B, T07.1C disposition and completion/disposition of remaining T07.1A review.
 
-- [ ] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
+- [x] Compare affected behavior with completed T07.1 evidence; record pass/fail, fixes and unverified cases without reopening or falsely replacing historical QA.
 - [ ] Verify guest cache hit with zero Meta calls, missing-barcode capture/OTP/new analysis, publication, second-session reuse, relevant-photo retake, retries and draft recovery/cleanup.
 - [ ] Verify identity/conflict protections from the audit, races/duplicates, trusted revision protection, auth/RLS, quota settlement, rate/spend controls and absence of secret/PII/image leaks.
 - [ ] Check affected UI/navigation/accessibility and owner/device observations. Record exact deployed/configured version and testing versus production limits; preserve owner-approved 1,000/100 testing allowances unless changed explicitly, and require 30/3 restoration before production public release.
-- [ ] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
+- [x] Issue a release decision with evidence and remaining limitations; billing stays disabled, T06.3 deferred. Do not sign off with a known unresolved P0 blocker or claim a feature is verified from schema validity alone.
 
 **Acceptance:** Affected end-to-end and security/privacy paths have recorded results, no regressions against T07.1, and no known unresolved P0 blockers. Untested capabilities are explicitly excluded/restricted; the approved deployment profile is clear.
 
@@ -938,6 +938,9 @@ EXACT TASK REQUIREMENTS
 COMPLETION REPORT
 Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
 ```
+
+
+**2026-11-04 fresh verification:** [T07.1D report](PICKWELL_RELEASE_GATE.md): 150 Flutter, 181 backend/native, 142 pgTAP assertions and 21 tooling checks passed; 30 hosted boundary checks passed. Hosted C.1/C migrations and publication gate are absent while inference remains enabled. No new live three-photo or physical-device full-flow pass. Remaining boxes stay open; no T07.2 sign-off.
 
 ## T07.2 — Hackathon submission handoff
 

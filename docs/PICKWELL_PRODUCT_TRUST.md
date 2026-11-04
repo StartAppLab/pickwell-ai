@@ -325,3 +325,12 @@ Working-tree files for this task (including generated localization output); no s
 - `supabase/tests/front_packaging.test.mjs`
 - `supabase/tests/product_trust.test.mjs`
 - `supabase/tests/trust_services.test.mjs`
+
+## 2026-11-04 — Later T07.1D verification
+
+The [fresh release-gate report](PICKWELL_RELEASE_GATE.md) supersedes this report's
+unverified native/CLI test caveats: disposable PostgreSQL 15 Auth/REST, concurrent
+publication/decision checks and actual operator CLI approval/rejection now pass.
+Hosted rollout is still absent and the release decision is BLOCKED; no new live
+three-photo inference or physical-device review handoff was performed. Historical
+results above remain unchanged.

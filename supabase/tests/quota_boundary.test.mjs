@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { networkBucket, createQuotaService } from '../functions/_shared/quota_boundary.mjs';
+import {frontLabelFixture} from './fixtures/label_analysis.mjs';
+import {validateAnalysis,PROMPT_VERSION} from '../functions/_shared/analysis_validation.mjs';
 const secret = 'local-test-only-'.repeat(4);
 test('network attribution ignores caller proxy headers unless trust is explicitly configured', async () => {
  const a=new Request('https://example.invalid',{headers:{'x-forwarded-for':'1.2.3.4'}});
@@ -44,14 +46,21 @@ test('native quota RPCs: exact limits, races, publication, retry and spending',
    body:JSON.stringify({email:`quota-${id()}@example.invalid`,password:id()+'Aa1!'})});
   assert.equal(r.status,200);const v=await r.json();assert.ok(v.access_token&&v.user.id);users.push(v.user.id);return v;
  }
- async function prepare(res,code,user){
-  const demo=(await rest('product_analyses?select=nutrition,ingredients&limit=1'))[0];
-  const p=(await rest('products','POST',{barcode:code,name:'SYNTHETIC NATIVE QUOTA TEST',is_demo:true}))[0];
-  const a=(await rest('product_analyses','POST',{product_id:p.id,contributor_id:user,...demo,summary:'SYNTHETIC TEST; no provider call',
-   model_version:'fixture:no-provider',prompt_version:'fixture',rules_version:'fixture',validated_at:new Date().toISOString()}))[0];
-  await rest('analysis_findings','POST',{analysis_id:a.id,severity:'yellow',title:'Synthetic test',explanation:'Not a real product analysis',source_details:{rule_id:'fixture',evidence:[{is_demo:true}]}});
-  return {p:p.id,a:a.id};
+ async function prepare(key,user){
+  const candidate=frontLabelFixture(),model='fixture:no-live-provider';
+  const validation=validateAnalysis(candidate,{model,requireFront:true});
+  assert.equal(validation.status,'validated');
+  const staged={...candidate,nutrition:validation.nutrition,ingredients:validation.ingredients,validation};
+  await rest('rpc/pickwell_stage_analysis','POST',{p_user:user,p_key:key,p_candidate:staged,p_model:model,p_prompt:PROMPT_VERSION});
+  const gate=await rest('rpc/pickwell_publication_gate','POST',{p_user:user,p_key:key});assert.equal(gate.status,'review_required');
+  const request=(await rest(`analysis_requests?user_id=eq.${user}&idempotency_key=eq.${key}`))[0];
+  const review=(await rest('product_trust_reviews?job_id=eq.'+request.job_id))[0];
+  await rest('rpc/pickwell_decide_product_review','POST',{p_review:review.id,p_barcode:review.barcode,p_input_digest:review.input_digest,
+   p_candidate_digest:review.candidate_digest,p_policy_version:review.policy_version,p_decision:'approve',p_review_ref:'native-quota-review',
+   p_review_basis:'controlled_demo_evidence',p_resolution:'no_discrepancy'});
+  return {p_user:user,p_key:key,p_validated:validation};
  }
+
  try{
  const alice=await makeUser(),bob=await makeUser();const u=alice.user.id,v=bob.user.id;
  await t.test('Auth adapter verifies identities and never accepts a fake session',async()=>{
@@ -195,12 +204,14 @@ test('native quota RPCs: exact limits, races, publication, retry and spending',
  });
  await t.test('three successful publications consume three credits, fourth denied; concurrent finalize counts once',async()=>{
   for(let i=1;i<=3;i++){
-   const code=barcode(),r=await q.reserve(v,'ai_analysis',id(),code);assert.equal(r.status,'reserved');
+   const code=barcode(),key=id(),r=await rest('rpc/pickwell_admit_analysis','POST',{p_user:v,p_key:key,p_barcode:code,p_digest:'a'.repeat(64)});assert.equal(r.status,'reserved');
    const a=await q.beginProvider(r.reservation_id,ip2);assert.equal(a.call_allowed,true);
    await assert.rejects(q.recordProvider(a.attempt_id,'succeeded',-1),/operation_failed/);
    await q.recordProvider(a.attempt_id,'succeeded',0.002,20,10,150);
-   const prepared=await prepare(r,code,v);
-   await Promise.all(Array.from({length:5},()=>q.finish(r.reservation_id,'published',prepared.p,prepared.a)));
+   const prepared=await prepare(key,v);
+   const outcomes=await Promise.all(Array.from({length:5},()=>rest('rpc/pickwell_publish_analysis','POST',prepared)));
+   assert.ok(outcomes.every(value=>['ready','already_exists'].includes(value.status)));
+   assert.equal((await rest('products?barcode=eq.'+code.padStart(14,'0'))).length,1);
    assert.equal((await q.snapshot(v,'ai_analysis')).used,i);
   }
   assert.equal((await q.reserve(v,'ai_analysis',id(),barcode())).status,'quota_exceeded');

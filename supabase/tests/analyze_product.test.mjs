@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdir,writeFile,rm} from 'node:fs/promises';
+import {runOperatorReview} from '../scripts/review-product.mjs';
 import {createServer} from 'node:http';
 import {deflateSync} from 'node:zlib';
 import {createAnalyzeProductHandler} from '../functions/_shared/analyze_product.mjs';
@@ -22,6 +23,7 @@ function form(barcode,key=crypto.randomUUID(),overrides={}){
  for(const [k,v]of Object.entries(overrides))f.set(k,v);return f;
 }
 const candidate=labelFixture;
+const nutrientFindings=product=>product.findings.filter(f=>f.source_details?.rule_id!=='declared-allergen-v1');
 const modelResult=value=>Response.json({model:'muse-spark-1.3',usage:{prompt_tokens:123,completion_tokens:42},
  choices:[{finish_reason:'stop',message:{content:JSON.stringify(value)}}]});
 
@@ -178,7 +180,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const out=await Promise.all(Array.from({length:12},()=>submit(alice,barcode,key)));
    assert.equal(providerCalls-before,1);assert.ok(out.every(r=>[200,202].includes(r.http)));
-   const r=await submit(alice,barcode,key,{ingredients_image:new Blob([png(30)],{type:'image/png'})});
+   const r=await submit(alice,barcode,key,{ingredients_image:new Blob([png(40)],{type:'image/png'})});
    assert.equal(r.http,409);assert.equal(providerCalls-before,1);
    const snapshot=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
    assert.equal(snapshot.used,0);assert.equal(snapshot.reserved,1);await cleanup(alice,key);
@@ -229,7 +231,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const staged=await submit(alice,barcode,key);assert.equal(staged.http,202);
    await rest('analysis_candidates?job_id=eq.'+staged.body.job_id,'PATCH',{expires_at:new Date(Date.now()-1000).toISOString()});
    assert.equal(await rpc('pickwell_prune_analysis',{}),1);
-   const retry=await submit(alice,barcode,key);assert.equal(retry.body.status,'analysis_failed');assert.equal(retry.body.error,'candidate_expired');
+   const retry=await submit(alice,barcode,key);assert.equal(retry.body.status,'analysis_failed');assert.equal(retry.body.error,'review_expired');
    assert.equal(providerCalls-before,1);assert.equal((await rest('analysis_candidates?job_id=eq.'+staged.body.job_id)).length,0);
    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});assert.equal(quota.used,0);assert.equal(quota.reserved,0);
   });
@@ -257,10 +259,72 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const ledger=(await rest(`ai_usage?reservation_id=eq.${request.reservation_id}`))[0];
    await rpc('pickwell_record_provider_metrics',{p_attempt:ledger.id,p_state:'failed',p_cost:0,p_input:null,p_output:null,p_duration:0,p_estimate:null});await cleanup(alice,key);
   });
+  await t.test('review decisions bind exact evidence; concurrent approve/cancel/publish settles once and stale approval cannot publish',async()=>{
+   const initial=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+   const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
+   assert.equal((await submit(alice,barcode,key)).body.status,'review_required');
+   const request=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${key}`))[0];
+   const review=(await rest('product_trust_reviews?job_id=eq.'+request.job_id))[0];
+   const row=(await rest('analysis_candidates?job_id=eq.'+request.job_id))[0];
+   const decision={p_review:review.id,p_barcode:review.barcode,p_input_digest:review.input_digest,p_candidate_digest:review.candidate_digest,
+    p_policy_version:review.policy_version,p_decision:'approve',p_review_ref:'native-race-review',p_review_basis:'controlled_demo_evidence',p_resolution:'no_discrepancy'};
+   for(const bad of [{p_input_digest:'c'.repeat(64)},{p_candidate_digest:'d'.repeat(64)},{p_barcode:code()},{p_policy_version:'unapproved-policy'}])await assert.rejects(rpc('pickwell_decide_product_review',{...decision,...bad}));
+   const race=await Promise.allSettled([
+    rpc('pickwell_decide_product_review',decision),
+    rpc('pickwell_cancel_analysis_review',{p_user:alice.user.id,p_key:key}),
+    rpc('pickwell_publish_analysis',{p_user:alice.user.id,p_key:key,p_validated:row.candidate.validation}),
+   ]);
+   assert.ok(race.some(value=>value.status==='fulfilled'));
+   const reservation=(await rest('usage_reservations?id=eq.'+request.reservation_id))[0];
+   assert.ok(['released','consumed'].includes(reservation.state));
+   const products=await rest('published_products?barcode=eq.'+review.barcode);
+   assert.equal(products.length,reservation.state==='consumed'?1:0);
+   const settled=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+   assert.equal(settled.used,initial.used+products.length);assert.equal(settled.reserved,0);
+   assert.equal((await rest('analysis_candidates?job_id=eq.'+request.job_id)).length,0);
+   const staleKey=crypto.randomUUID(),staleCode=code();await submit(alice,staleCode,staleKey);await approvePending(alice,staleKey);
+   const stale=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${staleKey}`))[0];
+   await rest('analysis_candidates?job_id=eq.'+stale.job_id,'PATCH',{expires_at:new Date(Date.now()-1000).toISOString()});
+   await rpc('pickwell_prune_analysis',{});
+   const retry=await submit(alice,staleCode,staleKey);assert.equal(retry.body.status,'analysis_failed');assert.equal(retry.body.error,'review_expired');
+   assert.equal((await rest('published_products?barcode=eq.'+staleCode.padStart(14,'0'))).length,0);
+   assert.equal((await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'})).used,settled.used);
+   const rejectedKey=crypto.randomUUID(),rejectedCode=code();
+   const pending=await submit(alice,rejectedCode,rejectedKey);assert.equal(pending.body.status,'review_required');
+   const rejectedReview=(await rest('product_trust_reviews?job_id=eq.'+pending.body.job_id))[0];
+   const dir='.secrets/t071d-reject-'+crypto.randomUUID(),file=dir+'/review.json';await mkdir(dir,{recursive:true});
+   try {
+    await runOperatorReview(['--inspect',rejectedReview.id,'--out',file],env);
+    await runOperatorReview(['--review-file',file,'--decision','reject','--ref','native-cli-rejection','--basis','controlled_demo_evidence','--resolution','conflict_unresolved','--apply'],env);
+   } finally { await rm(dir,{recursive:true,force:true}); }
+   const rejected=await submit(alice,rejectedCode,rejectedKey);assert.equal(rejected.body.error,'review_rejected');
+   const after=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
+   assert.equal(after.used,settled.used);assert.equal(after.reserved,0);
+   assert.equal((await rest('analysis_candidates?job_id=eq.'+pending.body.job_id)).length,0);
+   assert.equal(providerCalls-before,3);
+  });
   await t.test('explicit synthetic operator approval publishes once; parallel reuse makes no provider call',async()=>{
    const key=crypto.randomUUID(),barcode=code();
    const staged=await submit(alice,barcode,key);assert.equal(staged.body.status,'review_required');
-   await approvePending(alice,key);deferPublication=false;
+   // Exercise the real protected CLI against disposable REST/SQL with exact
+   // generated image bytes. These are fixtures, never claimed as real food photos.
+   const request=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${key}`))[0];
+   const review=(await rest('product_trust_reviews?job_id=eq.'+request.job_id))[0];
+   const dir='.secrets/t071d-operator-'+crypto.randomUUID(),file=dir+'/review.json',manifest=dir+'/evidence.json';
+   await mkdir(dir,{recursive:true});
+   try {
+    for(const [photo,color]of [['front',30],['nutrition',10],['ingredients',20]])await writeFile(dir+'/'+photo+'.png',png(color),{mode:0o600});
+    await writeFile(manifest,JSON.stringify({barcode:barcode.padStart(14,'0'),front:'front.png',nutrition:'nutrition.png',ingredients:'ingredients.png'}),{mode:0o600});
+    await runOperatorReview(['--inspect',review.id,'--out',file],env);
+    const args=['--review-file',file,'--decision','approve','--ref','native-cli-review','--basis','controlled_demo_evidence','--resolution','no_discrepancy','--evidence-manifest',manifest];
+    await writeFile(dir+'/ingredients.png',png(40),{mode:0o600});
+    await assert.rejects(runOperatorReview(args,env),/exact evidence/);
+    await writeFile(dir+'/ingredients.png',png(20),{mode:0o600});
+    await runOperatorReview(args,env); // Dry run cannot grant authority.
+    assert.equal((await rest('product_trust_reviews?id=eq.'+review.id))[0].state,'pending');
+    await runOperatorReview([...args,'--apply'],env);
+   } finally { await rm(dir,{recursive:true,force:true}); }
+   deferPublication=false;
    const published=await submit(alice,barcode,key);assert.equal(published.body.status,'ready');
    const before=providerCalls;
    const reused=await Promise.all(Array.from({length:12},(_,i)=>submit(i%2?alice:bob,barcode)));
@@ -272,9 +336,9 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    deferPublication=false;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const quotaBefore=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
    snapshotDown=true;const output=await submitApproved(alice,barcode,key);snapshotDown=false;assert.equal(output.http,200);assert.equal(output.body.status,'ready');assert.equal(output.body.quota_unavailable,true);
-   const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(product.findings.length,4);
+   const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(nutrientFindings(product).length,4);
    assert.equal(product.explanations.length,0);assert.equal(product.provenance.prompt_version,'label-analysis-v3');
-   assert.ok(product.findings.every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
+   assert.ok(nutrientFindings(product).every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
    assert.equal(providerCalls-before,1);
    assert.equal((await rest('analysis_candidates')).length,0);
    const revisions=await rest('product_analyses?product_id=eq.'+product.id);assert.equal(revisions.length,1);assert.ok(revisions[0].sealed_at);
@@ -300,7 +364,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
     const r=await submitApproved(alice,barcode,key);assert.equal(r.http,200,mode+': '+JSON.stringify(r.body));assert.equal(r.body.status,'ready',JSON.stringify(r.body));
     if(mode==='contradiction')assert.equal(r.body.product.nutrition.nutrients[0].value,null);
     if(mode==='text-only')assert.deepEqual(r.body.product.nutrition.nutrients,[]);
-    if(mode==='source-mismatch'){assert.ok(r.body.product.nutrition.nutrients.every(n=>n.value!==null));assert.deepEqual(r.body.product.findings,[]);}
+    if(mode==='source-mismatch'){assert.ok(r.body.product.nutrition.nutrients.every(n=>n.value!==null));assert.deepEqual(nutrientFindings(r.body.product),[]);}
     assert.equal((await submit(alice,barcode,key)).body.status,'already_exists');assert.equal(providerCalls-before,1);
     const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
     assert.equal(quota.used,initial.used+1);assert.equal(quota.reserved,0);
@@ -308,7 +372,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   });
   await t.test('a valid per-serving label publishes without inventing any colour finding',async()=>{
    behavior='unclassified';const result=await submitApproved(alice,code());behavior='success';
-   assert.equal(result.body.status,'ready');assert.deepEqual(result.body.product.findings,[]);
+   assert.equal(result.body.status,'ready');assert.deepEqual(nutrientFindings(result.body.product),[]);
    assert.equal(result.body.product.nutrition.basis,'per_serving');
    assert.ok(result.body.product.missing_information.some(v=>v.includes('No supported nutrition colour')));
   });
@@ -316,7 +380,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    behavior='normalized';const barcode=code(),key=crypto.randomUUID();
    const r=await submitApproved(alice,barcode,key);behavior='success';
    assert.equal(r.body.status,'ready',JSON.stringify(r.body));assert.equal(r.body.product.nutrition.basis,'unknown');
-   assert.equal(r.body.product.nutrition.nutrients[0].value,19);assert.deepEqual(r.body.product.findings,[]);
+   assert.equal(r.body.product.nutrition.nutrients[0].value,19);assert.deepEqual(nutrientFindings(r.body.product),[]);
    assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
   });
   await t.test('format-equivalent numeric sources publish and replay without another model call',async()=>{
@@ -324,7 +388,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const result=await submitApproved(alice,barcode,key);behavior='success';
    assert.equal(result.body.status,'ready');
    assert.ok(result.body.product.nutrition.nutrients.every(n=>n.value!==null));
-   assert.equal(result.body.product.findings.length,4);
+   assert.equal(nutrientFindings(result.body.product).length,4);
    assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
    assert.equal(providerCalls-before,1);
   });
@@ -353,7 +417,8 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   await t.test('operator refresh is immutable, atomic, idempotent and denied to clients without spending credits',async()=>{
    behavior='success';const r=await submitApproved(alice,code());assert.equal(r.body.status,'ready');
    const product=(await rest('published_products?id=eq.'+r.body.product.id))[0];
-   const payload=refreshInterpretationRecord(product),args={p_product:product.id,p_expected_analysis:product.analysis_id,p_expected_version:null,p_payload:payload};
+   const payload=refreshInterpretationRecord(product);payload.provenance.reference_version+='-native-test-revision';
+   const args={p_product:product.id,p_expected_analysis:product.analysis_id,p_expected_version:product.provenance.interpretation_version,p_payload:payload};
    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'}),before=providerCalls;
    const forged=structuredClone(args);forged.p_payload.nutrition.raw='Forged label';await assert.rejects(rpc('pickwell_refresh_interpretation',forged));
    await assert.rejects(rpc('pickwell_refresh_interpretation',{...args,p_expected_analysis:crypto.randomUUID()}));
@@ -397,7 +462,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   await t.test('invalidated catalog records require operator review and cannot be overwritten by contributors',async()=>{
    const barcode=code(),key=crypto.randomUUID();
    const existing=(await rest('products','POST',{barcode,status:'invalidated',invalidated_at:new Date().toISOString(),invalidation_reason:'Synthetic operator review fixture'}))[0];
-   const before=providerCalls,result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
+   const before=providerCalls,result=await submitApproved(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
    assert.equal(result.body.error,'correction_review_required');
    assert.equal((await rest('products?id=eq.'+existing.id))[0].status,'invalidated');
    assert.equal((await rest('product_analyses?product_id=eq.'+existing.id)).length,0);
@@ -411,7 +476,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const row=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
    row.candidate.nutrition.nutrients[0].value=9999;
    await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
-   await approvePending(alice,key);deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
+   deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
    assert.equal(result.body.error,'invalid_model_output');
    assert.equal((await rest('analysis_candidates?job_id=eq.'+row.job_id)).length,0);
    assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,0);
