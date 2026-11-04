@@ -1,11 +1,13 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
 **File:** `PICKWELL_SPEC.md`  
-**Version:** 1.5 — Product trust gates and post-submission architecture\
+**Version:** 1.6 — Product trust gates and post-submission architecture\
 **Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (PRD → DESIGN → SPEC → DATABASE → TASKS → AGENTS)  
 **Status:** Existing implementation/verification is recorded in TASKS and T07.1 evidence. Section 18 is an approved future contract, not implemented by this documentation revision; earlier feasibility caveats remain historical planning context.
+
+> **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
 > **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
@@ -448,3 +450,18 @@ presence checks use raw transcription with bounded spelling/punctuation/bilingua
 support; unsupported items and their explanations are omitted without discarding
 readable raw text. Citations do not prove presence. Interpretation refresh cannot
 replace trust/identity provenance. See the report for limits and deployment order.
+
+## T07.1A.1 — Optional immutable front derivative (local implementation)
+
+No extra client upload/photo field or analysis-handler Storage operation. After
+reviewed publication, operator CLI verifies the exact three original hashes and
+candidate/review binding, generates a <=384px/64KiB JPEG with pinned local tooling,
+and uses service-only prepare/upload/commit. Private staging cannot be read directly
+by ordinary clients. New public read-only `get-product-thumbnail` serves only ready
+media associated with the current ready product's published review, with byte/hash/
+MIME/dimension checks and short HTTP caching. It invokes no model/quota lookup.
+Published JSON adds optional safe id/digest/dimensions; Flutter resolves only the
+configured backend endpoint and uses fixed-size loading/error fallbacks. Cleanup
+uses protected operator Storage API commands, never SQL deletion of object metadata.
+A deployed protected scheduled runner is a rollout prerequisite. See Product
+Thumbnails for lifecycle, no-replacement rules and physical cleanup limitations.

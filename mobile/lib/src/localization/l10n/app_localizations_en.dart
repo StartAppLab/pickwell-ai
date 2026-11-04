@@ -518,7 +518,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pkCapturePrivacy =>
-      'Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.';
+      'Submitted evidence photos are temporary. A small front-package thumbnail may be retained and shown publicly after operator approval and publication. Nutrition and ingredient photos never become product images.';
 
   @override
   String get pkCaveat => 'Label information is not medical advice.';
@@ -1058,7 +1058,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pkFrontPackagingHint =>
-      'Capture the front of this package with its name, brand, variant and net quantity visible.';
+      'Show the package name, brand, variant and net quantity. Avoid faces and personal details.';
 
   @override
   String get pkCaptureStepFront => 'Step 1 · Front';

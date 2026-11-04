@@ -1,8 +1,34 @@
+import '../../domain/entities/product_thumbnail.dart';
 import '../../domain/entities/catalog_entity.dart';
 import '../../domain/entities/quota_snapshot.dart';
 import 'quota_model.dart';
 
 class CatalogModel {
+  static ProductThumbnail? _thumbnail(Object? value) {
+    if (value is! Map ||
+        value['id'] is! String ||
+        value['digest'] is! String ||
+        !RegExp(
+          r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+          caseSensitive: false,
+        ).hasMatch(value['id'] as String) ||
+        !RegExp(r'^[0-9a-f]{64}$').hasMatch(value['digest'] as String) ||
+        value['width'] is! int ||
+        value['height'] is! int ||
+        (value['width'] as int) < 1 ||
+        (value['width'] as int) > 384 ||
+        (value['height'] as int) < 1 ||
+        (value['height'] as int) > 384) {
+      return null;
+    }
+    return ProductThumbnail(
+      id: value['id'] as String,
+      digest: value['digest'] as String,
+      width: value['width'] as int,
+      height: value['height'] as int,
+    );
+  }
+
   static CatalogEntity parse(Map<String, dynamic> json, String barcode) {
     final status = switch (json['status']) {
       'ready' => LookupStatus.found,
@@ -115,6 +141,7 @@ class CatalogModel {
       if (!missing.every((v) => v is String)) throw const FormatException();
       product = ProductRecord(
         barcode: barcode,
+        thumbnail: _thumbnail(p['thumbnail']),
         name: p['name'] as String?,
         brand: p['brand'] as String?,
         summary: p['summary'] as String,

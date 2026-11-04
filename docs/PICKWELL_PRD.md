@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — PRODUCT REQUIREMENTS DOCUMENT
 
 **File:** `PICKWELL_PRD.md`  
-**Version:** 1.7 — Consumer product intelligence and trust roadmap\
+**Version:** 1.8 — Consumer product intelligence and trust roadmap\
 **Date:** November 4, 2026\
 **Project / repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2, PRD  
@@ -13,6 +13,8 @@
 > **Scope authority:** This PRD supersedes Pickwell PRD v1.1 wherever it excluded accounts or left backend choices undecided. It preserves the user's barcode-first seven-step experience, while adding optional sign-in for guests and mandatory verified authentication only when requesting a new AI analysis.
 
 ---
+
+> **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
 > **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 

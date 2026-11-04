@@ -1,8 +1,10 @@
 # PICKWELL AI V2 — AGENT PROMPTS
 
-**Version:** 1.4 — Trust gates and post-submission roadmap\
+**Version:** 1.5 — Trust gates and post-submission roadmap\
 **Date:** 2026-11-04\
-**Sources:** PRD v1.7, DESIGN v1.5, SPEC v1.5, DATABASE v1.3, TASKS v1.4 and actual applicable repository `AGENTS.md`.
+**Sources:** PRD v1.8, DESIGN v1.6, SPEC v1.6, DATABASE v1.4, TASKS v1.5 and actual applicable repository `AGENTS.md`.
+
+> **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
 > **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
@@ -795,6 +797,19 @@ Run tests relevant to touched code and directly affected dependencies; negative 
 COMPLETION REPORT
 Report task ID, exact modified files, work completed, commands/tests run with ACTUAL observed outcomes, pending credentials/device or UI assets, security/privacy/cost implications, remaining blockers, and which TASKS checkbox(es) were verified. Never mark incomplete tasks done.
 ```
+
+## T07.1A.1 — Product Thumbnail Storage & Display
+
+**Status:** IMPLEMENTED / locally and Native Runtime verified; NOT deployed. [Implementation/verification](PICKWELL_PRODUCT_THUMBNAILS.md). Use conservative post-publication operator attachment, not automatic image persistence in analysis. T07.1A visual polish remains separate.
+
+- [x] Generate a bounded orientation-correct JPEG derivative from the exact reviewed front image; preserve three-photo digest and original approval gate.
+- [x] Enforce private Storage, immutable reviewed product/source association, publication eligibility, size/MIME constraints and bounded Storage-API orphan cleanup.
+- [x] Display safe optional media on Home/local recent cards and Details, with loading/error/legacy fallbacks and no image-driven Muse calls or quota changes.
+- [x] Disclose retained published derivative versus temporary evidence/private incomplete upload; preserve operator evidence handoff and update capture privacy copy.
+- [x] Run targeted Flutter/backend/SQL/native codec/Storage/privacy/authority/association regression; record exact observed results.
+- [ ] Hosted rollout, protected cleanup scheduling, genuine product imagery and fresh-device visual verification. **Not authorized/executed in this task.** No synthetic local result is a real hosted publication claim.
+
+**Rollout requirements:** `20261104000300_pickwell_product_thumbnails.sql`, new public read-only image function, updated projection handlers, rebuilt client and protected operator cleanup runner. Explicit owner authorization before hosted deployment; no dashboard, fourth photo, automatic approval or broad UI redesign.
 
 ## T07.1B — Product Identity & Data Integrity Audit
 

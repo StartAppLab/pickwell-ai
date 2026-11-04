@@ -343,3 +343,13 @@ functions are deployed and hosted security checks pass; inference is restored un
 unchanged testing limits, billing false. Real three-photo/Muse/device/operator
 approval validation was explicitly deferred by the owner. Testing-deployment
 decision: PASS WITH LIMITATIONS; no full real-product flow or T07.2 sign-off claimed.
+
+## 2026-11-04 — Approved thumbnail derivative exception (T07.1A.1, local only)
+
+[Product Thumbnails](PICKWELL_PRODUCT_THUMBNAILS.md) permits an optional optimized
+front derivative **after published operator review**, tied to exact original
+three-image hashes and candidate/review. This intentionally retained public package
+media is distinct from temporary evidence photos; raw/nutrition/ingredient photos
+remain nonpublic. No new publication authority or pending-review upload is added.
+Keep private operator evidence through derivative attachment, then delete copies.
+This feature is not deployed by its implementation task.

@@ -1,9 +1,11 @@
 # PICKWELL AI V2 — SUPABASE DATABASE & BACKEND DATA DESIGN
 
-**Version:** 1.3 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
+**Version:** 1.4 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
 **Source of truth:** `PICKWELL_PRD.md` v1.6, `PICKWELL_DESIGN.md` v1.4, `PICKWELL_SPEC.md` v1.4.\
 **Status:** Original illustrative SQL remains a blueprint; later implementation references and TASKS record actual migrations/verification. Section 16 is proposed data design only. This revision creates/applies no SQL migration and makes no deployment claim.\
 **Goal:** Shared barcode product catalog, authenticated Meta AI contributions, server-enforced adjustable daily quotas, RevenueCat-ready Premium entitlements, no active purchase flow.
+
+> **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
 > **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
@@ -476,3 +478,19 @@ input digest or photos); legacy records remain unverified. Refresh preserves the
 original association review and identity fields. No schema reset, live migration,
 quota configuration change or billing activation was performed. Full operator and
 retention details: [Product Trust](PICKWELL_PRODUCT_TRUST.md).
+
+## T07.1A.1 — Implemented optional media migration (not applied to cloud)
+
+`20261104000300_pickwell_product_thumbnails.sql` adds private `product-thumbnails`
+bucket (JPEG, 64KiB), restrictive client denial, RLS-protected immutable
+`product_thumbnails`, service-only prepare/commit/cleanup/forget/orphan operations,
+`published_thumbnail_assets` and appended safe metadata in `published_products`.
+Association binds product/review/input/candidate/front/output hashes. SQL verifies
+the original ordered three-image digest; only published reviewed current products
+can reserve media. Actual original-to-derivative processing is trusted operator
+code, not a database image decoder or independent identity verification. Unique
+product association and ready-state immutability prevent replacement; reference-only
+refresh preserves association through original review provenance. No analysis row
+rewrite, allowance mutation, new provider call or approval-granting media field.
+Physical cleanup is Storage API work; SQL only claims private abandoned uploads and
+forgets tracking after confirmed removal. [Details](PICKWELL_PRODUCT_THUMBNAILS.md).

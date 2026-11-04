@@ -1,3 +1,7 @@
+import {resolve} from 'node:path';
+import {spawnSync} from 'node:child_process';
+import {runThumbnailOperator} from '../scripts/attach-product-thumbnail.mjs';
+import {createProductThumbnailHandler} from '../functions/_shared/product_thumbnail.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,mkdir,writeFile,rm} from 'node:fs/promises';
@@ -323,9 +327,51 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
     await runOperatorReview(args,env); // Dry run cannot grant authority.
     assert.equal((await rest('product_trust_reviews?id=eq.'+review.id))[0].state,'pending');
     await runOperatorReview([...args,'--apply'],env);
+    deferPublication=false;
+    const published=await submit(alice,barcode,key);assert.equal(published.body.status,'ready');
+    const thumbArgs=['--review-file',file,'--evidence-manifest',manifest,'--python',process.env.PICKWELL_THUMBNAIL_PYTHON??'.secrets/thumbnail-python/bin/python'];
+    await writeFile(dir+'/front.png',png(44),{mode:0o600});
+    await assert.rejects(runThumbnailOperator(thumbArgs,env),/Exact submitted bytes/);
+    await writeFile(dir+'/front.png',png(30),{mode:0o600});
+    await runThumbnailOperator(thumbArgs,env); // Dry run retains no Storage object.
+    assert.equal((await rest('product_thumbnails?review_id=eq.'+review.id)).length,0);
+    const python=resolve(process.env.PICKWELL_THUMBNAIL_PYTHON??'.secrets/thumbnail-python/bin/python');
+    const expected=spawnSync(python,[resolve('supabase/scripts/make-thumbnail.py'),resolve(dir+'/front.png'),resolve(dir+'/expected.jpg')],{encoding:'utf8'});
+    assert.equal(expected.status,0);const expectedDigest=JSON.parse(expected.stdout).sha256;
+    const wrapper=resolve(dir+'/snapshot-python');
+    await writeFile(wrapper,`#!${python}\nimport base64,os,sys,pathlib\npathlib.Path(${JSON.stringify(resolve(dir+'/front.png'))}).write_bytes(base64.b64decode('${png(44).toString('base64')}'))\nos.execv(${JSON.stringify(python)},[${JSON.stringify(python)},*sys.argv[1:]])\n`,{mode:0o700});
+    const snapshotArgs=[...thumbArgs];snapshotArgs[snapshotArgs.indexOf('--python')+1]=wrapper;
+    await runThumbnailOperator([...snapshotArgs,'--apply'],env,async(url,options)=>{
+     assert.equal(new URL(url).origin,origin.origin);const response=await fetch(url,options);
+     if(options?.method==='POST'&&url.includes('/storage/v1/object/product-thumbnails/')){
+      const pending=(await rest('product_thumbnails?review_id=eq.'+review.id))[0];assert.equal(pending.state,'uploading');
+      const hidden=await createProductThumbnailHandler(env)(new Request('http://127.0.0.1/get-product-thumbnail?id='+pending.id+'&v='+pending.digest));
+      assert.equal(hidden.status,404,'Uploaded bytes cannot become public before attachment commit');
+     }return response;
+    });
+    const media=(await rest('product_thumbnails?review_id=eq.'+review.id))[0];assert.equal(media.state,'ready');
+    assert.equal(media.digest,expectedDigest,'Generator must use verified bytes even if original path changes');
+    assert.deepEqual(await readFile(dir+'/front.png'),png(44));await writeFile(dir+'/front.png',png(30),{mode:0o600});
+    const thumbnailHandler=createProductThumbnailHandler(env,async(url,options)=>{assert.equal(new URL(url).origin,origin.origin);return fetch(url,options);}),beforeMedia=providerCalls;
+    const download=await thumbnailHandler(new Request('http://127.0.0.1/get-product-thumbnail?id='+media.id+'&v='+media.digest));
+    assert.equal(download.status,200);const photo=new Uint8Array(await download.arrayBuffer());assert.equal(photo.length,media.bytes);
+    const lookup=createGetProductHandler(env,fetcher);
+    const record=await lookup(new Request('http://127.0.0.1/get-product',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({barcode})}));
+    assert.equal((await record.json()).product.thumbnail.id,media.id);assert.equal(providerCalls,beforeMedia);
+    for(const token of [env.SUPABASE_ANON_KEY,alice.access_token])for(const route of ['authenticated','public']){
+     const privateRead=await fetch(origin.origin+'/storage/v1/object/'+route+'/product-thumbnails/'+media.object_path,{headers:{apikey:env.SUPABASE_ANON_KEY,Authorization:'Bearer '+token}});
+     assert.ok([400,401,403,404].includes(privateRead.status),'Ordinary users cannot fetch even a published object directly');
+    }
+    const forbiddenUpload=await fetch(origin.origin+'/storage/v1/object/product-thumbnails/forbidden.jpg',{method:'POST',headers:{apikey:env.SUPABASE_ANON_KEY,Authorization:'Bearer '+alice.access_token,'content-type':'image/jpeg'},body:photo});
+    assert.ok([400,401,403].includes(forbiddenUpload.status),'Client Storage writes remain forbidden');
+    for(const [type,body]of [['image/png',png(44)],['image/jpeg',new Uint8Array(65537)]]){
+     const limited=await fetch(origin.origin+'/storage/v1/object/product-thumbnails/rejected.jpg',{method:'POST',headers:{...serverHeaders,'content-type':type},body});
+     assert.ok([400,413,415].includes(limited.status),'Bucket enforces JPEG and bytes');
+    }
+    await runThumbnailOperator([...thumbArgs,'--apply'],env);assert.equal((await rest('product_thumbnails?review_id=eq.'+review.id)).length,1);
+    // Storage API removes physical test data before the disposable database resets.
+    const removed=await fetch(origin.origin+'/storage/v1/object/product-thumbnails',{method:'DELETE',headers:serverHeaders,body:JSON.stringify({prefixes:[media.object_path]})});assert.ok(removed.ok);
    } finally { await rm(dir,{recursive:true,force:true}); }
-   deferPublication=false;
-   const published=await submit(alice,barcode,key);assert.equal(published.body.status,'ready');
    const before=providerCalls;
    const reused=await Promise.all(Array.from({length:12},(_,i)=>submit(i%2?alice:bob,barcode)));
    assert.ok(reused.every(v=>v.http===200&&v.body.status==='already_exists'));

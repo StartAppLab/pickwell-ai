@@ -41,7 +41,7 @@ test('bound product trust gate on isolated PostgreSQL',async t=>{
    create schema auth;create table auth.users(id uuid primary key,email text,raw_user_meta_data jsonb,is_anonymous boolean not null default false,email_confirmed_at timestamptz default now());
    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
    create schema storage;create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
-   create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text);
+   create table storage.objects(id uuid primary key default gen_random_uuid(),bucket_id text,name text,metadata jsonb,created_at timestamptz default now());
    create function storage.foldername(text) returns text[] language sql immutable as $$select (string_to_array($1,'/'))[1:array_length(string_to_array($1,'/'),1)-1]$$;
    create schema extensions;create extension if not exists "uuid-ossp" with schema extensions;set search_path=public;`);
   for(const file of (await readdir('supabase/migrations')).filter(f=>f.endsWith('.sql')).sort())await db.exec((await readFile('supabase/migrations/'+file,'utf8')).replace('create extension if not exists "pgcrypto";','-- unavailable in PGlite'));
@@ -141,6 +141,83 @@ test('bound product trust gate on isolated PostgreSQL',async t=>{
    const r=await rpc('pickwell_refresh_interpretation',[p.id,p.analysis_id,p.provenance.interpretation_version,{nutrition:p.nutrition,ingredients:p.ingredients,findings:p.findings??[],summary:'Reviewed context revision',explanations:[],missing_information:[],provenance}],['uuid','uuid','text','jsonb']);assert.equal(r.status,'refreshed');
    const current=await rpc('pickwell_get_product',[null,id(),accepted.code],['uuid','uuid','text']);
    assert.deepEqual(current.product.provenance.barcode_association,p.provenance.barcode_association);assert.deepEqual(current.product.provenance.identity,p.provenance.identity);
+  });
+
+  // Thumbnail fixtures use the exact same ordered evidence-hash contract as analysis.
+  async function mediaFixture({published=true}={}) {
+   const code=barcode(),front='1'.repeat(64),nutrition='2'.repeat(64),ingredients='3'.repeat(64);
+   const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(`${code}|${front}|${nutrition}|${ingredients}`));
+   const digest=[...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('');
+   const s=await stage({code,digest}),v=await inspect(s);
+   if(published){await decide(v);await publish(s);}
+   const args=[v.review_id,code,digest,v.candidate_digest,front,nutrition,ingredients,'4'.repeat(64),300,200,4096];
+   const prepare=()=>rpc('pickwell_prepare_thumbnail',args,['uuid','text','text','text','text','text','text','text','integer','integer','integer']);
+   return {s,v,args,prepare};
+  }
+  await t.test('thumbnail upload is impossible for pending, rejected or cancelled reviews',async()=>{
+   for(const terminal of ['pending','reject','cancel','expire']){
+    const fixture=await mediaFixture({published:false});
+    if(terminal==='reject')await decide(fixture.v,{decision:'reject',resolution:'conflict_unresolved'});
+    if(terminal==='cancel')await rpc('pickwell_cancel_analysis_review',[fixture.s.uid,fixture.s.key],['uuid','uuid']);
+    if(terminal==='expire'){
+     await db.query("update public.analysis_candidates set expires_at=clock_timestamp()-interval '1 second' where job_id=$1",[fixture.s.job_id]);
+     await rpc('pickwell_prune_analysis',[],[]);
+    }
+    await denied(fixture.prepare());
+    if(terminal==='pending')await rpc('pickwell_cancel_analysis_review',[fixture.s.uid,fixture.s.key],['uuid','uuid']);
+   }
+   assert.equal(await scalar("select count(*)::int as value from public.product_thumbnails"),0);
+   assert.equal(await scalar("select public as value from storage.buckets where id='product-thumbnails'"),false);
+  });
+  await t.test('thumbnail source, review/candidate and format/size bindings fail closed',async()=>{
+   const fixture=await mediaFixture();
+   for(const [index,value]of [[1,barcode()],[2,'e'.repeat(64)],[3,'f'.repeat(64)],[4,'9'.repeat(64)],[7,'not-a-hash'],[8,385],[10,65537]]){
+    const args=[...fixture.args];args[index]=value;
+    await assert.rejects(rpc('pickwell_prepare_thumbnail',args,['uuid','text','text','text','text','text','text','text','integer','integer','integer']));
+   }
+  });
+  await t.test('only completed upload appears in published projection; association and image cannot be replaced',async()=>{
+   const fixture=await mediaFixture(),asset=await fixture.prepare();
+   assert.equal(await scalar("select thumbnail as value from public.published_products where barcode='"+fixture.s.code+"'"),null);
+   await denied(rpc('pickwell_commit_thumbnail',[asset.id],['uuid']));
+   await db.query("insert into storage.objects(bucket_id,name,metadata) values('product-thumbnails',$1,$2)",[asset.object_path,{mimetype:'image/jpeg',size:4096}]);
+   const outcomes=await Promise.all(Array.from({length:8},()=>rpc('pickwell_commit_thumbnail',[asset.id],['uuid'])));
+   assert.ok(outcomes.every(o=>o.status==='ready'));
+   assert.equal(await scalar("select count(*)::int as value from public.published_thumbnail_assets where id='"+asset.id+"'"),1);
+   const projection=await scalar("select thumbnail as value from public.published_products where barcode='"+fixture.s.code+"'");
+   assert.deepEqual(sanitizePublishedProduct({... (await publish(fixture.s)).product}).thumbnail,projection);
+   const current=(await publish(fixture.s)).product;
+   await rpc('pickwell_refresh_interpretation',[current.id,current.analysis_id,current.provenance.interpretation_version,
+    {nutrition:current.nutrition,ingredients:current.ingredients,findings:current.findings??[],summary:'Thumbnail-preserving fixture refresh',explanations:[],missing_information:[],
+     provenance:{...current.provenance,interpretation_version:'evidence-composition-v98'}}],['uuid','uuid','text','jsonb']);
+   const refreshed=await rpc('pickwell_get_product',[null,id(),fixture.s.code],['uuid','uuid','text']);assert.deepEqual(refreshed.product.thumbnail,projection);
+   const again=await fixture.prepare();assert.equal(again.id,asset.id);
+   fixture.args[7]='5'.repeat(64);await denied(fixture.prepare());
+   await denied(db.query("update public.product_thumbnails set digest=$1 where id=$2",['6'.repeat(64),asset.id]));
+   assert.equal((await usage(fixture.s)).used,1,'Optional thumbnail never charges another credit');
+  });
+  await t.test('expired upload is private, cleanup claims it, and Storage deletion must precede forgetting',async()=>{
+   const fixture=await mediaFixture(),asset=await fixture.prepare();
+   // Time travel only in a disposable test fixture, not a production mutation path.
+   await db.exec('alter table public.product_thumbnails disable trigger pickwell_thumbnail_immutable');
+   await db.query("update public.product_thumbnails set created_at=clock_timestamp()-interval '31 minutes' where id=$1",[asset.id]);
+   await db.exec('alter table public.product_thumbnails enable trigger pickwell_thumbnail_immutable');
+   await db.query("insert into storage.objects(bucket_id,name,metadata) values('product-thumbnails',$1,$2)",[asset.object_path,{mimetype:'image/jpeg',size:4096}]);
+   await denied(rpc('pickwell_commit_thumbnail',[asset.id],['uuid']));
+   const cleanup=await rpc('pickwell_thumbnail_cleanup',[],[]);assert.ok(cleanup.some(row=>row.id===asset.id));
+   await denied(rpc('pickwell_forget_thumbnail',[asset.id],['uuid']));
+   // Stub Storage API deletion in PGlite only; native verification uses Storage HTTP.
+   await db.query("delete from storage.objects where bucket_id='product-thumbnails' and name=$1",[asset.object_path]);
+   await rpc('pickwell_forget_thumbnail',[asset.id],['uuid']);
+   assert.equal(await scalar("select count(*)::int as value from public.product_thumbnails where id='"+asset.id+"'"),0);
+  });
+  await t.test('private thumbnail rows and mutation functions have no ordinary-role grants; Storage deny is restrictive',async()=>{
+   for(const role of ['anon','authenticated']){
+    await db.exec('set role '+role);
+    try{await denied(db.query('select * from public.product_thumbnails'));await denied(rpc('pickwell_commit_thumbnail',[id()],['uuid']));}
+    finally{await db.exec('reset role');}
+   }
+   assert.equal(await scalar("select permissive='RESTRICTIVE' as value from pg_policies where policyname='Pickwell thumbnails server only'"),true);
   });
  }finally{await db.close();}
 });

@@ -319,3 +319,7 @@ verify_jwt = true
 
 [functions.cancel-analysis-review]
 verify_jwt = false # Handler verifies confirmed non-anonymous Auth identity and ownership.
+
+# Public read-only derivative, eligible published association checked on every request.
+[functions.get-product-thumbnail]
+verify_jwt = false

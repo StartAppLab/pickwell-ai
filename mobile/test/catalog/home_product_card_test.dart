@@ -76,27 +76,30 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     semantics.dispose();
   });
-  testWidgets('card omits subtitles and the entire card remains tappable', (tester) async {
-    var opened = 0;
-    await tester.pumpWidget(
-      host(
-        CatalogWidget(
-          entry: RecentProduct(
-            '00000096385074',
-            DateTime.utc(2026),
-            product: product(name: 'Fixture oats', brand: 'Fixture brand', serving: '30 g'),
+  testWidgets(
+    'card shows brand without inferring package quantity from serving size; remains tappable',
+    (tester) async {
+      var opened = 0;
+      await tester.pumpWidget(
+        host(
+          CatalogWidget(
+            entry: RecentProduct(
+              '00000096385074',
+              DateTime.utc(2026),
+              product: product(name: 'Fixture oats', brand: 'Fixture brand', serving: '30 g'),
+            ),
+            onTap: () => opened++,
           ),
-          onTap: () => opened++,
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Fixture brand'), findsNothing);
-    expect(find.textContaining('Serving size'), findsNothing);
-    await tester.tap(find.byType(ProductCardThumbnail));
-    expect(opened, 1);
-    expect(tester.takeException(), isNull);
-  });
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Fixture brand'), findsOneWidget);
+      expect(find.textContaining('Serving size'), findsNothing);
+      await tester.tap(find.byType(ProductCardThumbnail));
+      expect(opened, 1);
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('long titles and unknown metadata fit compact large-text cards', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(320, 690);

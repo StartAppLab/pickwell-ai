@@ -1,12 +1,14 @@
 # PICKWELL AI V2 — DESIGN SPECIFICATION
 
 **File:** `PICKWELL_DESIGN.md`  
-**Version:** 1.5 — Preserved UI and planned trust presentation\
+**Version:** 1.6 — Preserved UI and planned trust presentation\
 **Date:** November 4, 2026\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework / DESIGN  
 **Status:** Final visual direction approved through iterative reference mockups; platform fidelity and real product-photo sources remain implementation checks.  
 **Source of truth:** `PICKWELL_PRD.md` v1.6. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
+
+> **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
 > **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
@@ -142,7 +144,7 @@ App launch
 ## 12. Assets and handoff
 
 - Whole-lemon brand icon with two green leaves on full-square white canvas (reference generated during conversation); source logo vector/PNG and exact font assets must be confirmed in actual repository. No file path is assumed from conversation mockups.
-- Real product thumbnails are optional and unavailable unless an authorized product media source exists. Label photos are deleted after analysis; **do not reuse them as long-term product imagery**.
+- Real product thumbnails are optional. T07.1A.1 authorizes a small derivative of the exact reviewed front photo after publication; **never reuse full-resolution originals, nutrition or ingredient evidence as public imagery**. Keep placeholders without an eligible thumbnail.
 - Reproduce the visual system with Flutter components; do not insert AI-generated screenshot images as the screen itself. Contrast, dynamic text, screen-reader semantics and tappable targets must be tested.
 - Reuse existing Flutter template layouts, fonts, asset build setup, platform camera packages and Cubit state; avoid unnecessary package swaps.
 
@@ -163,7 +165,7 @@ App launch
 
 **Status:** T07.1 remains complete for its recorded profile; T07.1A polish has implementation/test evidence in [UI polish](PICKWELL_UI_POLISH.md), with remaining screen fidelity/device review explicitly pending. The following roadmap adds no screens or controls in this documentation task.
 
-**Preserve the latest approved Home:** 16dp page margins; title-only cards with 8dp padding and 100×80 (5:4) images or theme-gray honest placeholders. Search replaces the brand row in place: Cupertino back restores the normal header, the in-field X clears only the query. Search and brand rows have matching height; All/Food chips and sort match heights with light neutral inactive backgrounds. Custom sort offers Newest, Oldest, Name A–Z and Name Z–A, without a dropdown chevron. Home uses HugeIcons except the requested Cupertino chevrons. Keep the animated glass-inspired Home/Settings dock, independent far-right Scan, current selector padding and transparent Android edge-to-edge treatment. Keep accessible text scaling, safe areas and keyboard behavior. These owner-approved refinements supersede conflicting earlier Home dimensions/supporting-line guidance, not the established flows. Product Details retains no logo app-bar title or bottom tabs; no numeric score, Chat, cosmetics, collections or paywall.
+**Preserve the latest approved Home:** 16dp page margins; cards with small secondary brand, prominent product name and subtle variant/net-quantity subtitle (T07.1A.1 follow-up), with 8dp padding and 100×80 (5:4) images or theme-gray honest placeholders. Search replaces the brand row in place: Cupertino back restores the normal header, the in-field X clears only the query. Search and brand rows have matching height; All/Food chips and sort match heights with light neutral inactive backgrounds. Custom sort offers Newest, Oldest, Name A–Z and Name Z–A, without a dropdown chevron. Home uses HugeIcons except the requested Cupertino chevrons. Keep the animated glass-inspired Home/Settings dock, independent far-right Scan, current selector padding and transparent Android edge-to-edge treatment. Keep accessible text scaling, safe areas and keyboard behavior. These owner-approved refinements supersede conflicting earlier Home dimensions/supporting-line guidance, not the established flows. Product Details retains no logo app-bar title or bottom tabs; no numeric score, Chat, cosmetics, collections or paywall.
 
 ### 14.1 Pre-submission trust work — T07.1B–D
 
@@ -202,3 +204,16 @@ expiry; cancellation retains photos for an explicit new request. Rejection is
 terminal for that key. Reviewed results explain operator-reviewed association and
 separately state that independent barcode ownership has not been verified. No
 confidence percentage or verified badge. Legacy results retain uncertainty.
+
+## T07.1A.1 follow-up — Product identity hierarchy
+
+Home/local recently scanned cards and Product Details share one presentation:
+brand (small secondary) → product name (prominent primary) → existing front
+variant/flavor and net quantity joined by ` · ` (subtle subtitle). Omit missing
+brand/subtitle; retain the honest generic product title when no name is available.
+Canonical published name/brand take priority; existing validated front observations
+fill missing canonical fields. Do not infer package quantity from serving size or
+parse label prose. Product Details retains the selectable barcode below identity;
+cards do not use it as a subtitle. Thumbnail retrieval/publication and existing
+image slots are unchanged. This approved follow-up supersedes prior title-only
+card guidance; no general UI redesign or backend inference change.

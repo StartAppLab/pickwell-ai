@@ -1055,7 +1055,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkCapturePrivacy.
   ///
   /// In en, this message translates to:
-  /// **'Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.'**
+  /// **'Submitted evidence photos are temporary. A small front-package thumbnail may be retained and shown publicly after operator approval and publication. Nutrition and ingredient photos never become product images.'**
   String get pkCapturePrivacy;
 
   /// No description provided for @pkCaveat.
@@ -1985,7 +1985,7 @@ abstract class AppLocalizations {
   /// No description provided for @pkFrontPackagingHint.
   ///
   /// In en, this message translates to:
-  /// **'Capture the front of this package with its name, brand, variant and net quantity visible.'**
+  /// **'Show the package name, brand, variant and net quantity. Avoid faces and personal details.'**
   String get pkFrontPackagingHint;
 
   /// No description provided for @pkCaptureStepFront.

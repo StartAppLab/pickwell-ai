@@ -1,3 +1,4 @@
+import 'product_identity_header.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,8 +15,6 @@ class CatalogWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = context.themeData.dimensionsData, l = context.l10n;
     final product = entry.product;
-    final name = product?.name?.trim() ?? '';
-    final title = name.isNotEmpty ? name : l.pkFoodProduct;
     return Semantics(
       button: true,
       label: product == null ? l.pkCardUnavailable : null,
@@ -31,24 +30,9 @@ class CatalogWidget extends StatelessWidget {
             padding: EdgeInsets.all(d.paddingXs),
             child: Row(
               children: [
-                const ProductCardThumbnail(),
+                ProductCardThumbnail(thumbnail: product?.thumbnail),
                 Gap(d.spacingSm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: context.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
+                Expanded(child: ProductIdentityHeader(product: product, compact: true)),
                 Gap(d.spacingXs),
                 AppIcon(
                   icon: CupertinoIcons.chevron_forward,

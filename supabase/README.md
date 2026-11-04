@@ -366,3 +366,14 @@ is available only to protected service/operator RPCs, never a mobile endpoint.
 See [Product Trust](../docs/PICKWELL_PRODUCT_TRUST.md) for dry-run commands, expiry,
 private evidence handling, tests and rollout prerequisites. No live change is
 implied by these files.
+
+## T07.1A.1 optional package thumbnails (not deployed)
+
+[Product thumbnail contract](../docs/PICKWELL_PRODUCT_THUMBNAILS.md): private JPEG
+bucket, immutable product/review/source binding, server-only post-publication
+attachment, read-only eligible-image endpoint and Storage-API cleanup. Original
+analysis submission is unchanged and never uploads photographs to Storage.
+Operator/test tooling needs Python >=3.11 plus pinned `scripts/thumbnail-requirements.txt`;
+no Flutter or Edge image-processing dependency was added. Configure protected
+scheduled `attach-product-thumbnail.mjs --cleanup --apply` before enabling uploads.
+No automatic production deployment; no image role/client flag grants publication.

@@ -1,3 +1,4 @@
+import { publicThumbnail } from './product_thumbnail.mjs';
 import { ingredientSupportedByRaw } from './ingredient_evidence.mjs';
 import { sanitizeIdentityObservations } from './product_identity.mjs';
 import { sanitizeRetakeDetails, retakePhotos } from './retake_details.mjs';
@@ -95,6 +96,7 @@ function pick(value, keys) {
 export function sanitizePublishedProduct(row) {
   const result = pick(row, ['id', 'barcode', 'name', 'brand', 'is_demo', 'summary',
     'schema_version', 'rules_version', 'model_version', 'analyzed_at']);
+  result.thumbnail=publicThumbnail(row.thumbnail);
   result.nutrition = pick(row.nutrition, ['raw', 'basis', 'serving_size']);
   result.nutrition.nutrients = (row.nutrition?.nutrients ?? []).map(item =>
     pick(item, ['name', 'value', 'unit', 'source']));
@@ -134,7 +136,7 @@ export function sanitizePublishedProduct(row) {
 export async function readPublishedProduct(env, canonicalBarcode, fetcher = fetch) {
   if (!/^[0-9]{14}$/.test(canonicalBarcode)) throw new Error('invalid_barcode');
   const query = new URLSearchParams({ barcode: `eq.${canonicalBarcode}`, limit: '1',
-    select: 'id,barcode,name,brand,is_demo,summary,schema_version,rules_version,model_version,analyzed_at,nutrition,ingredients,findings,explanations,missing_information,provenance' });
+    select: 'id,barcode,name,brand,is_demo,summary,schema_version,rules_version,model_version,analyzed_at,nutrition,ingredients,findings,explanations,missing_information,provenance,thumbnail' });
   const rows = await serverRead(env, 'published_products?' + query, fetcher);
   if (!Array.isArray(rows)) throw new Error('invalid_server_shape');
   return rows.length ? sanitizePublishedProduct(rows[0]) : null;

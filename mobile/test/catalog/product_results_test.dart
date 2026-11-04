@@ -80,8 +80,7 @@ void main() {
     p.provenance['identity_verification'] = 'unverified';
     await tester.pumpWidget(host(Scaffold(body: ProductResultContent(product: p))));
     await tester.pumpAndSettle();
-    expect(find.text('Variant: Original'), findsOneWidget);
-    expect(find.text('Net quantity: 500 g'), findsOneWidget);
+    expect(find.text('Original · 500 g'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text(
         'Barcode ownership has not been independently verified. Identity is read from the submitted packaging.',

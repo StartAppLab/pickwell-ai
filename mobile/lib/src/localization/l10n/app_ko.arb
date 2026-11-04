@@ -263,7 +263,7 @@
   "pkNoBarcode": "No readable barcode in this photo",
   "pkContinue": "Continue",
   "pkBarcodeDone": "Barcode ✓",
-  "pkCapturePrivacy": "Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.",
+  "pkCapturePrivacy": "Submitted evidence photos are temporary. A small front-package thumbnail may be retained and shown publicly after operator approval and publication. Nutrition and ingredient photos never become product images.",
   "pkCaveat": "Label information is not medical advice.",
   "pkBack": "Back",
   "pkCopyBarcode": "Copy barcode",

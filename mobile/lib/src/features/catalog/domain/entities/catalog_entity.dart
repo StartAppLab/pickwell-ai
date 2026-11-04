@@ -1,3 +1,4 @@
+import 'product_thumbnail.dart';
 import 'dart:math';
 import 'quota_snapshot.dart';
 
@@ -5,6 +6,7 @@ enum LookupStatus { idle, scanning, checking, found, miss, processing, denied, e
 
 class ProductRecord {
   final String barcode;
+  final ProductThumbnail? thumbnail;
   final String? name, brand;
   final String summary;
   final Map<String, dynamic> nutrition, ingredients;
@@ -17,6 +19,7 @@ class ProductRecord {
   final String? modelVersion, rulesVersion;
   const ProductRecord({
     required this.barcode,
+    this.thumbnail,
     this.name,
     this.brand,
     required this.summary,

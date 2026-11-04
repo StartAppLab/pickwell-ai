@@ -1,7 +1,8 @@
+import 'product_identity_header.dart';
+import 'product_card_thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
-import '../../../app/app.dart';
 import '../../domain/entities/catalog_entity.dart';
 import 'product_section.dart';
 import 'product_finding_card.dart';
@@ -40,37 +41,19 @@ class ProductResultContent extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Semantics(
-                  label: l.pkNoProductPhoto,
-                  child: Container(
-                    width: 80,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(d.nestedCornerRadius),
-                    ),
-                    child: AppIcon(
-                      icon: Icons.inventory_2_outlined,
-                      size: 40,
-                      color: context.colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                ProductCardThumbnail(
+                  thumbnail: p.thumbnail,
+                  placeholderLabel: l.pkNoProductPhoto,
+                  width: 80,
+                  height: 96,
                 ),
                 Gap(d.spacingMd),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(p.name ?? l.pkFoodProduct, style: context.textTheme.headlineSmall),
-                      if (p.brand?.trim().isNotEmpty == true) Text(p.brand!),
-                      if (p.provenance['identity'] case final Map identity) ...[
-                        if (identity['front'] case final Map front) ...[
-                          if (front['variant'] case final String variant)
-                            Text('${l.pkVariant}: $variant'),
-                          if (front['net_quantity'] case final String quantity)
-                            Text('${l.pkNetQuantity}: $quantity'),
-                        ],
-                      ],
+                      ProductIdentityHeader(product: p),
+                      Gap(d.spacingXxs),
                       SelectableText(p.barcode, style: context.textTheme.bodySmall),
                     ],
                   ),

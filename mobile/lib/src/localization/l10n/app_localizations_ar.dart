@@ -517,7 +517,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pkCapturePrivacy =>
-      'Photos are temporary. Submitting sends them securely for label extraction; they are not kept as product photos.';
+      'Submitted evidence photos are temporary. A small front-package thumbnail may be retained and shown publicly after operator approval and publication. Nutrition and ingredient photos never become product images.';
 
   @override
   String get pkCaveat => 'Label information is not medical advice.';
