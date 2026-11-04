@@ -1,5 +1,7 @@
 # T07.1D.1 — Hosted Product Trust rollout
 
+> **Current rollout:** T07.1C.4 deployed the C.3 private-result and thumbnail schema/handlers. This document preserves its original dated findings; its earlier “not deployed”/version notes are historical. See [current hosted versions, verification and genuine-product/device/cleanup limitations](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md).
+
 Date: 2026-11-04 (Asia/Manila).
 **Decision: PASS WITH LIMITATIONS for the protected hackathon testing deployment.**
 The missing hosted publication gate is resolved. The owner explicitly deferred the

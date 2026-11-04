@@ -1,5 +1,7 @@
 # T07.1C.3 — Immediate private results and safe shared publication
 
+> **Current rollout:** T07.1C.4 deployed the C.3 private-result and thumbnail schema/handlers. This document preserves its original dated findings; its earlier “not deployed”/version notes are historical. See [current hosted versions, verification and genuine-product/device/cleanup limitations](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md).
+
 2026-11-04. Source baseline: `befc320`. This implementation is a working-tree
 change on that baseline, **not a deployed release**. The hosted publication gate
 and testing configuration have not been changed. No live Muse call or physical

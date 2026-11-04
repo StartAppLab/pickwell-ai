@@ -1,5 +1,7 @@
 # T07.1A.1 — Product thumbnail storage and display
 
+> **Current rollout:** T07.1C.4 deployed the C.3 private-result and thumbnail schema/handlers. This document preserves its original dated findings; its earlier “not deployed”/version notes are historical. See [current hosted versions, verification and genuine-product/device/cleanup limitations](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md).
+
 Date: 2026-11-04. Baseline: **`c7b1ee6`**, clean working tree at start.
 **Status: IMPLEMENTED / locally and Native Runtime verified; NOT deployed.**
 No live Meta call, cloud Storage upload, hosted migration or hosted product change.

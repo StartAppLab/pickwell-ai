@@ -380,7 +380,8 @@ No automatic production deployment; no image role/client flag grants publication
 
 ## Private analysis / shared publication separation
 
-T07.1C.3 is implemented locally, not deployed. Read
+T07.1C.3 and thumbnails were deployed in T07.1C.4. Read
+[the hosted rollout and remaining verification/cleanup limits](../docs/PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md), then
 [PICKWELL_PRIVATE_RESULTS.md](../docs/PICKWELL_PRIVATE_RESULTS.md) before applying
 migration `20261104000400` or deploying the private-read/analysis/cancel handlers.
 It changes successful-credit timing while preserving bound operator publication.

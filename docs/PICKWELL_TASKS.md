@@ -1,6 +1,6 @@
 # PICKWELL AI V2 — IMPLEMENTATION TASKS
 
-> **2026-11-04 — T07.1C.3 local implementation, NOT deployed:** Validated new analyses return an owner-only preliminary result immediately, separate from the operator-approved shared catalog. One successful private result consumes one reserved credit exactly once; later publication adds no charge. Rejection/cancellation/review expiry cannot refund that success or erase the private result before its bounded expiry. Private non-image results last up to 24 hours; existing five-draft/24-hour local photo recovery is retained with owner-bound references. Public cache, exact operator approvals, original-photo privacy, billing disabled and 1000/100 testing versus 30/3 standard configuration remain unchanged. This supersedes review-only credit/refund and hidden-result wording **for the new local code only**; cloud behavior remains the T07.1D.1 baseline until authorized coordinated rollout. [Implementation, tests, retention and deployment requirements](PICKWELL_PRIVATE_RESULTS.md).
+> **2026-11-04 — T07.1C.4 hosted state:** Thumbnail and immediate owner-private-result migrations/handlers are deployed from `5178ec1`, with hosted HTTP/SQL boundary checks passing and inference restored. The 1000/100 testing profile, disabled billing, model/spend limits and exact operator approval remain unchanged. No genuine three-photo private-result/thumbnail demo was completed; automatic thumbnail Storage cleanup scheduling remains pending (protected manual cleanup works). [Deployment versions, actual tests and device limitations](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md). Earlier C.3 “not deployed” notes describe its original local-only run.
 
 **Document:** `PICKWELL_TASKS.md`  
 **Version:** 1.5 — Trust gates and post-submission product roadmap\
@@ -384,14 +384,15 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1A.1 Product Thumbnail Storage & Display
 
-**Status:** IMPLEMENTED / locally and Native Runtime verified; NOT deployed. [Implementation/verification](PICKWELL_PRODUCT_THUMBNAILS.md). Use conservative post-publication operator attachment, not automatic image persistence in analysis. T07.1A visual polish remains separate.
+**Status:** DEPLOYED / hosted boundary verification in [T07.1C.4](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md); genuine imagery/device display and automatic thumbnail cleanup scheduling pending. [Implementation/verification](PICKWELL_PRODUCT_THUMBNAILS.md). Use conservative post-publication operator attachment, not automatic image persistence in analysis. T07.1A visual polish remains separate.
 
 - [x] Generate a bounded orientation-correct JPEG derivative from the exact reviewed front image; preserve three-photo digest and original approval gate.
 - [x] Enforce private Storage, immutable reviewed product/source association, publication eligibility, size/MIME constraints and bounded Storage-API orphan cleanup.
 - [x] Display safe optional media on Home/local recent cards and Details, with loading/error/legacy fallbacks and no image-driven Muse calls or quota changes.
 - [x] Disclose retained published derivative versus temporary evidence/private incomplete upload; preserve operator evidence handoff and update capture privacy copy.
 - [x] Run targeted Flutter/backend/SQL/native codec/Storage/privacy/authority/association regression; record exact observed results.
-- [ ] Hosted rollout, protected cleanup scheduling, genuine product imagery and fresh-device visual verification. **Not authorized/executed in this task.** No synthetic local result is a real hosted publication claim.
+- [x] Hosted migration/handler rollout and protected operator cleanup execution verified in T07.1C.4.
+- [ ] Automatic protected Storage cleanup scheduling, genuine product imagery and fresh-device visual verification. No synthetic local/rollback result is a real hosted publication claim.
 
 **Rollout requirements:** `20261104000300_pickwell_product_thumbnails.sql`, new public read-only image function, updated projection handlers, rebuilt client and protected operator cleanup runner. Explicit owner authorization before hosted deployment; no dashboard, fourth photo, automatic approval or broad UI redesign.
 
@@ -442,19 +443,34 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1C.3 Immediate Private Results & Safe Shared Publication
 
-**Status:** IMPLEMENTED / locally verified; NOT deployed. Hosted/device/live-model
-validation and coordinated rollout remain pending explicit authorization.
+**Status:** DEPLOYED / hosted boundary checks passed in T07.1C.4. Android APK
+installed; genuine private-result/Muse/operator/device validation remains pending.
 Dependencies: C.1, C and the existing thumbnail/identity implementation.
 
 - [x] Deliver validated owner-only preliminary Details immediately, with uncertainty and private/local preview fallback; exclude private results from public lookup and shared recents.
 - [x] Preserve exact evidence-bound operator publication, immutable ready records and separate conflicting private contributions; only one canonical publication wins.
 - [x] Add SQL tests before accounting changes, then verify exactly-once successful private credit, no publication double charge, failed-inference refunds and cancellation/expiry abuse resistance in native PostgreSQL.
 - [x] Keep bounded owner references/local drafts and expiry cleanup; preserve published thumbnails, legacy records, quotas, spend controls and disabled billing.
-- [ ] Authorize and verify coordinated hosted migration/function rollout and matching Flutter installation; test a real three-photo private-result/operator/canonical flow on device.
+- [x] Authorized coordinated hosted migration/function rollout and matching Android APK installation verified in T07.1C.4.
+- [ ] Test a real three-photo private-result/operator/canonical flow on device.
 
 **Evidence:** [T07.1C.3 report](PICKWELL_PRIVATE_RESULTS.md). Prior T07.1/T07.1D.1
 passes remain historical evidence for their tested revisions, not approval of this
-undeployed accounting change. No next task is started automatically.
+changed accounting path. Hosted evidence and remaining limits are in T07.1C.4; no next task is started automatically.
+
+### T07.1C.4 Hosted Private Results & Thumbnail Rollout
+
+**Status:** DEPLOYED / PASS WITH LIMITATIONS for protected hackathon testing.
+Implementation/deployment source `5178ec1`; [full rollout report](PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md).
+
+- [x] Review and commit existing C.3 source/tests; preserve thumbnail baseline and clean source tree before deployment.
+- [x] Verify project/inventory; pause inference under existing lock; apply exact `20261104000300` and `20261104000400` forward migrations; deploy six compatible handlers; restore inference without altering plans, billing, model or spend controls.
+- [x] Execute 71 hosted HTTP/REST and 59 rollback-only SQL assertions; preserve original data/counters; verify owner/private/public boundaries, review bindings/closure, credit settlement, canonical winner and thumbnail eligibility.
+- [x] Confirm scheduled private/telemetry maintenance; run protected operator thumbnail cleanup successfully (zero orphans). Build and install matching Android APK; secret/config/artifact checks pass.
+- [ ] Demonstrate a genuine three-photo Muse analysis, positive owner-only private HTTP/UI/local preview, real exact-evidence operator approval, attached/public thumbnail bytes and guest reuse; run fresh parallel cloud submission races with controlled real inputs.
+- [ ] Configure an automatic protected Storage-API thumbnail cleanup runner; existing command remains manual after upload batches.
+
+**Limitations:** SQL fixture identities/metrics/approvals/publication/Storage metadata were rolled back, not a real product inference or committed public asset. The Android phone was locked at UI inspection; launch intent accepted is not a device UI pass. Existing hosted private-result/thumbnail counts are zero. Do not start polish or submission automatically.
 
 ### T07.1D Targeted Regression and Release Gate
 
