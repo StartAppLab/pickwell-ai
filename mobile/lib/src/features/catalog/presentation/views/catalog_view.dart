@@ -4,13 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../../config/_config.dart';
 import '../../../../core/_core.dart';
-import '../../../app/app.dart';
 import '../../data/data_sources/services/scanner_media_service.dart';
 import '../../domain/entities/catalog_entity.dart';
 import '../blocs/catalog/catalog_cubit.dart';
-import '../widgets/lookup_notice.dart';
+import '../widgets/barcode_scanner_page.dart';
+import '../widgets/scanner_circle_button.dart';
 
 class CatalogView extends StatefulWidget {
   final AppSession? session;
@@ -161,124 +162,55 @@ class _CatalogViewState extends State<CatalogView> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
-    final d = context.themeData.dimensionsData;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l.pkScan),
-        actions: [
-          BlocBuilder<CatalogCubit, CatalogState>(
-            builder: (context, state) => IconButton(
-              tooltip: l.pkTorch,
-              onPressed:
-                  state.status == LookupStatus.scanning &&
-                      camera.value.torchState != TorchState.unavailable
-                  ? () => camera.toggleTorch().catchError((Object _) {
-                      if (context.mounted) context.read<CatalogCubit>().cameraError();
-                    })
-                  : null,
-              icon: const AppIcon(icon: Icons.flash_on),
-            ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: BlocConsumer<CatalogCubit, CatalogState>(
-          listener: (context, state) {
-            if (state.status == LookupStatus.found) {
-              context.replace('/product/${state.barcode}', extra: state.quota);
-            }
-            if (state.status == LookupStatus.miss) {
-              context.replace('/capture/${state.barcode}', extra: state.quota);
-            }
+    return BlocConsumer<CatalogCubit, CatalogState>(
+      listener: (context, state) {
+        // Ready results open the existing Details directly, without a found page.
+        if (state.status == LookupStatus.found) {
+          context.replace('/product/${state.barcode}', extra: state.quota);
+        }
+        if (state.status == LookupStatus.miss) {
+          context.replace('/capture/${state.barcode}', extra: state.quota);
+        }
+      },
+      builder: (context, state) => BarcodeScannerPage(
+        state: state,
+        session: widget.session,
+        camera: MobileScanner(
+          controller: camera,
+          onDetect: (capture) => unawaited(_detect(capture)),
+          onDetectError: (_, _) {
+            if (context.mounted) context.read<CatalogCubit>().cameraError();
           },
-          builder: (context, state) => Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    MobileScanner(
-                      controller: camera,
-                      onDetect: (capture) => unawaited(_detect(capture)),
-                      onDetectError: (_, _) {
-                        if (context.mounted) context.read<CatalogCubit>().cameraError();
-                      },
-                      errorBuilder: (context, error) => Center(
-                        child: Text(
-                          error.errorCode == MobileScannerErrorCode.permissionDenied
-                              ? l.pkCameraDenied
-                              : l.pkError,
-                        ),
-                      ),
-                    ),
-                    if (state.status == LookupStatus.scanning || state.status == LookupStatus.idle)
-                      IgnorePointer(
-                        child: Container(
-                          width: MediaQuery.sizeOf(context).width.clamp(0, 300) - 40,
-                          height: 160,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: context.colorScheme.tertiaryContainer,
-                              width: 3,
-                            ),
-                            borderRadius: BorderRadius.circular(d.cardCornerRadius),
-                          ),
-                        ),
-                      ),
-                    if (state.status == LookupStatus.checking)
-                      const Center(child: CircularProgressIndicator()),
-                  ],
-                ),
-              ),
-              if (state.status == LookupStatus.scanning)
-                Padding(
-                  padding: EdgeInsets.all(d.paddingMd),
-                  child: Text(l.pkPoint, textAlign: TextAlign.center),
-                ),
-              if ([
-                LookupStatus.denied,
-                LookupStatus.error,
-                LookupStatus.processing,
-              ].contains(state.status))
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: LookupNotice(
-                      status: state.status,
-                      error: state.error,
-                      quota: state.quota,
-                      session: widget.session,
-                      retry: () {
-                        if (state.barcode != null && state.error != 'invalid_barcode') {
-                          context.read<CatalogCubit>().retry();
-                        } else {
-                          _start();
-                        }
-                      },
-                    ),
-                  ),
-                ),
-              if (state.error == 'camera')
-                TextButton(onPressed: () => openAppSettings(), child: Text(l.pkOpenSettings)),
-              Padding(
-                padding: EdgeInsets.all(d.paddingSm),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    IconButton(
-                      tooltip: l.pkGallery,
-                      onPressed: state.status == LookupStatus.checking ? null : _gallery,
-                      icon: const AppIcon(icon: Icons.photo_library_outlined),
-                    ),
-                    TextButton(
-                      onPressed: state.status == LookupStatus.checking ? null : _manual,
-                      child: Text(l.pkManual),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          errorBuilder: (context, error) => const SizedBox.expand(),
+        ),
+        torchAction: ValueListenableBuilder<MobileScannerState>(
+          valueListenable: camera,
+          builder: (context, value, _) => ScannerCircleButton(
+            tooltip: l.pkTorch,
+            overCamera: true,
+            selected: value.torchState == TorchState.on,
+            icon: value.torchState == TorchState.on
+                ? HugeIcons.strokeRoundedFlash
+                : HugeIcons.strokeRoundedFlashOff,
+            onPressed:
+                state.status == LookupStatus.scanning && value.torchState != TorchState.unavailable
+                ? () => camera.toggleTorch().catchError((Object _) {
+                    if (context.mounted) context.read<CatalogCubit>().cameraError();
+                  })
+                : null,
           ),
         ),
+        onClose: () => context.canPop() ? context.pop() : context.go('/home'),
+        onGallery: _gallery,
+        onManual: _manual,
+        onRetry: () {
+          if (state.barcode != null && state.error != 'invalid_barcode') {
+            context.read<CatalogCubit>().retry();
+          } else {
+            _start();
+          }
+        },
+        onOpenSettings: () => openAppSettings(),
       ),
     );
   }

@@ -11,3 +11,7 @@ export 'quota_status.dart';
 export 'product_card_thumbnail.dart';
 export 'product_identity_header.dart';
 export 'product_detail_scaffold.dart';
+export 'barcode_scan_overlay.dart';
+export 'barcode_lookup_loading.dart';
+export 'barcode_scanner_page.dart';
+export 'scanner_circle_button.dart';
