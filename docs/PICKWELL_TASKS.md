@@ -1,11 +1,13 @@
 # PICKWELL AI V2 — IMPLEMENTATION TASKS
 
 **Document:** `PICKWELL_TASKS.md`  
-**Version:** 1.3 — Trust gates and post-submission product roadmap\
+**Version:** 1.4 — Trust gates and post-submission product roadmap\
 **Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (TASKS)  
 **Status:** Core hackathon flow verified; statuses reconciled 2026-11-04 against implementation reports, T07.1 and owner-confirmed device checks. UI polish implementation verified (screen mockups/native brand assets and fresh device review remain); optional Settings scope is undecided; submission handoff remains open.
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -28,7 +30,8 @@ This section and the dated reconciliation notes below describe current status. E
 | T07.1A | UI polish implementation/regression evidence exists; remaining screen fidelity and fresh device visual review are pending. No new sign-off in this roadmap update. |
 | T07.1B | COMPLETE: read-only audit delivered; critical publication gaps remain. |
 | T07.1C.1 | Three-photo capture/identity observations implemented and locally verified; deployment/live/device checks remain. |
-| T07.1C / T07.1D | NOT COMPLETE: operator publication protections and targeted release gate remain pending. |
+| T07.1C | IMPLEMENTED / locally verified, restricted operator publication; hosted deployment and fresh device/native concurrency verification remain. [Evidence](PICKWELL_PRODUCT_TRUST.md). |
+| T07.1D | NOT STARTED; deployment-profile and affected full-flow release sign-off remain pending. |
 | T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
 | T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
@@ -405,17 +408,20 @@ permissions, EAN/UPC/gallery and live mobile navigation. No device checkbox chan
 
 ### T07.1C Minimum Product Trust Protection
 
-**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report, T07.1C.1 identity observations and prioritized critical findings.
+**Status / dependencies:** IMPLEMENTED / locally verified; hosted rollout and fresh device/native multi-connection checks remain unverified. Depends on T07.1B report, T07.1C.1 identity observations and prioritized critical findings.
 
-- [ ] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
-- [ ] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
-- [ ] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
-- [ ] Preserve guest cached lookup, the approved three-photo capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
-- [ ] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
+- [x] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
+- [x] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
+- [x] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
+- [x] Preserve guest cached lookup, the approved three-photo capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
+- [x] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
 
 **Acceptance:** Each critical audit finding has a verified mitigation or an explicit release-blocking/restricted-path disposition; no false identity assurance or unsafe trusted-record overwrite. Deadline pressure does not waive a P0 blocker.
 
 **Targeted validation:** Reproduce each critical case before/after; negative auth/RLS, concurrent publication/idempotency, quota rollback, photo disposal and sanitized cache projection tests for affected paths.
+
+
+**Local evidence / release disposition:** [T07.1C implementation report](PICKWELL_PRODUCT_TRUST.md). All new associations are restricted to exact-evidence operator review. These checks record local implementation, not deployment or T07.1D completion. An operator must obtain and inspect the exact processed evidence privately; without it, do not approve.
 
 ### T07.1D Targeted Regression and Release Gate
 

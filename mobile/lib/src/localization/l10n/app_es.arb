@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "Paso 1 · Frente",
   "pkIdentityUnverified": "La titularidad del código de barras no se ha verificado de forma independiente. La identidad se lee del envase enviado.",
   "pkVariant": "Variante",
-  "pkNetQuantity": "Cantidad neta"
+  "pkNetQuantity": "Cantidad neta",
+  "pkAnalysisReviewPending": "Este producto necesita revisión antes de compartirse. Tus fotos están guardadas; no se ha gastado un crédito de análisis exitoso.",
+  "pkAnalysisReviewRejected": "No se aprobó la asociación del producto. Tus fotos están guardadas y no se gastó un crédito.",
+  "pkCancelAnalysisReview": "Cancelar revisión",
+  "pkReviewExpiresAt": "La revisión caduca: {time}",
+  "pkBarcodeOperatorReviewed": "Asociación del código revisada por un operador; sin verificación independiente.",
+  "pkAnalysisReviewExpired": "La revisión caducó. Tus fotos están guardadas. Puedes enviar un nuevo análisis."
 }

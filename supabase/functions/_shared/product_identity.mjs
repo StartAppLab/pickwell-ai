@@ -27,7 +27,7 @@ export function identityConflictPhotos(identity){
  }
  for(let a=0;a<IDENTITY_PHOTOS.length;a++)for(let b=a+1;b<IDENTITY_PHOTOS.length;b++){
   const left=IDENTITY_PHOTOS[a],right=IDENTITY_PHOTOS[b];
-  for(const field of ['brand','variant','net_quantity']){
+  for(const field of ['product_name','brand','variant','net_quantity']){
    const x=identity[left][field],y=identity[right][field];if(!norm(x)||!norm(y))continue;
    let conflict=false;
    if(field==='net_quantity'){

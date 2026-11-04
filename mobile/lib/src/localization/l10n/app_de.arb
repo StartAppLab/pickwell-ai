@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "Schritt 1 · Vorderseite",
   "pkIdentityUnverified": "Die Zuordnung zum Barcode wurde nicht unabhängig geprüft. Die Identität wird von der eingesandten Verpackung abgelesen.",
   "pkVariant": "Variante",
-  "pkNetQuantity": "Nettofüllmenge"
+  "pkNetQuantity": "Nettofüllmenge",
+  "pkAnalysisReviewPending": "Dieses Produkt muss vor der Freigabe geprüft werden. Deine Fotos sind gespeichert; kein Guthaben für erfolgreiche Analysen wurde verbraucht.",
+  "pkAnalysisReviewRejected": "Die Produktzuordnung wurde nicht genehmigt. Fotos und Guthaben bleiben erhalten.",
+  "pkCancelAnalysisReview": "Prüfung abbrechen",
+  "pkReviewExpiresAt": "Prüfung läuft ab: {time}",
+  "pkBarcodeOperatorReviewed": "Barcode-Zuordnung durch einen Betreiber geprüft, nicht unabhängig verifiziert.",
+  "pkAnalysisReviewExpired": "Die Prüfung ist abgelaufen. Deine Fotos sind gespeichert. Du kannst eine neue Analyse senden."
 }

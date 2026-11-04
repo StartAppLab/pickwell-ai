@@ -9,6 +9,7 @@ import '../../../domain/entities/label_photo.dart';
 
 abstract class AnalysisApiService {
   Future<Map<String, dynamic>> submit(AnalysisRequest request);
+  Future<Map<String, dynamic>> cancelReview(String requestId);
 }
 
 @LazySingleton(as: AnalysisApiService)
@@ -48,6 +49,47 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
       throw StateError('invalid_image');
     }
     return bytes;
+  }
+
+  @override
+  Future<Map<String, dynamic>> cancelReview(String requestId) async {
+    if (!config.features.backendEnabled || !config.features.authEnabled) {
+      return {'status': 'auth_required'};
+    }
+    final client = _client ?? Supabase.instance.client;
+    var session = client.auth.currentSession;
+    if (session == null) return {'status': 'auth_required'};
+    if (session.isExpired) {
+      try {
+        session = (await client.auth.refreshSession().timeout(const Duration(seconds: 10))).session;
+      } on AuthException {
+        return {'status': 'auth_required'};
+      }
+      if (session == null) return {'status': 'auth_required'};
+    }
+    final owner = session.user.id;
+    try {
+      final response = await client.functions
+          .invoke(
+            'cancel-analysis-review',
+            body: {'request_id': requestId},
+            headers: {'apikey': config.apiKey, 'Authorization': 'Bearer ${session.accessToken}'},
+          )
+          .timeout(const Duration(seconds: 10));
+      if (client.auth.currentUser?.id != owner || [401, 403].contains(response.status)) {
+        return {'status': 'auth_required'};
+      }
+      if (response.data is! Map) throw const FormatException();
+      return {...Map<String, dynamic>.from(response.data as Map), '_quota_subject': owner};
+    } on FunctionException catch (error) {
+      if (client.auth.currentUser?.id != owner || [401, 403].contains(error.status)) {
+        return {'status': 'auth_required'};
+      }
+      if (error.details is Map) {
+        return {...Map<String, dynamic>.from(error.details as Map), '_quota_subject': owner};
+      }
+      rethrow;
+    }
   }
 
   @override

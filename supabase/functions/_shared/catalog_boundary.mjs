@@ -1,3 +1,4 @@
+import { ingredientSupportedByRaw } from './ingredient_evidence.mjs';
 import { sanitizeIdentityObservations } from './product_identity.mjs';
 import { sanitizeRetakeDetails, retakePhotos } from './retake_details.mjs';
 // T02.2 read boundaries. No Meta calls, quota mutation, purchases or public writes.
@@ -98,6 +99,8 @@ export function sanitizePublishedProduct(row) {
   result.nutrition.nutrients = (row.nutrition?.nutrients ?? []).map(item =>
     pick(item, ['name', 'value', 'unit', 'source']));
   result.ingredients = pick(row.ingredients, ['raw', 'items', 'declared_allergens']);
+  result.ingredients.items=(row.ingredients?.items??[]).filter(item=>ingredientSupportedByRaw(item,row.ingredients?.raw));
+  const unsupportedIngredients=result.ingredients.items.length!==(row.ingredients?.items??[]).length;
   result.findings = (row.findings ?? []).map(finding => ({
     ...pick(finding, ['severity', 'title', 'explanation', 'sort_order']),
     source_details: {
@@ -108,7 +111,7 @@ export function sanitizePublishedProduct(row) {
         pick(evidence, ['source', 'field', 'label_text', 'reference', 'is_demo','photo','value','unit','basis'])),
     },
   }));
-  result.explanations=(row.explanations??[]).map(e=>({
+  result.explanations=(row.explanations??[]).filter(e=>e.photo!=='ingredients'||ingredientSupportedByRaw(e.ingredient??e.source,row.ingredients?.raw)).map(e=>({
     ...pick(e,['photo','source','text','ingredient','topic','kind','reference_id','limitations','origin']),
     ...(Array.isArray(e.references)?{references:e.references.map(r=>pick(r,['id','title','url','reviewed_at']))}:{}),
   }));
@@ -117,6 +120,12 @@ export function sanitizePublishedProduct(row) {
     'interpretation_version','reference_version','interpretation_method','interpretation_reviewed_at','nutrition_context_rules_version']);
   const identity=sanitizeIdentityObservations(row.provenance?.identity);
   if(identity){result.provenance.identity=identity;result.provenance.identity_verification='unverified';result.provenance.identity_policy_version='front-observations-v1';}
+  const association=row.provenance?.barcode_association;
+  result.provenance.barcode_association=association?.status==='operator_reviewed'&&association.method==='operator_evidence_review'&&association.policy_version==='trust-publication-v1'&&
+    /^[A-Za-z0-9][A-Za-z0-9._-]{7,99}$/.test(association.review_ref??'')&&Number.isFinite(Date.parse(association.reviewed_at??''))?
+    pick(association,['status','method','policy_version','review_ref','reviewed_at','review_basis']):{status:'unverified',method:'none'};
+  if(unsupportedIngredients||(row.explanations??[]).some(e=>e.photo==='ingredients'&&!ingredientSupportedByRaw(e.ingredient??e.source,row.ingredients?.raw))){result.summary='Some ingredient readings could not be supported by the transcribed text. Review the available label information.';
+    result.missing_information.push('Unsupported structured ingredient readings are omitted; source transcription may be incomplete.');}
   return result;
 }
 

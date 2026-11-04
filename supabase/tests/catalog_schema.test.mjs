@@ -205,6 +205,10 @@ test('T02.1 additive migrations and catalog/job invariants', async t => {
       const candidate=frontLabelFixture();candidate.identity.front.brand='Synthetic fixture';candidate.identity.front.net_quantity='500 g';
       const validated=validateAnalysis(candidate,{model:'muse-spark-1.3',requireFront:true});
       await rpc('pickwell_stage_analysis',[user,key,{...candidate,validation:validated},'muse-spark-1.3',PROMPT_VERSION],['uuid','uuid','jsonb','text','text']);
+      assert.equal((await rpc('pickwell_publication_gate',[user,key],['uuid','uuid'])).status,'review_required');
+      const review=(await rpc('pickwell_inspect_product_review',[null],['uuid'])).find(r=>r.barcode===code);
+      const observed=await rpc('pickwell_inspect_product_review',[review.review_id],['uuid']);
+      await rpc('pickwell_decide_product_review',[observed.review_id,observed.barcode,observed.input_digest,observed.candidate_digest,observed.policy_version,'approve','schema-review-001','controlled_demo_evidence','no_discrepancy'],['uuid','text','text','text','text','text','text','text','text']);
       const published=await rpc('pickwell_publish_analysis',[user,key,validated],['uuid','uuid','jsonb']);
       assert.equal(published.status,'ready');assert.equal(published.product.name,'Synthetic oats');assert.equal(published.product.brand,'Synthetic fixture');
       assert.equal(published.product.provenance.identity.front.net_quantity,'500 g');assert.equal(published.product.provenance.identity_verification,'unverified');

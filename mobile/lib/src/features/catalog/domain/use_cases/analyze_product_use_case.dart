@@ -8,6 +8,8 @@ import '../repositories/analysis_repository.dart';
 class AnalyzeProductUseCase implements FutureEitherUseCase<AnalysisRequest, AnalysisResult> {
   final AnalysisRepository repository;
   AnalyzeProductUseCase(this.repository);
+  Future<Either<Failure, AnalysisResult>> cancelReview(String requestId, String barcode) =>
+      repository.cancelReview(requestId, barcode);
   @override
   Future<Either<Failure, AnalysisResult>> call(AnalysisRequest input) => repository.submit(input);
 }

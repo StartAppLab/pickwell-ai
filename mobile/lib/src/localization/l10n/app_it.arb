@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "Passo 1 · Fronte",
   "pkIdentityUnverified": "L’associazione al codice a barre non è stata verificata indipendentemente. L’identità è letta dalla confezione inviata.",
   "pkVariant": "Variante",
-  "pkNetQuantity": "Quantità netta"
+  "pkNetQuantity": "Quantità netta",
+  "pkAnalysisReviewPending": "Questo prodotto richiede una revisione prima della condivisione. Le foto sono salvate; nessun credito per analisi riuscite è stato usato.",
+  "pkAnalysisReviewRejected": "L’associazione del prodotto non è stata approvata. Le foto sono salvate e nessun credito è stato usato.",
+  "pkCancelAnalysisReview": "Annulla revisione",
+  "pkReviewExpiresAt": "La revisione scade: {time}",
+  "pkBarcodeOperatorReviewed": "Associazione al codice esaminata da un operatore, non verificata indipendentemente.",
+  "pkAnalysisReviewExpired": "La revisione è scaduta. Le foto sono salvate. Puoi inviare una nuova analisi."
 }

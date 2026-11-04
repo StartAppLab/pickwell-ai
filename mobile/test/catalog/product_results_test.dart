@@ -37,6 +37,39 @@ Widget host(Widget child, {bool dark = false, double scale = 1}) => MaterialApp(
 );
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets(
+    'pending review is bounded and cancellable without infinite loading or trust certification',
+    (tester) async {
+      var cancelled = false, checked = false;
+      await tester.pumpWidget(
+        host(
+          Scaffold(
+            body: SingleChildScrollView(
+              child: AnalysisSubmissionNotice(
+                state: AnalysisSubmissionState(
+                  phase: AnalysisPhase.review,
+                  canRetry: true,
+                  result: AnalysisResult(
+                    AnalysisPhase.review,
+                    reviewExpiresAt: DateTime.utc(2026, 11, 4, 12),
+                  ),
+                ),
+                retry: () => checked = true,
+                cancelReview: () => cancelled = true,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(LinearProgressIndicator), findsNothing);
+      await tester.tap(find.text('Cancel review'));
+      expect(cancelled, true);
+      await tester.tap(find.text('Check request again'));
+      expect(checked, true);
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('front identity observations show variant and quantity without a verification claim', (
     tester,
   ) async {

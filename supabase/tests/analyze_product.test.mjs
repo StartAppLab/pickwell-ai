@@ -110,6 +110,22 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   const r=await fetch(endpoint,{method:'POST',headers:{Authorization:`Bearer ${u.access_token}`},body:form(barcode,key,overrides)});
   const j=await r.json();assert.ok(!/PRIVATE|data:image|Bearer |refresh_token/.test(JSON.stringify(j)));return {http:r.status,body:j};
  };
+ // Explicit operator actions only for disposable positive-publication fixtures.
+ // The ordinary submit helper never grants approval.
+ const approvePending=async(u,key)=>{
+  const q=(await rest(`analysis_requests?user_id=eq.${u.user.id}&idempotency_key=eq.${key}`))[0];
+  await rpc('pickwell_publication_gate',{p_user:u.user.id,p_key:key});
+  const v=(await rest('product_trust_reviews?job_id=eq.'+q.job_id))[0];
+  assert.equal(v.state,'pending');
+  await rpc('pickwell_decide_product_review',{p_review:v.id,p_barcode:v.barcode,p_input_digest:v.input_digest,
+   p_candidate_digest:v.candidate_digest,p_policy_version:v.policy_version,p_decision:'approve',
+   p_review_ref:'native-fixture-review',p_review_basis:'controlled_demo_evidence',p_resolution:'wording_variation_reviewed'});
+ };
+ const submitApproved=async(u,barcode,key=crypto.randomUUID())=>{
+  const first=await submit(u,barcode,key);
+  if(first.body.status!=='review_required')return first;
+  await approvePending(u,key);return submit(u,barcode,key);
+ };
  const cleanup=async(u,key)=>rpc('pickwell_settle_analysis',{p_user:u.user.id,p_key:key,p_outcome:'failed',p_error:'service_unavailable',p_retake:null});
  let alice,bob;
  try{
@@ -146,9 +162,9 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   await t.test('32 cross-user submits share one claim and hide the other owner job',async()=>{
    const barcode=code(),before=providerCalls,keys=Array.from({length:32},()=>crypto.randomUUID());
    const out=await Promise.all(keys.map((k,i)=>submit(i%2?bob:alice,barcode,k)));
-   assert.equal(providerCalls-before,1);assert.equal(out.filter(r=>r.http===202).length,1);
-   assert.ok(out.every(r=>[200,202].includes(r.http)&&r.body.status==='processing'));
-   const winner=out.findIndex(r=>r.http===202);const owner=winner%2?bob:alice;
+   assert.equal(providerCalls-before,1);assert.ok(out.some(r=>r.body.status==='review_required'));
+   assert.ok(out.every(r=>[200,202].includes(r.http)&&['processing','review_required'].includes(r.body.status)));
+   const winner=out.findIndex(r=>r.body.status==='review_required');const owner=winner%2?bob:alice;
    for(let i=0;i<out.length;i++)if(i%2!==winner%2)assert.equal(out[i].body.job_id,undefined);
    const jobs=await rest(`analysis_jobs?barcode=eq.${barcode.padStart(14,'0')}`);assert.equal(jobs.length,1);
    assert.equal((await rest(`products?barcode=eq.${barcode.padStart(14,'0')}`)).length,0,'No premature publication');
@@ -241,30 +257,21 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const ledger=(await rest(`ai_usage?reservation_id=eq.${request.reservation_id}`))[0];
    await rpc('pickwell_record_provider_metrics',{p_attempt:ledger.id,p_state:'failed',p_cost:0,p_input:null,p_output:null,p_duration:0,p_estimate:null});await cleanup(alice,key);
   });
-  await t.test('one synthetic trusted publication is reused by parallel users with zero repeated provider calls',async()=>{
-   const key=crypto.randomUUID(),barcode=code();const staged=await submit(alice,barcode,key);assert.equal(staged.http,202);
-   const pending=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
-   const request=(await rest(`analysis_requests?user_id=eq.${alice.user.id}&idempotency_key=eq.${key}`))[0];
-   // Trusted fixture writer exercises the existing atomic finalizer, not an
-   // implementation or claim of real T05.2 interpretation/T05.3 publication.
-   const product=(await rest('products','POST',{barcode,name:'SYNTHETIC ORCHESTRATION TEST',is_demo:true}))[0];
-   const analysis=(await rest('product_analyses','POST',{product_id:product.id,contributor_id:alice.user.id,
-    nutrition:pending.candidate.nutrition,ingredients:pending.candidate.ingredients,summary:'SYNTHETIC MOCK PROVIDER FIXTURE ONLY',
-    model_version:'fixture:mock-provider',prompt_version:'fixture',rules_version:'fixture',validated_at:new Date().toISOString()}))[0];
-   await rest('analysis_findings','POST',{analysis_id:analysis.id,severity:'yellow',title:'Synthetic fixture',
-    explanation:'Test data, not food advice',source_details:{rule_id:'fixture',evidence:[{is_demo:true}]}});
-   await rpc('pickwell_finish_usage',{p_reservation:request.reservation_id,p_outcome:'published',p_product:product.id,p_analysis:analysis.id});
+  await t.test('explicit synthetic operator approval publishes once; parallel reuse makes no provider call',async()=>{
+   const key=crypto.randomUUID(),barcode=code();
+   const staged=await submit(alice,barcode,key);assert.equal(staged.body.status,'review_required');
+   await approvePending(alice,key);deferPublication=false;
+   const published=await submit(alice,barcode,key);assert.equal(published.body.status,'ready');
    const before=providerCalls;
    const reused=await Promise.all(Array.from({length:12},(_,i)=>submit(i%2?alice:bob,barcode)));
-   assert.ok(reused.every(v=>v.http===200&&v.body.status==='already_exists'&&v.body.product.is_demo===true));
-   assert.equal(providerCalls,before);assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,1);
-   assert.equal((await submit(alice,barcode,key)).body.status,'already_exists');assert.equal(providerCalls,before);
+   assert.ok(reused.every(v=>v.http===200&&v.body.status==='already_exists'));
+   assert.equal(providerCalls,before);
   });
   await rest('plan_limits?plan_code=eq.free&metric=eq.ai_analysis','PATCH',{daily_limit:100,change_reason:'Disposable publication integration only'});
   await t.test('actual publication revalidates, seals facts and charges once; another guest reads without Meta',async()=>{
    deferPublication=false;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const quotaBefore=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
-   snapshotDown=true;const output=await submit(alice,barcode,key);snapshotDown=false;assert.equal(output.http,200);assert.equal(output.body.status,'ready');assert.equal(output.body.quota_unavailable,true);
+   snapshotDown=true;const output=await submitApproved(alice,barcode,key);snapshotDown=false;assert.equal(output.http,200);assert.equal(output.body.status,'ready');assert.equal(output.body.quota_unavailable,true);
    const product=output.body.product;assert.equal(product.schema_version,2);assert.equal(product.findings.length,4);
    assert.equal(product.explanations.length,0);assert.equal(product.provenance.prompt_version,'label-analysis-v3');
    assert.ok(product.findings.every(f=>f.source_details.reference&&f.source_details.evidence[0].basis==='per_100g'));
@@ -290,7 +297,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    for(const [mode,target] of [['contradiction','nutrition'],['ingredient-order','ingredients'],['source-mismatch','nutrition'],['text-only','nutrition']]){
     behavior=mode;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
     const initial=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'});
-    const r=await submit(alice,barcode,key);assert.equal(r.http,200,mode+': '+JSON.stringify(r.body));assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+    const r=await submitApproved(alice,barcode,key);assert.equal(r.http,200,mode+': '+JSON.stringify(r.body));assert.equal(r.body.status,'ready',JSON.stringify(r.body));
     if(mode==='contradiction')assert.equal(r.body.product.nutrition.nutrients[0].value,null);
     if(mode==='text-only')assert.deepEqual(r.body.product.nutrition.nutrients,[]);
     if(mode==='source-mismatch'){assert.ok(r.body.product.nutrition.nutrients.every(n=>n.value!==null));assert.deepEqual(r.body.product.findings,[]);}
@@ -300,21 +307,21 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    }behavior='success';
   });
   await t.test('a valid per-serving label publishes without inventing any colour finding',async()=>{
-   behavior='unclassified';const result=await submit(alice,code());behavior='success';
+   behavior='unclassified';const result=await submitApproved(alice,code());behavior='success';
    assert.equal(result.body.status,'ready');assert.deepEqual(result.body.product.findings,[]);
    assert.equal(result.body.product.nutrition.basis,'per_serving');
    assert.ok(result.body.product.missing_information.some(v=>v.includes('No supported nutrition colour')));
   });
   await t.test('uncertain facts publish as unknown and survive secure candidate revalidation',async()=>{
    behavior='normalized';const barcode=code(),key=crypto.randomUUID();
-   const r=await submit(alice,barcode,key);behavior='success';
+   const r=await submitApproved(alice,barcode,key);behavior='success';
    assert.equal(r.body.status,'ready',JSON.stringify(r.body));assert.equal(r.body.product.nutrition.basis,'unknown');
    assert.equal(r.body.product.nutrition.nutrients[0].value,19);assert.deepEqual(r.body.product.findings,[]);
    assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
   });
   await t.test('format-equivalent numeric sources publish and replay without another model call',async()=>{
    behavior='formatted';const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
-   const result=await submit(alice,barcode,key);behavior='success';
+   const result=await submitApproved(alice,barcode,key);behavior='success';
    assert.equal(result.body.status,'ready');
    assert.ok(result.body.product.nutrition.nutrients.every(n=>n.value!==null));
    assert.equal(result.body.product.findings.length,4);
@@ -323,7 +330,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   });
   await t.test('IU and qualified units publish and remain readable to a guest without another model call',async()=>{
    behavior='extended-units';const barcode=code(),key=crypto.randomUUID(),before=providerCalls;
-   const r=await submit(alice,barcode,key);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+   const r=await submitApproved(alice,barcode,key);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
    const vitamin=r.body.product.nutrition.nutrients.find(n=>n.name==='Vitamin D');
    assert.deepEqual(vitamin,{name:'Vitamin D',value:71,unit:'IU',source:'Vitamin D 71 IU'});
    const lookup=createGetProductHandler(env,fetcher);
@@ -335,7 +342,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   });
   await t.test('grounded interpretation publishes, caches references and requires no model on guest lookup',async()=>{
    behavior='interpreted';const barcode=code(),before=providerCalls;
-   const r=await submit(alice,barcode);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
+   const r=await submitApproved(alice,barcode);behavior='success';assert.equal(r.body.status,'ready',JSON.stringify(r.body));
    assert.ok(r.body.product.summary.includes('other food contributes'));assert.ok(r.body.product.provenance.interpretation_version);
    assert.ok(r.body.product.explanations.some(e=>e.references?.[0]?.id==='fda-ingredients'&&e.text.includes('reduce separation')));
    const lookup=createGetProductHandler(env,fetcher);
@@ -344,7 +351,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal(providerCalls-before,1);
   });
   await t.test('operator refresh is immutable, atomic, idempotent and denied to clients without spending credits',async()=>{
-   behavior='success';const r=await submit(alice,code());assert.equal(r.body.status,'ready');
+   behavior='success';const r=await submitApproved(alice,code());assert.equal(r.body.status,'ready');
    const product=(await rest('published_products?id=eq.'+r.body.product.id))[0];
    const payload=refreshInterpretationRecord(product),args={p_product:product.id,p_expected_analysis:product.analysis_id,p_expected_version:null,p_payload:payload};
    const quota=await rpc('pickwell_quota_snapshot',{p_user:alice.user.id,p_metric:'ai_analysis'}),before=providerCalls;
@@ -365,7 +372,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
   await t.test('parallel publication is atomic and a lost acknowledgement never double charges',async()=>{
    deferPublication=true;const key=crypto.randomUUID(),barcode=code(),before=providerCalls;
    const staged=await submit(alice,barcode,key);assert.equal(staged.http,202);
-   deferPublication=false;publicationAckLoss=true;
+   await approvePending(alice,key);deferPublication=false;publicationAckLoss=true;
    const results=await Promise.all(Array.from({length:12},()=>submit(alice,barcode,key)));
    assert.ok(results.every(r=>r.http===200&&['ready','already_exists'].includes(r.body.status)));
    assert.equal(providerCalls-before,1);
@@ -385,7 +392,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    assert.equal((await rest('usage_reservations?job_id=eq.'+row.job_id))[0].state,'reserved');
    assert.equal((await rest('analysis_jobs?id=eq.'+row.job_id))[0].state,'processing');
    await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
-   deferPublication=false;assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
+   await approvePending(alice,key);deferPublication=false;assert.ok(['ready','already_exists'].includes((await submit(alice,barcode,key)).body.status));
   });
   await t.test('invalidated catalog records require operator review and cannot be overwritten by contributors',async()=>{
    const barcode=code(),key=crypto.randomUUID();
@@ -404,7 +411,7 @@ test('real native HTTP/Auth/SQL orchestration with mocked Meta and parallel subm
    const row=(await rest('analysis_candidates?job_id=eq.'+staged.body.job_id))[0];
    row.candidate.nutrition.nutrients[0].value=9999;
    await rest('analysis_candidates?job_id=eq.'+row.job_id,'PATCH',{candidate:row.candidate});
-   deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
+   await approvePending(alice,key);deferPublication=false;const result=await submit(alice,barcode,key);assert.equal(result.body.status,'analysis_failed');
    assert.equal(result.body.error,'invalid_model_output');
    assert.equal((await rest('analysis_candidates?job_id=eq.'+row.job_id)).length,0);
    assert.equal((await rest('products?barcode=eq.'+barcode.padStart(14,'0'))).length,0);

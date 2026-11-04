@@ -11,6 +11,60 @@ import 'label_capture_test.dart' show pngFixture;
 
 void main() {
   test(
+    'review cancellation requires session and sends only the request identity, never photos or authority',
+    () async {
+      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final url = 'http://127.0.0.1:${server.port}';
+      var calls = 0;
+      final listener = server.listen((request) async {
+        calls++;
+        expect(request.uri.path, '/functions/v1/cancel-analysis-review');
+        expect(request.headers.value('authorization'), isNot('Bearer public-fixture'));
+        final body = jsonDecode(await utf8.decoder.bind(request).join());
+        expect(body, {'request_id': '10000000-0000-4000-8000-000000000002'});
+        request.response.headers.contentType = ContentType.json;
+        request.response.write(jsonEncode({'status': 'review_cancelled'}));
+        await request.response.close();
+      });
+      final sdk = SupabaseClient(
+        url,
+        'public-fixture',
+        authOptions: const AuthClientOptions(autoRefreshToken: false),
+      );
+      final api = SupabaseAnalysisApiService.withClient(
+        AppConfig(
+          features: const AppFeatures(authMode: AuthMode.optional, backendEnabled: true),
+          baseUrl: url,
+          apiKey: 'public-fixture',
+          sentryDsn: '',
+          postHogApiKey: '',
+          postHogHost: '',
+          revenueCatAndroidApiKey: '',
+          revenueCatiOSApiKey: '',
+          revenueCatEntitlementId: '',
+        ),
+        sdk,
+      );
+      try {
+        expect(
+          (await api.cancelReview('10000000-0000-4000-8000-000000000002'))['status'],
+          'auth_required',
+        );
+        expect(calls, 0);
+        await sdk.auth.setInitialSession(jsonEncode(fixtureSession()));
+        expect(
+          (await api.cancelReview('10000000-0000-4000-8000-000000000002'))['status'],
+          'review_cancelled',
+        );
+        expect(calls, 1);
+      } finally {
+        await sdk.dispose();
+        await listener.cancel();
+        await server.close(force: true);
+      }
+    },
+  );
+  test(
     'SDK submits binary three-file multipart only with user session, reuses key and parses safe failures',
     () async {
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);

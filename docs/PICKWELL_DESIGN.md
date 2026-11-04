@@ -1,12 +1,14 @@
 # PICKWELL AI V2 — DESIGN SPECIFICATION
 
 **File:** `PICKWELL_DESIGN.md`  
-**Version:** 1.4 — Preserved UI and planned trust presentation\
+**Version:** 1.5 — Preserved UI and planned trust presentation\
 **Date:** November 4, 2026\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework / DESIGN  
 **Status:** Final visual direction approved through iterative reference mockups; platform fidelity and real product-photo sources remain implementation checks.  
 **Source of truth:** `PICKWELL_PRD.md` v1.6. For technical semantics use SPEC/DATABASE; this document governs presentation and navigation.
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -188,3 +190,15 @@ Processing photos (including future front-package evidence) remain transient, ne
 Reuse the existing capture screen, camera adapter, independent previews/retakes, saved-draft recovery and contextual OTP; no unrelated UI polish. A legacy two-photo draft keeps its labels and requests the missing front. Front-specific failures identify the affected image; clear pair conflicts preserve the other photo. Missing/unreadable names do not by themselves force a retake. Results show front-observed name/brand, variant/net quantity when available, and a color-independent statement that barcode ownership has not been independently verified. Known cached records without identity metadata remain readable. No front image becomes product art; placeholders stay honest. The full T07.1C operator gate remains pending.
 
 **v1.4:** Mandatory front capture supersedes section 14's earlier prohibition on a required front step. Future T08.3 enhances verification of the three-photo evidence; it does not introduce this already-approved capture requirement anew. No independent identity verification or fresh device sign-off claimed.
+
+## T07.1C restricted-publication presentation
+
+Keep existing capture/results layout and approved visual system. A readable
+three-photo analysis may display a bounded **pending operator review** notice,
+expiry in local time, manual Check request again and Cancel review actions. This
+is not an infinite loading state or a request to retake every readable label.
+Retain private bounded drafts until ready, explicit discard or existing draft
+expiry; cancellation retains photos for an explicit new request. Rejection is
+terminal for that key. Reviewed results explain operator-reviewed association and
+separately state that independent barcode ownership has not been verified. No
+confidence percentage or verified badge. Legacy results retain uncertainty.

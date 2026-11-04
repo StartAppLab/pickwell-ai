@@ -1072,4 +1072,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'Net quantity';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'An operator must review this product before it can be shared. Your photos are saved; no successful-analysis credit has been used.';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'The product association was not approved. Your photos are saved and no successful-analysis credit was used.';
+
+  @override
+  String get pkCancelAnalysisReview => 'Cancel review';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'Review expires: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed =>
+      'Barcode association reviewed by an operator; not independently verified.';
+
+  @override
+  String get pkAnalysisReviewExpired =>
+      'The review expired. Your photos are saved. You can submit a new analysis.';
 }

@@ -2011,6 +2011,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Net quantity'**
   String get pkNetQuantity;
+
+  /// No description provided for @pkAnalysisReviewPending.
+  ///
+  /// In en, this message translates to:
+  /// **'An operator must review this product before it can be shared. Your photos are saved; no successful-analysis credit has been used.'**
+  String get pkAnalysisReviewPending;
+
+  /// No description provided for @pkAnalysisReviewRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'The product association was not approved. Your photos are saved and no successful-analysis credit was used.'**
+  String get pkAnalysisReviewRejected;
+
+  /// No description provided for @pkCancelAnalysisReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel review'**
+  String get pkCancelAnalysisReview;
+
+  /// No description provided for @pkReviewExpiresAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Review expires: {time}'**
+  String pkReviewExpiresAt(String time);
+
+  /// No description provided for @pkBarcodeOperatorReviewed.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode association reviewed by an operator; not independently verified.'**
+  String get pkBarcodeOperatorReviewed;
+
+  /// No description provided for @pkAnalysisReviewExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'The review expired. Your photos are saved. You can submit a new analysis.'**
+  String get pkAnalysisReviewExpired;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

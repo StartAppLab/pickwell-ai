@@ -1074,4 +1074,28 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'Nettofüllmenge';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'Dieses Produkt muss vor der Freigabe geprüft werden. Deine Fotos sind gespeichert; kein Guthaben für erfolgreiche Analysen wurde verbraucht.';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'Die Produktzuordnung wurde nicht genehmigt. Fotos und Guthaben bleiben erhalten.';
+
+  @override
+  String get pkCancelAnalysisReview => 'Prüfung abbrechen';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'Prüfung läuft ab: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed =>
+      'Barcode-Zuordnung durch einen Betreiber geprüft, nicht unabhängig verifiziert.';
+
+  @override
+  String get pkAnalysisReviewExpired =>
+      'Die Prüfung ist abgelaufen. Deine Fotos sind gespeichert. Du kannst eine neue Analyse senden.';
 }

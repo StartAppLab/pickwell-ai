@@ -355,3 +355,14 @@ Daily analysis service limits return a UTC retry/reset time. Only confirmed
 pre-provider denials explicitly permit a fresh persisted request key; uncertain
 provider outcomes retain their key. Manual retries still enforce all rate/spend
 controls. See [pending analysis evidence](../docs/PICKWELL_PENDING_ANALYSES.md).
+
+## T07.1C publication review (rollout pending)
+
+New associations require an exact-evidence operator decision under
+`trust-publication-v1`. Apply the C.1 migration then
+`20261104000200_pickwell_product_trust.sql` before updated analysis handlers; deploy
+`cancel-analysis-review` with handler-owned confirmed-user authorization. Approval
+is available only to protected service/operator RPCs, never a mobile endpoint.
+See [Product Trust](../docs/PICKWELL_PRODUCT_TRUST.md) for dry-run commands, expiry,
+private evidence handling, tests and rollout prerequisites. No live change is
+implied by these files.

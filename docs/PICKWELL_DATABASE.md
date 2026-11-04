@@ -1,9 +1,11 @@
 # PICKWELL AI V2 — SUPABASE DATABASE & BACKEND DATA DESIGN
 
-**Version:** 1.2 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
+**Version:** 1.3 · **Date:** 2026-11-04 · **Repository:** `pickwell-ai`\
 **Source of truth:** `PICKWELL_PRD.md` v1.6, `PICKWELL_DESIGN.md` v1.4, `PICKWELL_SPEC.md` v1.4.\
 **Status:** Original illustrative SQL remains a blueprint; later implementation references and TASKS record actual migrations/verification. Section 16 is proposed data design only. This revision creates/applies no SQL migration and makes no deployment claim.\
 **Goal:** Shared barcode product catalog, authenticated Meta AI contributions, server-enforced adjustable daily quotas, RevenueCat-ready Premium entitlements, no active purchase flow.
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -446,3 +448,31 @@ Only non-image model observations are retained: nullable name/brand/variant/net 
 The migration has clean/replay and actual publication/front-retake/credit tests in isolated PGlite PostgreSQL 17.5; Supabase's PostgreSQL 15/native/hosted application is not claimed. Apply through the migration runner before deploying updated handlers/client; no cloud push was performed. T07.1C's approval gate, durable review/dispute schema and historical identity review remain outside this implementation.
 
 **v1.2:** Three-photo input/provenance/retake support only; the audit's first-contribution poisoning gap remains until T07.1C.
+
+## T07.1C actual additive migration (local verification; cloud not applied)
+
+`supabase/migrations/20261104000200_pickwell_product_trust.sql`, after C.1's
+`20261104000100`, adds private RLS-protected `product_trust_reviews` and service-only
+review/inspection/decision/cancellation RPCs. Each unique job is bound immutably to
+barcode, image digest, canonical candidate digest and policy. Decisions are
+pending → approved/rejected/cancelled/expired; approved → published/cancelled/expired.
+Approval attribution cannot be edited after decision. Review references are opaque,
+not contributor emails. No review table access or mutation RPC grant goes to
+`anon`/`authenticated`; existing server-privilege trust remains explicit.
+
+Publication and the lower usage finalizer independently compare exact candidate
+facts, findings, versions and approval before inserting/sealing/marking ready and
+charging one credit in the existing transaction/advisory lock. Ready data is never
+replaced by contributor submissions. Pending candidates expire within 30 minutes;
+existing maintenance/admission pruning releases successful-provider reservations,
+clears candidates and expires reviews. Closed unpublished reviews are pruned after
+30 days; published bindings are minimal retained non-image provenance. Raw provider
+payloads and photographs are not stored in this table.
+
+Empty structured ingredient arrays are allowed alongside readable partial raw text;
+unsupported structured assertions must not be fabricated to satisfy a nonempty
+array. Public reads sanitize provenance (no private review ID, contributor identity,
+input digest or photos); legacy records remain unverified. Refresh preserves the
+original association review and identity fields. No schema reset, live migration,
+quota configuration change or billing activation was performed. Full operator and
+retention details: [Product Trust](PICKWELL_PRODUCT_TRUST.md).

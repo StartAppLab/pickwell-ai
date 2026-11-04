@@ -1069,4 +1069,24 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get pkNetQuantity => '내용량';
+
+  @override
+  String get pkAnalysisReviewPending => '공유 전에 운영자의 검토가 필요합니다. 사진은 저장되어 있으며 성공 분석 횟수는 사용되지 않았습니다.';
+
+  @override
+  String get pkAnalysisReviewRejected => '제품 연결이 승인되지 않았습니다. 사진과 분석 횟수는 유지됩니다.';
+
+  @override
+  String get pkCancelAnalysisReview => '검토 취소';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return '검토 만료: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed => '운영자가 바코드 연결을 검토했으며 독립적으로 검증한 것은 아닙니다.';
+
+  @override
+  String get pkAnalysisReviewExpired => '검토가 만료되었습니다. 사진은 저장되어 있으며 새 분석을 제출할 수 있습니다.';
 }

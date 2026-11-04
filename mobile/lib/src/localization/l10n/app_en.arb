@@ -458,5 +458,12 @@
   "pkCaptureStepFront": "Step 1 · Front",
   "pkIdentityUnverified": "Barcode ownership has not been independently verified. Identity is read from the submitted packaging.",
   "pkVariant": "Variant",
-  "pkNetQuantity": "Net quantity"
+  "pkNetQuantity": "Net quantity",
+  "pkAnalysisReviewPending": "An operator must review this product before it can be shared. Your photos are saved; no successful-analysis credit has been used.",
+  "pkAnalysisReviewRejected": "The product association was not approved. Your photos are saved and no successful-analysis credit was used.",
+  "pkCancelAnalysisReview": "Cancel review",
+  "pkReviewExpiresAt": "Review expires: {time}",
+  "pkBarcodeOperatorReviewed": "Barcode association reviewed by an operator; not independently verified.",
+  "pkAnalysisReviewExpired": "The review expired. Your photos are saved. You can submit a new analysis.",
+  "@pkReviewExpiresAt": {"placeholders": {"time": {"type": "String"}}}
 }

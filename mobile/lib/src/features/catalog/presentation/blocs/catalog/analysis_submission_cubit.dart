@@ -122,13 +122,27 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
     // A definitive quota denial made no model attempt; manual same-key checks
     // may re-evaluate a reset/config change. Only explicit no-provider admission responses
     // permit a fresh persisted request key; uncertain provider outcomes always reuse it.
-    if (result.phase == AnalysisPhase.authRequired ||
+    if (result.phase == AnalysisPhase.idle ||
+        result.phase == AnalysisPhase.review ||
+        result.phase == AnalysisPhase.authRequired ||
         result.phase == AnalysisPhase.denied ||
         result.restartAllowed) {
       _attempts--;
       await draft.recordAttempts(_attempts);
-      if (result.restartAllowed) {
-        await draft.renewRequest();
+      if (result.restartAllowed || result.phase == AnalysisPhase.idle) {
+        if (!await draft.renewRequest()) {
+          if (!isClosed) {
+            emit(
+              AnalysisSubmissionState(
+                phase: AnalysisPhase.error,
+                barcode: snapshot.barcode,
+                error: 'draft_save',
+                canRetry: true,
+              ),
+            );
+          }
+          return;
+        }
         _key = draft.requestId;
         _attempts = 0;
       }
@@ -147,6 +161,66 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
   bool get retryAvailable => state.canRetry && current;
   Future<void> retry() async {
     if (state.canRetry) await submit();
+  }
+
+  Future<void> cancelReview() async {
+    if (isClosed || state.phase != AnalysisPhase.review || !current || _key == null) return;
+    final snapshot = draft.state;
+    emit(AnalysisSubmissionState(phase: AnalysisPhase.submitting, barcode: snapshot.barcode));
+    final response = await analyze.cancelReview(_key!, snapshot.barcode!);
+    if (isClosed) return;
+    final result = response.fold(
+      (_) => const AnalysisResult(
+        AnalysisPhase.review,
+        error: 'review_cancel_failed',
+        retryable: true,
+      ),
+      (value) => value,
+    );
+    if (result.phase == AnalysisPhase.ready) {
+      final clean = await draft.discardSubmitted(snapshot);
+      if (!isClosed) {
+        emit(
+          AnalysisSubmissionState(
+            phase: clean ? AnalysisPhase.ready : AnalysisPhase.cleanupFailed,
+            barcode: snapshot.barcode,
+            result: result,
+          ),
+        );
+      }
+    } else if (result.phase == AnalysisPhase.idle) {
+      if (!current) {
+        emit(AnalysisSubmissionState(barcode: snapshot.barcode));
+        return;
+      }
+      if (!await draft.renewRequest()) {
+        if (!isClosed) {
+          emit(
+            AnalysisSubmissionState(
+              phase: AnalysisPhase.error,
+              barcode: snapshot.barcode,
+              error: 'draft_save',
+              canRetry: true,
+            ),
+          );
+        }
+        return;
+      }
+      _key = draft.requestId;
+      _attempts = 0;
+      _stamp = _fingerprint(draft.state);
+      if (!isClosed) emit(AnalysisSubmissionState(barcode: draft.state.barcode));
+    } else {
+      emit(
+        AnalysisSubmissionState(
+          phase: result.phase,
+          barcode: snapshot.barcode,
+          error: result.error,
+          result: result,
+          canRetry: result.retryable,
+        ),
+      );
+    }
   }
 
   // Explicit fresh inference for server-approved legacy or source-validation retakes.

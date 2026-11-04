@@ -13,6 +13,19 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   final CatalogLocalSource local;
   AnalysisRepositoryImpl(this.api, this.local);
   @override
+  Future<Either<Failure, AnalysisResult>> cancelReview(String requestId, String barcode) async {
+    try {
+      return Right(AnalysisModel.parse(await api.cancelReview(requestId), barcode));
+    } catch (_) {
+      return Left(
+        ServerFailure(
+          error: const DataError(stackTrace: 'review_cancel_failed', statusCode: 'unavailable'),
+        ),
+      );
+    }
+  }
+
+  @override
   Future<Either<Failure, AnalysisResult>> submit(AnalysisRequest request) async {
     try {
       final result = AnalysisModel.parse(await api.submit(request), request.barcode);

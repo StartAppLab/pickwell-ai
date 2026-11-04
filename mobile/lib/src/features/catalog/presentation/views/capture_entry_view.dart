@@ -201,6 +201,9 @@ class CaptureEntryView extends StatelessWidget {
                             submission.phase == AnalysisPhase.ready))
                       AnalysisSubmissionNotice(
                         state: submission,
+                        cancelReview: submission.phase == AnalysisPhase.review
+                            ? () => sender.cancelReview()
+                            : null,
                         reanalyzeSaved:
                             sender.current && submission.result?.canReanalyzeSaved == true
                             ? () => sender.reanalyzeSaved()

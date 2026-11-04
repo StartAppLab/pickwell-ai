@@ -86,6 +86,9 @@ class ProductResultContent extends StatelessWidget {
               title: l.pkOverview,
               children: [
                 Text(p.summary),
+                if (p.provenance['barcode_association'] case final Map association)
+                  if (association['status'] == 'operator_reviewed')
+                    Text(l.pkBarcodeOperatorReviewed, style: context.textTheme.bodySmall),
                 if (p.provenance['identity'] is Map)
                   Text(l.pkIdentityUnverified, style: context.textTheme.bodySmall),
                 Text(l.pkCaveat, style: context.textTheme.bodySmall),

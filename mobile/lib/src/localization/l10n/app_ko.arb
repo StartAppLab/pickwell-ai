@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "1단계 · 앞면",
   "pkIdentityUnverified": "바코드와의 연결은 독립적으로 검증되지 않았습니다. 제품 정보는 제출된 포장에서 읽은 것입니다.",
   "pkVariant": "종류",
-  "pkNetQuantity": "내용량"
+  "pkNetQuantity": "내용량",
+  "pkAnalysisReviewPending": "공유 전에 운영자의 검토가 필요합니다. 사진은 저장되어 있으며 성공 분석 횟수는 사용되지 않았습니다.",
+  "pkAnalysisReviewRejected": "제품 연결이 승인되지 않았습니다. 사진과 분석 횟수는 유지됩니다.",
+  "pkCancelAnalysisReview": "검토 취소",
+  "pkReviewExpiresAt": "검토 만료: {time}",
+  "pkBarcodeOperatorReviewed": "운영자가 바코드 연결을 검토했으며 독립적으로 검증한 것은 아닙니다.",
+  "pkAnalysisReviewExpired": "검토가 만료되었습니다. 사진은 저장되어 있으며 새 분석을 제출할 수 있습니다."
 }

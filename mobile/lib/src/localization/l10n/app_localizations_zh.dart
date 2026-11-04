@@ -1069,4 +1069,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkNetQuantity => '净含量';
+
+  @override
+  String get pkAnalysisReviewPending => '此产品分享前需要操作员审核。照片已保存，未消耗成功分析额度。';
+
+  @override
+  String get pkAnalysisReviewRejected => '产品对应关系未获批准。照片和成功分析额度均已保留。';
+
+  @override
+  String get pkCancelAnalysisReview => '取消审核';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return '审核到期：$time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed => '条形码对应关系经操作员审核，尚未经独立核实。';
+
+  @override
+  String get pkAnalysisReviewExpired => '审核已到期。照片已保存，可以提交新的分析。';
 }

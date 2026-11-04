@@ -572,3 +572,13 @@ All future feature ideas go to a separately approved ROADMAP, not to TASKS check
 ---
 
 **Reminder:** The repository is not attached to this document. The coding agent must inspect the real working tree and existing instructions before applying `AGENTS.md` or beginning development.
+
+## T07.1C publication safety (current implementation)
+
+New shared barcode associations require server-controlled evidence-bound operator
+approval under `trust-publication-v1`. Preserve pending review, expiry/cancel/retry
+with bounded private drafts; no client/model may authorize publication. Cross-photo
+identity discrepancies require review, not blanket retakes of readable labels.
+Operator review does not establish independent barcode ownership. Follow
+`../docs/PICKWELL_PRODUCT_TRUST.md`; existing general “validate and publish” wording
+is conditional on this gate. No backend rollout or new UI polish is implied.

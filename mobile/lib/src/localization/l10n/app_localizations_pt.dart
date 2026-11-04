@@ -1074,4 +1074,28 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'Quantidade líquida';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'Este produto precisa de revisão antes de ser partilhado. As fotos estão guardadas; nenhum crédito de análise bem-sucedida foi usado.';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'A associação do produto não foi aprovada. As fotos e os créditos foram preservados.';
+
+  @override
+  String get pkCancelAnalysisReview => 'Cancelar revisão';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'A revisão expira: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed =>
+      'Associação ao código revista por um operador, sem verificação independente.';
+
+  @override
+  String get pkAnalysisReviewExpired =>
+      'A revisão expirou. As fotos estão guardadas. Pode enviar uma nova análise.';
 }

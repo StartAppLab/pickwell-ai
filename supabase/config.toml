@@ -316,3 +316,6 @@ verify_jwt = true
 # DB inference_enabled remains false until the validation/publication path is ready.
 [functions.analyze-product]
 verify_jwt = true
+
+[functions.cancel-analysis-review]
+verify_jwt = false # Handler verifies confirmed non-anonymous Auth identity and ownership.

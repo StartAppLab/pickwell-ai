@@ -15,6 +15,32 @@ class AnalysisModel {
     }
     if (json['barcode'] != null && json['barcode'] != barcode) throw const FormatException();
     if (status == 'auth_required') return const AnalysisResult(AnalysisPhase.authRequired);
+    if (status == 'review_required') {
+      return AnalysisResult(
+        AnalysisPhase.review,
+        quota: quota,
+        error: 'review_required',
+        retryable: true,
+        retryAfterSeconds: 30,
+        reviewExpiresAt: json['review_expires_at'] is String
+            ? DateTime.tryParse(json['review_expires_at'] as String)
+            : null,
+      );
+    }
+    if (status == 'review_cancelled') return AnalysisResult(AnalysisPhase.idle, quota: quota);
+    if (status == 'analysis_failed' &&
+        ['review_expired', 'review_policy_changed', 'review_cancelled'].contains(json['error'])) {
+      return AnalysisResult(
+        AnalysisPhase.error,
+        error: json['error'] as String,
+        quota: quota,
+        retryable: true,
+        restartAllowed: true,
+      );
+    }
+    if (status == 'analysis_failed' && json['error'] == 'review_rejected') {
+      return AnalysisResult(AnalysisPhase.blocked, error: 'review_rejected', quota: quota);
+    }
     if (status == 'needs_retake') {
       final targets = json['retake'];
       if (targets is! List ||

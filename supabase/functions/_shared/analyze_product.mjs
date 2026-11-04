@@ -1,3 +1,4 @@
+import { normalizeIngredientEvidence } from './ingredient_evidence.mjs';
 import { sanitizeRetakeDetails, retakePhotos, retakeTarget } from './retake_details.mjs';
 import { attachAnalysisQuota } from './analysis_quota_response.mjs';
 import { requireVerifiedEmail, IdentityError } from './analysis_authorization.mjs';
@@ -55,7 +56,7 @@ function createAnalysisExecution(env,fetcher){
    // A previous denial before provider admission stays retryable after restart.
    if(result.status==='analysis_failed'&&['service_budget_exceeded','provider_attempt_limit','concurrency_limited','inference_disabled'].includes(result.error))
     return failure(result.error,result.error==='inference_disabled'?503:429);
-   if(!['ready','already_exists','processing','analysis_failed','needs_retake'].includes(result.status))throw Error();
+   if(!['ready','already_exists','processing','analysis_failed','needs_retake','review_required','review_cancelled'].includes(result.status))throw Error();
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.
    if(['ready','already_exists'].includes(result.status))body.product=sanitizePublishedProduct(result.product);
@@ -65,13 +66,14 @@ function createAnalysisExecution(env,fetcher){
     body.allow_diagnostic_reanalysis=Array.isArray(result.retake_details)&&(
      result.retake_details.length===0||body.retake_details.some(d=>d.source==='validation'&&d.code==='numeric_source'));
    }
+   if(result.status==='review_required'){body.review_expires_at=result.review_expires_at;body.retry_after_seconds=30;}
    if(result.status==='processing'){
     body.retry_after_seconds=4;
     if(['validation_pending','provider_reconciliation_required'].includes(result.stage))body.stage=result.stage;
     if(result.stage==='provider_reconciliation_required'){body.error='provider_outcome_unknown';body.retryable=false;body.retry_after_seconds=30;}
    }
    if(result.status==='analysis_failed')body.error=result.error||'analysis_failed';
-   return reply(body,http);
+   return reply(body,result.status==='review_required'?202:http);
   }
   async function complete(){
    try{return safe(await publishAnalysis(rpc,identity,settle));}
@@ -86,7 +88,7 @@ function createAnalysisExecution(env,fetcher){
    }
    if(admitted.status==='inference_disabled')return failure('inference_disabled');
    if(admitted.status!=='reserved'){
-    if(admitted.status==='processing'&&admitted.stage==='validation_pending')return await complete();
+    if(admitted.status==='review_required'||admitted.status==='processing'&&admitted.stage==='validation_pending')return await complete();
     return safe(admitted);
    }
    // Missing/mismatched credentials cannot spend a provider-attempt claim.
@@ -108,6 +110,7 @@ function createAnalysisExecution(env,fetcher){
    const metadata={model:claim.model,usage:null};let extracted;
    try{
     extracted=await invokeMetaLabels(env,input.images,metadata,fetcher,analysisProfile);
+    extracted.candidate=normalizeIngredientEvidence(extracted.candidate);
     extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,requireFront:true});
    }catch(error){
     const uncertain=['TimeoutError','AbortError','TypeError'].includes(error?.name)||!metadata.provider_status;
@@ -132,7 +135,7 @@ function createAnalysisExecution(env,fetcher){
    // policy. Store the accepted handoff state required by the private DB contract.
    extracted.candidate.status='extracted';
    extracted.candidate.retake=[];
-   extracted.candidate.retake_reasons=[];
+   extracted.candidate.retake_reasons=extracted.candidate.retake_reasons.filter(d=>d.code==='product_mismatch');
    extracted.candidate.nutrition=extracted.validation.nutrition;
    extracted.candidate.ingredients=extracted.validation.ingredients;
    extracted.validation=validateAnalysis(extracted.candidate,{model:claim.model,now:extracted.validation.provenance.validated_at,requireFront:true});

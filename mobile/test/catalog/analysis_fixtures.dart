@@ -11,6 +11,13 @@ class FakeAnalysis extends AnalysisRepository {
   );
   Completer<Either<Failure, AnalysisResult>>? pending;
   bool transportError = false;
+  int cancelledReviews = 0;
+  @override
+  Future<Either<Failure, AnalysisResult>> cancelReview(String requestId, String barcode) async {
+    cancelledReviews++;
+    return const Right(AnalysisResult(AnalysisPhase.idle));
+  }
+
   @override
   Future<Either<Failure, AnalysisResult>> submit(AnalysisRequest request) async {
     requests.add(request);

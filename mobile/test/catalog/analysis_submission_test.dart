@@ -17,6 +17,10 @@ import 'catalog_repository_test.dart' show MemoryStorage, FakeApi;
 class ApiFixture extends AnalysisApiService {
   Map<String, dynamic> value = {};
   @override
+  Future<Map<String, dynamic>> cancelReview(String requestId) async => {
+    'status': 'review_cancelled',
+  };
+  @override
   Future<Map<String, dynamic>> submit(AnalysisRequest request) async => value;
 }
 
@@ -50,6 +54,69 @@ void main() {
     repository = FakeAnalysis();
     sender = AnalysisSubmissionCubit(AnalyzeProductUseCase(repository), draft);
     await capture();
+  });
+  test('review status checks retain photos and the same key without exhausting retries', () async {
+    final before = draft.state, key = draft.requestId;
+    repository.result = const AnalysisResult(AnalysisPhase.review, retryable: true);
+    sender.beginAuthorization();
+    await sender.finishAuthorization(true);
+    for (var i = 0; i < 5; i++) {
+      await sender.retry();
+    }
+    expect(sender.state.phase, AnalysisPhase.review);
+    expect(draft.attempts, 0);
+    expect(repository.requests.every((request) => request.requestId == key), true);
+    expect(draft.state.front, same(before.front));
+    expect(draft.state.nutrition, same(before.nutrition));
+    expect(draft.state.ingredients, same(before.ingredients));
+    expect(media.deleted, isEmpty);
+    repository.result = AnalysisResult(AnalysisPhase.ready, product: resultFixture());
+    await sender.retry();
+    expect(sender.state.phase, AnalysisPhase.ready);
+    expect(draft.state.count, 0);
+  });
+  test('explicit cancellation retains photos and creates a new persisted request', () async {
+    final before = draft.state, key = draft.requestId;
+    repository.result = const AnalysisResult(AnalysisPhase.review, retryable: true);
+    sender.beginAuthorization();
+    await sender.finishAuthorization(true);
+    await sender.cancelReview();
+    expect(repository.cancelledReviews, 1);
+    expect(sender.state.phase, AnalysisPhase.idle);
+    expect(draft.requestId, isNot(key));
+    expect(draft.state.front, same(before.front));
+    expect(draft.state.nutrition, same(before.nutrition));
+    expect(draft.state.ingredients, same(before.ingredients));
+    expect(media.deleted, isEmpty);
+  });
+  test('expiry permits explicit retry; rejection cannot silently retry', () async {
+    repository.result = AnalysisModel.parse({
+      'status': 'analysis_failed',
+      'error': 'review_expired',
+    }, draft.state.barcode!);
+    final key = draft.requestId;
+    sender.beginAuthorization();
+    await sender.finishAuthorization(true);
+    expect(draft.requestId, isNot(key));
+    expect(sender.retryAvailable, true);
+    expect(draft.state.ready, true);
+    repository.result = AnalysisModel.parse({
+      'status': 'analysis_failed',
+      'error': 'review_rejected',
+    }, draft.state.barcode!);
+    await sender.retry();
+    expect(sender.state.phase, AnalysisPhase.blocked);
+    expect(sender.retryAvailable, false);
+    expect(draft.state.ready, true);
+  });
+  test('lost cancellation acknowledgement recovers with a new request key', () async {
+    repository.result = AnalysisModel.parse({'status': 'review_cancelled'}, draft.state.barcode!);
+    final key = draft.requestId;
+    sender.beginAuthorization();
+    await sender.finishAuthorization(true);
+    expect(sender.state.phase, AnalysisPhase.idle);
+    expect(draft.requestId, isNot(key));
+    expect(draft.state.ready, true);
   });
   test('definitive no-provider denial renews key; uncertain retries preserve it', () async {
     final original = draft.requestId;

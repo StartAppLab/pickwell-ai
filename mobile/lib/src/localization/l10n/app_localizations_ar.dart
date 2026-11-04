@@ -1071,4 +1071,26 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'الكمية الصافية';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'يجب أن يراجع مشغّل هذا المنتج قبل مشاركته. صورك محفوظة ولم تُستهلك حصة تحليل ناجح.';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'لم تتم الموافقة على ارتباط المنتج. صورك وحصة التحليل محفوظتان.';
+
+  @override
+  String get pkCancelAnalysisReview => 'إلغاء المراجعة';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'تنتهي المراجعة: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed => 'راجع مشغّل ارتباط الباركود، دون تحقق مستقل.';
+
+  @override
+  String get pkAnalysisReviewExpired => 'انتهت مهلة المراجعة. صورك محفوظة ويمكنك إرسال تحليل جديد.';
 }

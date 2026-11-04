@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "الخطوة 1 · الواجهة",
   "pkIdentityUnverified": "لم يتم التحقق بشكل مستقل من ارتباط الباركود بالمنتج. تُقرأ الهوية من العبوة المرسلة.",
   "pkVariant": "النوع",
-  "pkNetQuantity": "الكمية الصافية"
+  "pkNetQuantity": "الكمية الصافية",
+  "pkAnalysisReviewPending": "يجب أن يراجع مشغّل هذا المنتج قبل مشاركته. صورك محفوظة ولم تُستهلك حصة تحليل ناجح.",
+  "pkAnalysisReviewRejected": "لم تتم الموافقة على ارتباط المنتج. صورك وحصة التحليل محفوظتان.",
+  "pkCancelAnalysisReview": "إلغاء المراجعة",
+  "pkReviewExpiresAt": "تنتهي المراجعة: {time}",
+  "pkBarcodeOperatorReviewed": "راجع مشغّل ارتباط الباركود، دون تحقق مستقل.",
+  "pkAnalysisReviewExpired": "انتهت مهلة المراجعة. صورك محفوظة ويمكنك إرسال تحليل جديد."
 }

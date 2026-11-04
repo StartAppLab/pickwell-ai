@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "第1步 · 正面",
   "pkIdentityUnverified": "条形码与产品的对应关系尚未经过独立核实。产品身份信息来自提交的包装照片。",
   "pkVariant": "口味或型号",
-  "pkNetQuantity": "净含量"
+  "pkNetQuantity": "净含量",
+  "pkAnalysisReviewPending": "此产品分享前需要操作员审核。照片已保存，未消耗成功分析额度。",
+  "pkAnalysisReviewRejected": "产品对应关系未获批准。照片和成功分析额度均已保留。",
+  "pkCancelAnalysisReview": "取消审核",
+  "pkReviewExpiresAt": "审核到期：{time}",
+  "pkBarcodeOperatorReviewed": "条形码对应关系经操作员审核，尚未经独立核实。",
+  "pkAnalysisReviewExpired": "审核已到期。照片已保存，可以提交新的分析。"
 }

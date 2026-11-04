@@ -1,7 +1,7 @@
 # PICKWELL AI V2 — PRODUCT REQUIREMENTS DOCUMENT
 
 **File:** `PICKWELL_PRD.md`  
-**Version:** 1.6 — Consumer product intelligence and trust roadmap\
+**Version:** 1.7 — Consumer product intelligence and trust roadmap\
 **Date:** November 4, 2026\
 **Project / repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2, PRD  
@@ -13,6 +13,8 @@
 > **Scope authority:** This PRD supersedes Pickwell PRD v1.1 wherever it excluded accounts or left backend choices undecided. It preserves the user's barcode-first seven-step experience, while adding optional sign-in for guests and mandatory verified authentication only when requesting a new AI analysis.
 
 ---
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -427,3 +429,16 @@ Approved before submission, implemented/tested locally; no deployment or new liv
 Names/brands on new records come from front observations, not trusted client fields. Public results expose the limited observations and unverified status. Photo bytes stay transient; device recovery remains five drafts/24 hours, cleared on success/discard/expiry. Three photos are one analysis, one provider request and at most one successful-analysis credit. T07.1C must still control shared publication and address the remaining audit findings; a readable front alone does not fix poisoning. T06.3 deferred, billing disabled. See implementation report for deployment ordering and limits.
 
 **v1.6:** Mandatory front-photo requirement supersedes earlier two-photo flow; no identity certification or full publication gate claimed.
+
+## T07.1C pre-submission safety restriction
+
+The shared catalog must not auto-publish new barcode/label associations merely
+because extraction is plausible. The minimum implemented protection is a bounded,
+private candidate review followed by an authorized, exact-evidence decision before
+publication. Operator review is a restricted operational workflow, not independent
+identity certification or a full moderation product. If the operator cannot obtain
+and review the submitted evidence and barcode association, the candidate must not
+be approved. Existing cache reads remain guest-accessible with no additional AI.
+Readable partial labels remain usable; discrepancies and uncertain identity are
+review conditions. This restriction requires hosted rollout and T07.1D verification
+before a release claim. No T08 scope or monetization is enabled.

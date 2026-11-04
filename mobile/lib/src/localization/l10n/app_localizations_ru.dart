@@ -1071,4 +1071,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'Количество нетто';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'Перед публикацией нужна проверка оператором. Фото сохранены; лимит успешных анализов не потрачен.';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'Связь товара со штрихкодом не одобрена. Фото сохранены; лимит не потрачен.';
+
+  @override
+  String get pkCancelAnalysisReview => 'Отменить проверку';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'Проверка истекает: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed =>
+      'Связь со штрихкодом проверена оператором, но не подтверждена независимо.';
+
+  @override
+  String get pkAnalysisReviewExpired =>
+      'Срок проверки истёк. Фото сохранены. Можно отправить новый анализ.';
 }

@@ -1,11 +1,13 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
 **File:** `PICKWELL_SPEC.md`  
-**Version:** 1.4 — Product trust gates and post-submission architecture\
+**Version:** 1.5 — Product trust gates and post-submission architecture\
 **Date:** 2026-11-04\
 **Repository:** `pickwell-ai`  
 **Framework:** StartAppLab App Framework — Stage 2 (PRD → DESIGN → SPEC → DATABASE → TASKS → AGENTS)  
 **Status:** Existing implementation/verification is recorded in TASKS and T07.1 evidence. Section 18 is an approved future contract, not implemented by this documentation revision; earlier feasibility caveats remain historical planning context.
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -417,3 +419,32 @@ Maintain guest lookup and verified Email OTP for new analysis, deterministic cla
 - Flutter pending manifests write v2 and read v1/v2. V1 drafts keep both labels but are not submission-ready until front capture, which renews their key. All three photos survive OTP/navigation/restart and are included in cleanup, stale-result protection, independent retake and five-item/24-hour retention. No permanent photo storage or public image URL.
 
 **v1.4:** New mandatory three-image contract and backward-compatible observations; original two-image spike/QA evidence remains historical.
+
+## T07.1C implemented publication contract (local; rollout pending)
+
+`analyze-product` keeps its existing verified Email OTP, bounded three-photo parser,
+input digest, quota/admission controls and one Muse call. Validated extraction now
+stages privately and invokes `pickwell_publication_gate`; the service and atomic
+publisher/finalizer both require a current operator decision bound to normalized
+barcode, ordered image digest, canonical JSONB candidate SHA-256 and
+`trust-publication-v1`. Model/client fields cannot approve. Existing ready records
+win over any submission, including potential reformulations.
+
+Owner responses add `review_required` (HTTP 202, expiry, manual same-key check) and
+`review_cancelled`. Pending review is bounded to 30 minutes, with reserved—not
+consumed—AI allowance. Known failures, rejection, cancellation and expiry release
+it; provider ledger costs remain. A rejected key is terminal; expiry/cancellation
+permits an explicit new submission with a new persisted key. Uncertain provider
+outcomes retain the existing reconciliation hold and never rerun blindly.
+`cancel-analysis-review` authenticates confirmed identity and ownership inside the
+handler, throttles, then uses a service-only RPC; it cannot approve or cancel
+another contributor's job. No publicly callable approval endpoint exists.
+
+Observed names/brands/variants/net quantities and cross-image discrepancies remain
+non-image provenance. Potential wording differences require review, not blanket
+retakes. Independent verification remains `unverified`; the separate barcode
+association is `operator_reviewed` only after a real operator decision. Ingredient
+presence checks use raw transcription with bounded spelling/punctuation/bilingual
+support; unsupported items and their explanations are omitted without discarding
+readable raw text. Citations do not prove presence. Interpretation refresh cannot
+replace trust/identity provenance. See the report for limits and deployment order.

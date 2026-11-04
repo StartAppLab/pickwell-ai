@@ -1069,4 +1069,24 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pkNetQuantity => '内容量';
+
+  @override
+  String get pkAnalysisReviewPending => '共有する前に担当者による確認が必要です。写真は保存されており、成功した分析の利用枠は消費されていません。';
+
+  @override
+  String get pkAnalysisReviewRejected => '商品の対応関係は承認されませんでした。写真と分析の利用枠は保持されています。';
+
+  @override
+  String get pkCancelAnalysisReview => '確認をキャンセル';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return '確認期限: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed => 'バーコードとの対応は担当者が確認しましたが、独立した検証ではありません。';
+
+  @override
+  String get pkAnalysisReviewExpired => '確認期限が切れました。写真は保存されています。新しい分析を送信できます。';
 }

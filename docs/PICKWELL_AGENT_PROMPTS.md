@@ -1,8 +1,10 @@
 # PICKWELL AI V2 — AGENT PROMPTS
 
-**Version:** 1.3 — Trust gates and post-submission roadmap\
+**Version:** 1.4 — Trust gates and post-submission roadmap\
 **Date:** 2026-11-04\
-**Sources:** PRD v1.6, DESIGN v1.4, SPEC v1.4, DATABASE v1.2, TASKS v1.3 and actual applicable repository `AGENTS.md`.
+**Sources:** PRD v1.7, DESIGN v1.5, SPEC v1.5, DATABASE v1.3, TASKS v1.4 and actual applicable repository `AGENTS.md`.
+
+> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. Locally implemented/tested, **not deployed or release-signed-off**. `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D remains NOT STARTED; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -875,14 +877,21 @@ LOCKED PRODUCT / ARCHITECTURE
 SCOPE / IMPLEMENT
 Work ONLY on T07.1C (pre-submission) and directly necessary prerequisites after checking its dependencies. Implement only critical audit-backed protections that can be safely verified before submission; document blockers rather than waive them. Do not build Phase 8.
 
-EXACT TASK REQUIREMENTS
-**Status / dependencies:** Pre-submission P0 conditional implementation; NOT STARTED. Depends on T07.1B report and prioritized critical findings.
+CURRENT IMPLEMENTED CONTRACT / FOLLOW-UP
+- Preserve the evidence-bound operator gate at service and SQL finalizer boundaries. Approval binds barcode, exact image digest, canonical candidate digest and trust-publication-v1, not user/model/schema/allowlist.
+- Preserve bounded review expiry, owner cancellation, terminal rejection, same-key checks without repeat AI, candidate cleanup and successful-credit release. Keep provider spending separate.
+- Retain observed identities/cross-image consistency separately from operator review and independent verification. Missing identity stays unknown; wording conflicts go to review, not blanket retakes.
+- Ingredient explanations require presence support from raw transcription. Preserve partial OCR; citations alone do not establish presence. Refresh cannot replace trust provenance.
+- Use docs/PICKWELL_PRODUCT_TRUST.md for implementation evidence, operator CLI dry runs and rollout prerequisites. No live deployment/provider call is authorized by the documentation.
 
-- [ ] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
-- [ ] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
-- [ ] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
-- [ ] Preserve guest cached lookup, the approved three-photo capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
-- [ ] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
+EXACT TASK REQUIREMENTS
+**Status / dependencies:** IMPLEMENTED / locally verified; hosted rollout and fresh device/native multi-connection checks remain unverified. Depends on T07.1B report and prioritized critical findings.
+
+- [x] Implement only critical protections identified by T07.1B that can be completed and verified safely before submission; reuse existing admission, validation, publication and revision controls.
+- [x] Prevent demonstrated mismatched/untrusted publication or trusted-record replacement through server-controlled checks; preserve RLS, verified submission auth, idempotency, atomic publication and quota settlement.
+- [x] Keep model uncertainty separate from identity verification; never invent confidence scores, claim unperformed verification, or reinstate blanket retakes for usable partial nutrition data.
+- [x] Preserve guest cached lookup, the approved three-photo capture and approved UI; retain deletion after processing and justified minimal non-image provenance only. Do not build T08 features or enable billing.
+- [x] Record fixes and tests, residual risks and a release disposition. If no critical changes are needed, document the evidence-backed no-change disposition; if a critical risk cannot be safely resolved, restrict the affected path or block T07.1D sign-off.
 
 **Acceptance:** Each critical audit finding has a verified mitigation or an explicit release-blocking/restricted-path disposition; no false identity assurance or unsafe trusted-record overwrite. Deadline pressure does not waive a P0 blocker.
 
@@ -891,6 +900,9 @@ EXACT TASK REQUIREMENTS
 COMPLETION REPORT
 Report status, exact files changed, observed commands/test results, security/privacy/cost implications, residual risks and blocked criteria. Distinguish local/mock/live/owner-device evidence. Update only genuinely verified TASKS checkboxes and identify the next dependency without starting it.
 ```
+
+
+**Local evidence / release disposition:** [T07.1C implementation report](PICKWELL_PRODUCT_TRUST.md). All new associations are restricted to exact-evidence operator review. These checks record local implementation, not deployment or T07.1D completion. An operator must obtain and inspect the exact processed evidence privately; without it, do not approve.
 
 ## T07.1D — Targeted Regression and Release Gate
 

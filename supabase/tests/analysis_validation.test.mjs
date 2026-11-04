@@ -72,7 +72,7 @@ test('contradictory totals, duplicate nutrients and mass/energy discrepancies be
 test('ingredient transcription differences do not require retake; unsupported allergens stay unknown',()=>{
  for(const mutate of [c=>c.ingredients.items.reverse(),c=>c.ingredients.items.push('salt'),
  c=>c.ingredients.items.push('butter'),c=>c.ingredients.items=[]]){
- const c=labelFixture();mutate(c);const r=validate(c);assert.equal(r.status,'validated');assert.ok(r.ingredients.items.length);
+ const c=labelFixture();mutate(c);const r=validate(c);assert.equal(r.status,'validated');assert.ok(Array.isArray(r.ingredients.items));
  }
  const c=labelFixture();c.ingredients.declared_allergens='Contains: nuts.';
  assert.equal(validate(c).ingredients.declared_allergens,null);

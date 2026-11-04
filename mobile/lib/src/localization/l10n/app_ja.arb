@@ -422,5 +422,11 @@
   "pkCaptureStepFront": "手順1 · 前面",
   "pkIdentityUnverified": "バーコードとの対応は独立に確認されていません。商品情報は送信されたパッケージから読み取られています。",
   "pkVariant": "種類",
-  "pkNetQuantity": "内容量"
+  "pkNetQuantity": "内容量",
+  "pkAnalysisReviewPending": "共有する前に担当者による確認が必要です。写真は保存されており、成功した分析の利用枠は消費されていません。",
+  "pkAnalysisReviewRejected": "商品の対応関係は承認されませんでした。写真と分析の利用枠は保持されています。",
+  "pkCancelAnalysisReview": "確認をキャンセル",
+  "pkReviewExpiresAt": "確認期限: {time}",
+  "pkBarcodeOperatorReviewed": "バーコードとの対応は担当者が確認しましたが、独立した検証ではありません。",
+  "pkAnalysisReviewExpired": "確認期限が切れました。写真は保存されています。新しい分析を送信できます。"
 }

@@ -1,3 +1,4 @@
+import { publicationReview } from './publication_review.mjs';
 import { retakeTarget } from './retake_details.mjs';
 import { validateAnalysis, PROMPT_VERSION, LEGACY_PROMPT_VERSION } from './analysis_validation.mjs';
 // Candidate reads and publication are server-only. Never accept this payload from Flutter.
@@ -16,5 +17,7 @@ export async function publishAnalysis(rpc,identity,settle) {
    Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;
   if(JSON.stringify(stable(validated))!==JSON.stringify(stable(validation)))throw Error();
  } catch { return settle('failed','invalid_model_output'); }
+ const review=await publicationReview(rpc,identity);
+ if(review.status!=='approved')return review;
  return rpc('pickwell_publish_analysis',{...identity,p_validated:validated});
 }

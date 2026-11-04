@@ -1,3 +1,4 @@
+import { normalizeIngredientEvidence } from './ingredient_evidence.mjs';
 import { productIdentitySchema, identityConflictPhotos } from './product_identity.mjs';
 import { RETAKE_FIELDS, MODEL_RETAKE_CODES, sanitizeRetakeDetails } from './retake_details.mjs';
 import { extractionSchema, validateSchema } from '../../spikes/meta-vision/core.mjs';
@@ -5,6 +6,7 @@ import { interpretationSchema, INTERPRETATION_INSTRUCTIONS, composeInterpretatio
 
 export const PROMPT_VERSION = 'label-analysis-v3';
 export const LEGACY_PROMPT_VERSION = 'label-analysis-v2';
+export const TRUST_POLICY_VERSION='trust-publication-v1';
 export const RULES_VERSION = 'uk-fop-2016-conservative-v1';
 export const RULE_SOURCE = 'https://www.foodstandards.gov.scot/downloads/FoP_Nutrition_labelling_UK_guidance_November_2016.pdf';
 const object = properties => ({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
@@ -130,11 +132,11 @@ export function validateAnalysis(value,{model,now=new Date().toISOString(),requi
  const hasFront=!!value?.identity?.front;
  if(requireFront&&!hasFront){const error=new Error('invalid_model_output');error.code='invalid_model_output';throw error;}
  validateSchema(value,hasFront?analysisSchema:Object.hasOwn(value,'interpretation')?legacyInterpretationSchema:legacyAnalysisSchema);
- value=structuredClone(value); // Unknown normalization must not mutate the provider candidate.
+ value=normalizeIngredientEvidence(value); // Never turn unsupported model items into confirmed ingredients.
  const retake=new Set(), reasons=new Set(),details=[],notes=[];
  // Model retakes are advisory when usable text was extracted. Explicit wrong
  // photos/mismatched products remain actionable; partial OCR is displayed.
- for(const d of value.retake_reasons)if(['wrong_photo','product_mismatch'].includes(d.code))retake.add(d.photo);
+ for(const d of value.retake_reasons)if(d.code==='wrong_photo'||!hasFront&&d.code==='product_mismatch')retake.add(d.photo);
  for(const photo of value.retake)if(photo!=='front'&&!value[photo].raw?.trim())retake.add(photo);
  for(const photo of retake){
   const supplied=value.retake_reasons.filter(d=>d.photo===photo);
@@ -143,14 +145,15 @@ export function validateAnalysis(value,{model,now=new Date().toISOString(),requi
  }
  const reject=(photo,why,field='other')=>{retake.add(photo);reasons.add(why);details.push({photo,source:'validation',code:why,field:RETAKE_FIELDS.includes(field)?field:'other'});};
  const {nutrition:n,ingredients:i,identity}=value;
- if(hasFront){
-  for(const photo of identityConflictPhotos(identity))reject(photo,'product_mismatch','product_identity');
- }else if(identity.consistency==='mismatch') {
+ const identityDiscrepancies=hasFront?[...new Set([...identityConflictPhotos(identity),...value.retake_reasons.filter(d=>d.code==='product_mismatch').map(d=>d.photo)])]:[];
+ if(hasFront&&identityDiscrepancies.length)notes.push('Identity observations differ and require operator review; wording differences alone do not prove a mismatch.');
+ if(!hasFront&&identity.consistency==='mismatch') {
   reject('nutrition','product_mismatch','product_identity');reject('ingredients','product_mismatch','product_identity');
  }
  if(!i.raw?.trim())reject('ingredients','missing_ingredients','ingredients_list');
  i.items=i.items.filter(item=>item.trim());
- if(i.raw?.trim()&&!i.items.length)i.items=[i.raw.trim()];
+ // Readable raw text is retained even when no structured item can be supported.
+ notes.push('Only ingredient readings supported by the transcribed text are listed; the transcription may be incomplete.');
  if(/\[(?:cropped|illegible|unreadable|unknown)[^\]]*\]/i.test(i.raw??''))notes.push('Ingredient transcription is partial; unreadable text is unknown.');
  let offset=0;const ingredientSource=sourceNorm(i.raw??'');
  for(const item of i.items){const token=sourceNorm(item),at=ingredientSource.indexOf(token,offset);
@@ -234,7 +237,7 @@ export function validateAnalysis(value,{model,now=new Date().toISOString(),requi
    ...(identity.consistency==='unknown'?['Cross-photo product identity could not be confirmed.']:[]),
    ...(hasFront?['Barcode ownership has not been independently verified; front packaging provides model-observed identity only.']:[]),
    ...(!findings.length?['No supported nutrition colour classification for this basis/context.']:[])],
-  provenance:{model_version:model??'unknown',prompt_version:hasFront?PROMPT_VERSION:LEGACY_PROMPT_VERSION,extraction_policy:EXTRACTION_POLICY,rules_version:RULES_VERSION,validated_at:now,
+  provenance:{trust_policy_version:TRUST_POLICY_VERSION,validation_method:'schema_and_reference_rules',ingredient_evidence_method:'transcription-crosscheck-v1',cross_image_consistency:identityDiscrepancies.length?'review_required':identity.consistency,identity_review_photos:identityDiscrepancies,model_version:model??'unknown',prompt_version:hasFront?PROMPT_VERSION:LEGACY_PROMPT_VERSION,extraction_policy:EXTRACTION_POLICY,rules_version:RULES_VERSION,validated_at:now,
    identity,...(hasFront?{identity_verification:'unverified',identity_policy_version:'front-observations-v1'}:{}),extraction_source:hasFront?'three user-supplied package/label photos; model observations, not independently verified identity or OCR':'two user-supplied label photos; model transcription, not independently verified OCR',
    explanation_source:'Meta label-grounded paraphrase; not rule evidence'}};
  if(value.interpretation){

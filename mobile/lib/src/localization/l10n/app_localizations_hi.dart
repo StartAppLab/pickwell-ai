@@ -1071,4 +1071,28 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get pkNetQuantity => 'शुद्ध मात्रा';
+
+  @override
+  String get pkAnalysisReviewPending =>
+      'साझा करने से पहले संचालक की समीक्षा ज़रूरी है। फ़ोटो सहेजी गई हैं; सफल विश्लेषण का क्रेडिट खर्च नहीं हुआ है।';
+
+  @override
+  String get pkAnalysisReviewRejected =>
+      'उत्पाद का संबंध स्वीकृत नहीं हुआ। फ़ोटो और विश्लेषण क्रेडिट सुरक्षित हैं।';
+
+  @override
+  String get pkCancelAnalysisReview => 'समीक्षा रद्द करें';
+
+  @override
+  String pkReviewExpiresAt(String time) {
+    return 'समीक्षा की समय-सीमा: $time';
+  }
+
+  @override
+  String get pkBarcodeOperatorReviewed =>
+      'बारकोड संबंध की संचालक ने समीक्षा की है; स्वतंत्र पुष्टि नहीं हुई है।';
+
+  @override
+  String get pkAnalysisReviewExpired =>
+      'समीक्षा का समय समाप्त हो गया। फ़ोटो सहेजी गई हैं। आप नया विश्लेषण भेज सकते हैं।';
 }

@@ -8,6 +8,7 @@ enum AnalysisPhase {
   authenticating,
   submitting,
   processing,
+  review,
   retake,
   authRequired,
   denied,
@@ -40,7 +41,7 @@ class AnalysisResult {
   final bool restartAllowed;
   final bool canReanalyzeSaved;
   final int retryAfterSeconds;
-  final DateTime? retryAt;
+  final DateTime? retryAt, reviewExpiresAt;
   const AnalysisResult(
     this.phase, {
     this.product,
@@ -53,5 +54,6 @@ class AnalysisResult {
     this.canReanalyzeSaved = false,
     this.retryAfterSeconds = 4,
     this.retryAt,
+    this.reviewExpiresAt,
   });
 }

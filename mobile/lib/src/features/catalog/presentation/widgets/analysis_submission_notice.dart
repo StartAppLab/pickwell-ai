@@ -10,13 +10,14 @@ import '../blocs/catalog/analysis_submission_cubit.dart';
 class AnalysisSubmissionNotice extends StatelessWidget {
   final AnalysisSubmissionState state;
   final AppSession? session;
-  final VoidCallback? retry, cleanup, reanalyzeSaved;
+  final VoidCallback? retry, cleanup, reanalyzeSaved, cancelReview;
   const AnalysisSubmissionNotice({
     super.key,
     required this.state,
     this.retry,
     this.cleanup,
     this.reanalyzeSaved,
+    this.cancelReview,
     this.session,
   });
   @override
@@ -26,6 +27,7 @@ class AnalysisSubmissionNotice extends StatelessWidget {
       AnalysisPhase.authenticating => l.pkAnalysisAuthenticating,
       AnalysisPhase.submitting => l.pkAnalysisSubmitting,
       AnalysisPhase.processing => l.pkAnalysisProcessing,
+      AnalysisPhase.review => l.pkAnalysisReviewPending,
       AnalysisPhase.retake => l.pkAnalysisRetake,
       AnalysisPhase.authRequired => l.pkAnalysisAuthRequired,
       AnalysisPhase.denied =>
@@ -35,9 +37,16 @@ class AnalysisSubmissionNotice extends StatelessWidget {
             ? l.pkAnalysisDenied
             : l.pkQuotaRateLimited,
       AnalysisPhase.cleanupFailed => l.pkCaptureCleanupError,
-      AnalysisPhase.error => l.pkAnalysisUncertain,
+      AnalysisPhase.error =>
+        ['review_expired', 'review_policy_changed'].contains(state.error)
+            ? l.pkAnalysisReviewExpired
+            : l.pkAnalysisUncertain,
       AnalysisPhase.blocked =>
-        state.error == 'inference_disabled' ? l.pkAnalysisDisabled : l.pkAnalysisReview,
+        state.error == 'inference_disabled'
+            ? l.pkAnalysisDisabled
+            : state.error == 'review_rejected'
+            ? l.pkAnalysisReviewRejected
+            : l.pkAnalysisReview,
       _ => '',
     };
     if (message.isEmpty) return const SizedBox.shrink();
@@ -68,6 +77,10 @@ class AnalysisSubmissionNotice extends StatelessWidget {
                   rateLimited: state.error == 'rate_limited',
                   unavailable: state.phase == AnalysisPhase.authRequired,
                 ),
+              if (state.phase == AnalysisPhase.review && state.result?.reviewExpiresAt != null)
+                Text(l.pkReviewExpiresAt(state.result!.reviewExpiresAt!.toLocal().toString())),
+              if (cancelReview != null && state.phase == AnalysisPhase.review)
+                OutlinedButton(onPressed: cancelReview, child: Text(l.pkCancelAnalysisReview)),
               if (state.busy) ...[Gap(d.spacingSm), const LinearProgressIndicator()],
               if (state.phase == AnalysisPhase.retake)
                 for (final target in state.result?.retake ?? <LabelKind>{})

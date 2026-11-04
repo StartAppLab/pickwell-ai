@@ -1,3 +1,4 @@
+import { ingredientSupportedByRaw } from './ingredient_evidence.mjs';
 // Reviewed, bounded background knowledge. No model-supplied URLs or medical claims.
 export const INTERPRETATION_VERSION='evidence-composition-v1';
 export const REFERENCE_VERSION='2026-11-03';
@@ -82,7 +83,7 @@ export function composeInterpretation(nutrition,ingredients,plan,{grounded=()=>f
   ingredients.items.flatMap((item,index)=>{const id=ingredientReference(item);return id?[{index,reference_id:id,text:INGREDIENT_REFERENCES[id].text}]:[];}).slice(0,8):plan.ingredients;
  for(const row of selectedIngredients){
   const item=ingredients.items[row.index],r=INGREDIENT_REFERENCES[row.reference_id];
-  if(!Number.isSafeInteger(row.index)||typeof item!=='string'||item.length>400||!r||ingredientReference(item)!==row.reference_id||tidy(row.text)!==tidy(r.text)){rejected++;continue;}
+  if(!Number.isSafeInteger(row.index)||!ingredientSupportedByRaw(item,ingredients.raw)||typeof item!=='string'||item.length>400||!r||ingredientReference(item)!==row.reference_id||tidy(row.text)!==tidy(r.text)){rejected++;continue;}
   if(acceptedIngredients.has(row.index))continue;
   const entry={photo:'ingredients',source:item,text:r.text,ingredient:item,kind:'background',reference_id:row.reference_id,
    references:sources([r.source]),limitations:'Common function only; the exact purpose and quantity in this product are not established.',origin:mode==='meta'?'meta_grounded_composition':'reviewed_reference_refresh'};
