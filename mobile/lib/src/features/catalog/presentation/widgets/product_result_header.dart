@@ -33,7 +33,7 @@ class ProductResultHeader extends StatelessWidget {
       );
       final identity = ProductIdentityHeader(product: product);
       return Padding(
-        padding: EdgeInsets.only(top: d.paddingXs, bottom: d.paddingLg),
+        padding: EdgeInsets.only(top: d.paddingXs),
         child: stacked
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

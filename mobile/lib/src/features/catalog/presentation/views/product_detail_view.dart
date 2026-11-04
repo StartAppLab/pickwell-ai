@@ -13,6 +13,7 @@ import '../../domain/_domain.dart';
 import '../blocs/catalog/catalog_cubit.dart';
 import '../widgets/lookup_notice.dart';
 import '../widgets/product_result_content.dart';
+import '../widgets/product_detail_scaffold.dart';
 
 class ProductDetailView extends StatelessWidget {
   final AppSession? session;
@@ -20,98 +21,62 @@ class ProductDetailView extends StatelessWidget {
   final Future<void> Function()? onPublished;
   const ProductDetailView({super.key, this.session, this.drafts, this.onPublished});
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Color.lerp(
-      context.colorScheme.surfaceContainerLowest,
-      context.colorScheme.surface,
-      .15,
-    ),
-    appBar: AppBar(
-      backgroundColor: Color.lerp(
-        context.colorScheme.surfaceContainerLowest,
-        context.colorScheme.surface,
-        .15,
-      ),
-      surfaceTintColor: Colors.transparent,
-      leadingWidth:
-          context.themeData.dimensionsData.minimumTouchTarget +
-          context.themeData.dimensionsData.paddingSm * 2,
-      toolbarHeight:
-          context.themeData.dimensionsData.minimumTouchTarget +
-          context.themeData.dimensionsData.paddingSm * 2,
-      leading: Padding(
-        padding: EdgeInsets.all(context.themeData.dimensionsData.paddingSm),
-        child: IconButton(
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          icon: const Icon(CupertinoIcons.chevron_back),
+  Widget build(BuildContext context) => ProductDetailScaffold(
+    actions: [
+      Padding(
+        padding: EdgeInsets.only(right: context.themeData.edgeInsetsData.pagePadding.right),
+        child: PopupMenuButton<String>(
+          icon: const Icon(CupertinoIcons.ellipsis),
           style: IconButton.styleFrom(
             backgroundColor: context.colorScheme.surfaceContainerLowest,
             foregroundColor: context.colorScheme.primary,
             side: BorderSide(color: context.colorScheme.outlineVariant),
           ),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/home');
+          onSelected: (value) async {
+            try {
+              await Clipboard.setData(ClipboardData(text: value));
+            } catch (_) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(context.l10n.pkError)));
+              }
             }
           },
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              value: context.read<CatalogCubit>().state.barcode ?? '',
+              child: Text(context.l10n.pkCopyBarcode),
+            ),
+          ],
         ),
       ),
-      actions: [
-        Padding(
-          padding: EdgeInsets.only(right: context.themeData.dimensionsData.paddingSm),
-          child: PopupMenuButton<String>(
-            icon: const Icon(CupertinoIcons.ellipsis),
-            style: IconButton.styleFrom(
-              backgroundColor: context.colorScheme.surfaceContainerLowest,
-              foregroundColor: context.colorScheme.primary,
-              side: BorderSide(color: context.colorScheme.outlineVariant),
-            ),
-            onSelected: (value) async {
-              try {
-                await Clipboard.setData(ClipboardData(text: value));
-              } catch (_) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(context.l10n.pkError)));
-                }
-              }
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: context.read<CatalogCubit>().state.barcode ?? '',
-                child: Text(context.l10n.pkCopyBarcode),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-    body: SafeArea(
-      child: BlocConsumer<CatalogCubit, CatalogState>(
-        listener: (context, state) {
-          if (state.status == LookupStatus.found &&
-              state.product != null &&
-              state.recentSaved &&
-              onPublished != null) {
-            unawaited(onPublished!());
-          }
-          if (state.status == LookupStatus.miss) {
-            context.replace('/capture/${state.barcode}', extra: state.quota);
-          }
-        },
-        builder: (context, state) {
-          final p = state.product;
-          final l = context.l10n;
-          if (state.status == LookupStatus.checking) {
-            return Center(
+    ],
+    body: BlocConsumer<CatalogCubit, CatalogState>(
+      listener: (context, state) {
+        if (state.status == LookupStatus.found &&
+            state.product != null &&
+            state.recentSaved &&
+            onPublished != null) {
+          unawaited(onPublished!());
+        }
+        if (state.status == LookupStatus.miss) {
+          context.replace('/capture/${state.barcode}', extra: state.quota);
+        }
+      },
+      builder: (context, state) {
+        final p = state.product;
+        final l = context.l10n;
+        if (state.status == LookupStatus.checking) {
+          return SafeArea(
+            child: Center(
               child: Semantics(label: l.pkChecking, child: const CircularProgressIndicator()),
-            );
-          }
-          if (p == null) {
-            return Column(
+            ),
+          );
+        }
+        if (p == null) {
+          return SafeArea(
+            child: Column(
               children: [
                 if (drafts != null)
                   PendingCaptureCard(
@@ -129,38 +94,38 @@ class ProductDetailView extends StatelessWidget {
                   ),
                 ),
               ],
-            );
-          }
-          return ProductResultContent(
-            product: p,
-            recentSaved: state.recentSaved,
-            statusNotice: Column(
-              children: [
-                if (drafts != null)
-                  PendingCaptureCard(
-                    draft: drafts!,
-                    barcode: state.barcode,
-                    onPublished: onPublished,
-                  ),
-                if (state.status == LookupStatus.error ||
-                    state.status == LookupStatus.denied ||
-                    state.quota?.remaining == 0)
-                  QuotaStatus(
-                    snapshot: state.quota,
-                    session: session,
-                    metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
-                    unavailable: state.status == LookupStatus.error,
-                    rateLimited: state.error == 'rate_limited',
-                    loadedResult:
-                        state.status == LookupStatus.error ||
-                        state.status == LookupStatus.denied ||
-                        state.quota?.remaining == 0,
-                  ),
-              ],
             ),
           );
-        },
-      ),
+        }
+        return ProductResultContent(
+          product: p,
+          recentSaved: state.recentSaved,
+          statusNotice: Column(
+            children: [
+              if (drafts != null)
+                PendingCaptureCard(
+                  draft: drafts!,
+                  barcode: state.barcode,
+                  onPublished: onPublished,
+                ),
+              if (state.status == LookupStatus.error ||
+                  state.status == LookupStatus.denied ||
+                  state.quota?.remaining == 0)
+                QuotaStatus(
+                  snapshot: state.quota,
+                  session: session,
+                  metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
+                  unavailable: state.status == LookupStatus.error,
+                  rateLimited: state.error == 'rate_limited',
+                  loadedResult:
+                      state.status == LookupStatus.error ||
+                      state.status == LookupStatus.denied ||
+                      state.quota?.remaining == 0,
+                ),
+            ],
+          ),
+        );
+      },
     ),
   );
 }

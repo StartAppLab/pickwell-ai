@@ -1,4 +1,6 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
+import '../../lib/src/features/catalog/presentation/widgets/product_result_header.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import '../../lib/src/features/catalog/domain/_domain.dart';
@@ -97,6 +99,56 @@ void main() {
       });
     },
   );
+  testWidgets('edge-to-edge results clear system insets and scroll beneath usable controls', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final repo = FakeCatalog()
+      ..result = Right(
+        CatalogEntity(status: LookupStatus.found, barcode: fixture().barcode, product: fixture()),
+      );
+    final cubit = CatalogCubit(GetCatalogUseCase(repo));
+    addTearDown(cubit.close);
+    await cubit.check(fixture().barcode, local: true);
+    await tester.pumpWidget(
+      host(
+        MediaQuery(
+          data: const MediaQueryData(
+            size: Size(390, 844),
+            padding: EdgeInsets.only(top: 24, bottom: 34),
+            viewPadding: EdgeInsets.only(top: 24, bottom: 34),
+          ),
+          child: BlocProvider.value(value: cubit, child: const ProductDetailView()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final viewport = find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable));
+    expect(tester.getRect(viewport).top, 0);
+    expect(tester.getRect(viewport).bottom, 844);
+    expect(tester.getTopLeft(find.byType(ProductResultHeader)).dy, greaterThanOrEqualTo(80));
+    final appBar = tester.widget<AppBar>(find.byType(AppBar));
+    expect(appBar.systemOverlayStyle!.systemNavigationBarColor, Colors.transparent);
+    expect(appBar.systemOverlayStyle!.systemNavigationBarContrastEnforced, false);
+    final back = find.ancestor(
+      of: find.byIcon(CupertinoIcons.chevron_back),
+      matching: find.byType(IconButton),
+    );
+    expect(tester.getRect(back).left, 16);
+    expect(tester.getRect(back).top, greaterThanOrEqualTo(32));
+    expect(tester.getSize(back).width, greaterThanOrEqualTo(48));
+    expect(tester.getSize(back).height, greaterThanOrEqualTo(48));
+    await tester.drag(find.byType(ListView), const Offset(0, -160));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(find.byType(ProductResultHeader)).dy, lessThan(80));
+    await tester.tap(find.byIcon(CupertinoIcons.ellipsis));
+    await tester.pumpAndSettle();
+    expect(find.text('Copy barcode').hitTestable(), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
   testWidgets(
     'compact highlights preserve printed units and keep micronutrients available on expansion',
     (tester) async {

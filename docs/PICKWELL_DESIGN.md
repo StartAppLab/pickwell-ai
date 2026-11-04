@@ -231,3 +231,35 @@ placeholder; never imply private imagery is approved shared media. Pending Home
 cards become **Analysis ready / View analysis** for their owner only. Keep explicit
 shared-publication check/cancel actions, TTL information and optional canonical
 transition. No major visual redesign is included.
+
+### 2026-11-05 — Product Details visual consistency
+
+Public and owner-private Details use the same theme-derived cream canvas as Home
+(`surfaceContainerLowest` blended 30% toward `surface`), without Home's decorative
+shapes. Both routes use a transparent Details-specific app bar over an edge-to-edge
+scrolling canvas, with `EdgeBlur` fades at the top and bottom, neutral circular
+back controls, no logo title and no bottom dock. List padding includes the actual
+system insets and toolbar clearance; scroll content may pass beneath the controls.
+System bars remain transparent with theme-appropriate icon brightness. Retain the existing 16dp page gutter
+and bounded reading width. Product identity uses a bold green headline, with brand
+and variant/quantity as secondary text. White rounded section cards use 16dp content
+insets, 24dp separation, green 20sp headings and comfortable body line spacing.
+Keep raw label/evidence and technical metadata expandable, with all existing
+uncertainty, private-result status and publication controls intact.
+
+Validation: 44 affected Flutter tests passed, including compact 320dp layouts at
+2× text scale in light/dark themes, identity presentation, private access and
+published-result handoff. Flutter analyzer passed; the 390×844 fixture render was
+visually inspected. This pass does not claim new device or hosted verification.
+
+Edge-to-edge follow-up: 42 targeted result/private-result/navigation tests passed,
+including inset clearance, scroll-under behavior and a usable overflow menu.
+Disclosure tests now center their target before tapping in the full-height
+viewport. Existing shared app bar and edge-fade implementations were reused;
+no backend, authentication or publication behavior changed.
+
+Details navigation follow-up: use a local transparent `AppBar` instead of the
+shared `MaterialAppBar`, whose fixed leading slot crowded the back button. Keep
+16dp horizontal control insets and 8dp vertical breathing room around a minimum
+48dp back target. Match the overflow inset to the page gutter. Preserve the
+edge fades, scroll-under clearance and transparent system bars.

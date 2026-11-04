@@ -33,7 +33,11 @@ class ProductIdentityHeader extends StatelessWidget {
           identity.name ?? context.l10n.pkFoodProduct,
           style: compact
               ? context.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, fontSize: 18)
-              : context.textTheme.headlineSmall,
+              : context.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
+                  color: context.colorScheme.primary,
+                ),
           maxLines: compact ? 2 : null,
           overflow: compact ? TextOverflow.ellipsis : null,
         ),

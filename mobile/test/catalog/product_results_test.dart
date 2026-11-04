@@ -321,6 +321,13 @@ void main() {
             .first,
       );
       expect(find.textContaining('fixture:no-provider'), findsNothing);
+      // The full-height viewport now scrolls behind the app bar. Place the
+      // disclosure in its unobscured middle before tapping its text.
+      await Scrollable.ensureVisible(
+        tester.element(find.text('About this analysis')),
+        alignment: .5,
+      );
+      await tester.pumpAndSettle();
       await tester.tap(find.text('About this analysis'));
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(

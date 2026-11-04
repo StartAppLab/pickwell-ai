@@ -293,3 +293,17 @@ Files: new `private_product_card_cubit.dart`, `private_analysis_card.dart` and
 `private_product_card_test.dart`; existing catalog/pending-card widgets,
 `label_capture_cubit.dart`, Product Details/router callbacks, Home view/Cubit,
 English ARB/generated localization files, and this report.
+
+### 2026-11-05 — Private retrieval recovery check
+
+A connected Android debug build showed loading followed by the generic retry
+screen. The saved test account still had an unexpired private result. The hosted
+owner endpoint returned `private_ready` (HTTP 200) in 724 ms; repeating with the
+phone's current valid session returned HTTP 200 in 1,922 ms. The actual response
+passed the current Flutter model parser. No inference or submission was requested.
+After restarting the app without clearing its data, reopening the same private
+product displayed its saved identity, photograph and analysis. Reopening after
+removing temporary diagnostics succeeded again. The original failure was not
+reproduced; its root cause remains unconfirmed. No retrieval-code or backend fix
+was needed or claimed. Temporary credential/response copies and device screenshots
+were deleted; no secrets or private product payloads were added to tracked files.

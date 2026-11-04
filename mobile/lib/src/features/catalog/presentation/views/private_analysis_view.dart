@@ -11,6 +11,7 @@ import '../../domain/entities/pending_capture.dart';
 import '../../domain/use_cases/analyze_product_use_case.dart';
 import '../blocs/catalog/label_capture_cubit.dart';
 import '../widgets/product_result_content.dart';
+import '../widgets/product_detail_scaffold.dart';
 
 /// Owner-only preliminary analysis. Never enters CatalogCubit or public recents.
 class PrivateAnalysisView extends StatefulWidget {
@@ -135,15 +136,10 @@ class _PrivateAnalysisViewState extends State<PrivateAnalysisView> {
     final product = result?.product;
     final front = _draft?.front;
     final canonical = result?.canonicalProduct;
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
-        ),
-      ),
-      body: SafeArea(
-        child: product == null
-            ? Center(
+    return ProductDetailScaffold(
+      body: product == null
+          ? SafeArea(
+              child: Center(
                 child: Padding(
                   padding: context.themeData.edgeInsetsData.pagePadding,
                   child: Column(
@@ -171,61 +167,60 @@ class _PrivateAnalysisViewState extends State<PrivateAnalysisView> {
                     ],
                   ),
                 ),
-              )
-            : ProductResultContent(
-                product: product,
-                privateThumbnail: front == null
-                    ? null
-                    : SizedBox(
-                        width: 80,
-                        height: 96,
-                        child: Image.file(
-                          File(front.path),
-                          fit: BoxFit.cover,
-                          cacheWidth: 384,
-                          errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported_outlined),
-                        ),
-                      ),
-                statusNotice: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    QuotaStatus(
-                      snapshot: result?.quota,
-                      session: widget.session,
-                      metric: QuotaMetric.aiAnalysis,
-                      loadedResult: true,
-                    ),
-                    Text(l.pkPrivateReady, style: context.textTheme.titleSmall),
-                    Text(
-                      result?.phase == AnalysisPhase.ready ||
-                              result?.publicationStatus == 'published'
-                          ? l.pkPrivatePublished
-                          : l.pkPrivateNotice,
-                    ),
-                    if (_failed) Text(l.pkError),
-                    Text(l.pkPrivateRetention, style: context.textTheme.bodySmall),
-                    if (['rejected', 'cancelled', 'expired'].contains(result?.publicationStatus))
-                      Text(l.pkPrivateReviewClosed),
-                    if (canonical != null || result?.phase == AnalysisPhase.ready)
-                      TextButton(
-                        onPressed: () => context.push('/product/${product.barcode}'),
-                        child: Text(l.pkPrivateViewShared),
-                      ),
-                    if (_busy)
-                      const LinearProgressIndicator()
-                    else ...[
-                      TextButton(onPressed: _load, child: Text(l.pkPrivateCheck)),
-                      if (_draft != null &&
-                          ['pending', 'approved'].contains(result?.publicationStatus))
-                        TextButton(
-                          onPressed: () => _load(cancel: true),
-                          child: Text(l.pkPrivateCancel),
-                        ),
-                    ],
-                  ],
-                ),
               ),
-      ),
+            )
+          : ProductResultContent(
+              product: product,
+              privateThumbnail: front == null
+                  ? null
+                  : SizedBox(
+                      width: 80,
+                      height: 96,
+                      child: Image.file(
+                        File(front.path),
+                        fit: BoxFit.cover,
+                        cacheWidth: 384,
+                        errorBuilder: (_, _, _) => const Icon(Icons.image_not_supported_outlined),
+                      ),
+                    ),
+              statusNotice: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  QuotaStatus(
+                    snapshot: result?.quota,
+                    session: widget.session,
+                    metric: QuotaMetric.aiAnalysis,
+                    loadedResult: true,
+                  ),
+                  Text(l.pkPrivateReady, style: context.textTheme.titleSmall),
+                  Text(
+                    result?.phase == AnalysisPhase.ready || result?.publicationStatus == 'published'
+                        ? l.pkPrivatePublished
+                        : l.pkPrivateNotice,
+                  ),
+                  if (_failed) Text(l.pkError),
+                  Text(l.pkPrivateRetention, style: context.textTheme.bodySmall),
+                  if (['rejected', 'cancelled', 'expired'].contains(result?.publicationStatus))
+                    Text(l.pkPrivateReviewClosed),
+                  if (canonical != null || result?.phase == AnalysisPhase.ready)
+                    TextButton(
+                      onPressed: () => context.push('/product/${product.barcode}'),
+                      child: Text(l.pkPrivateViewShared),
+                    ),
+                  if (_busy)
+                    const LinearProgressIndicator()
+                  else ...[
+                    TextButton(onPressed: _load, child: Text(l.pkPrivateCheck)),
+                    if (_draft != null &&
+                        ['pending', 'approved'].contains(result?.publicationStatus))
+                      TextButton(
+                        onPressed: () => _load(cancel: true),
+                        child: Text(l.pkPrivateCancel),
+                      ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 }

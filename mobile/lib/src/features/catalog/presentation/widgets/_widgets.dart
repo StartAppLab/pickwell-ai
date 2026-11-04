@@ -10,3 +10,4 @@ export 'product_result_content.dart';
 export 'quota_status.dart';
 export 'product_card_thumbnail.dart';
 export 'product_identity_header.dart';
+export 'product_detail_scaffold.dart';

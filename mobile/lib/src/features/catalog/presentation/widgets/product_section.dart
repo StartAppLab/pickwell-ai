@@ -15,14 +15,21 @@ class ProductSection extends StatelessWidget {
         borderRadius: BorderRadius.circular(d.cardCornerRadius),
         side: BorderSide(color: context.colorScheme.outlineVariant.withValues(alpha: .7)),
       ),
-      margin: EdgeInsets.only(bottom: d.spacingSm),
+      margin: EdgeInsets.only(bottom: d.spacingLg),
       color: context.colorScheme.surfaceContainerLowest,
       child: Padding(
         padding: EdgeInsets.all(d.paddingMd),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(title, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              title,
+              style: context.textTheme.titleMedium?.copyWith(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.primary,
+              ),
+            ),
             Gap(d.spacingMd),
             for (var index = 0; index < children.length; index++) ...[
               if (index > 0) Gap(d.spacingSm),
