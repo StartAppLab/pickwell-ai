@@ -86,9 +86,15 @@ class HomeHeader extends StatelessWidget {
             color: colors.surfaceContainerLowest,
             elevation: 3,
             shadowColor: colors.shadow.withValues(alpha: .14),
-            shape: const CircleBorder(),
+            shape: CircleBorder(side: BorderSide(color: colors.outlineVariant)),
             child: IconButton(
-              style: IconButton.styleFrom(minimumSize: const Size(56, 56)),
+              // Keep the visible control a little smaller than the Details
+              // back control while retaining the platform touch target.
+              style: IconButton.styleFrom(
+                minimumSize: Size.square(context.themeData.dimensionsData.minimumTouchTarget),
+                fixedSize: Size.square(context.themeData.dimensionsData.minimumTouchTarget),
+                padding: EdgeInsets.zero,
+              ),
               tooltip: l.pkSearch,
               onPressed: onOpen,
               icon: const AppIcon(icon: HugeIcons.strokeRoundedSearch01, size: 28),

@@ -287,3 +287,12 @@ recorded “Unknown” nutrition-row presentation is superseded by this owner re
 Validation: 31 affected Flutter tests passed, covering vertical ordering, known
 zeroes, unknown amounts/units, empty sections, printed micronutrient units,
 private-result recovery and compact/large-text light/dark layouts.
+
+### 2026-11-05 — Hide the navigation dock, retain standalone Scan
+
+The active Pickwell router hides the Home/Settings pill and its Settings entry.
+Keep the icon-only Scan action at the lower right of Home with safe-area and
+keyboard clearance; nested screens do not show it. Existing Settings routes and
+the reusable animated dock implementation are retained, but the dock is disabled
+for the current app shell. This owner-approved presentation change supersedes
+older requirements to display the dock; it does not alter guest scanning or auth.

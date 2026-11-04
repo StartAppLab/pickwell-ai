@@ -15,6 +15,62 @@ void main() {
   setUp(() => getIt.registerSingleton<AppConfig>(config()));
   tearDown(() => getIt.reset());
 
+  testWidgets('hidden dock keeps the guest scan action on Home only', (tester) async {
+    final root = RootCubit();
+    final router = GoRouter(
+      initialLocation: '/home',
+      routes: [
+        ShellRoute(
+          builder: (context, state, child) => BlocProvider.value(
+            value: root,
+            child: RootView(currentPath: state.uri.path, showNavigation: false, child: child),
+          ),
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (_, _) => const Scaffold(body: Text('Home fixture')),
+            ),
+            GoRoute(
+              path: '/settings',
+              builder: (_, _) => const Scaffold(body: Text('Settings fixture')),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/scan',
+          builder: (_, _) => const Scaffold(body: Text('Scanner opened')),
+        ),
+      ],
+    );
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        theme: AppTheme.lightTheme(AppColorScheme.lightColorScheme),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Home fixture'), findsOneWidget);
+    expect(find.text('Home'), findsNothing);
+    expect(find.text('Settings'), findsNothing);
+    expect(find.byKey(const ValueKey('navigation-selector')), findsNothing);
+    final scan = find.byTooltip('Scan barcode');
+    expect(scan.hitTestable(), findsOneWidget);
+    expect(tester.getCenter(scan).dx, greaterThan(tester.getSize(find.byType(RootView)).width / 2));
+    await tester.tap(scan);
+    await tester.pumpAndSettle();
+    expect(find.text('Scanner opened'), findsOneWidget);
+    expect(find.byType(RootView), findsNothing);
+    router.go('/settings');
+    await tester.pumpAndSettle();
+    expect(find.text('Settings fixture'), findsOneWidget);
+    expect(scan, findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    router.dispose();
+    await root.close();
+  });
+
   for (final reducedMotion in [false, true]) {
     testWidgets(
       'selector remains edge-aligned and moves across shell routes; reduced motion=$reducedMotion',

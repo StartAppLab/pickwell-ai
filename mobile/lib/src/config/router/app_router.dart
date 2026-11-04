@@ -236,8 +236,12 @@ class AppRouter {
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) =>
-            RootView(key: state.pageKey, currentPath: state.uri.path, child: child),
+        builder: (context, state, child) => RootView(
+          key: state.pageKey,
+          currentPath: state.uri.path,
+          showNavigation: false,
+          child: child,
+        ),
         routes: [
           GoRoute(
             name: homeRoute,

@@ -29,8 +29,16 @@ class RootView extends StatefulWidget {
   final Widget? actionButton;
   final List<RootTab>? tabs;
   final String? currentPath;
+  final bool showNavigation;
 
-  const RootView({super.key, this.child, this.actionButton, this.tabs, this.currentPath});
+  const RootView({
+    super.key,
+    this.child,
+    this.actionButton,
+    this.tabs,
+    this.currentPath,
+    this.showNavigation = true,
+  });
 
   @override
   State<RootView> createState() => _RootViewState();
@@ -153,12 +161,17 @@ class _RootViewState extends State<RootView> {
       bottomNavigationBar: BlocSelector<RootCubit, RootState, int>(
         selector: (state) => state.selectedIndex,
         builder: (context, selectedIndex) {
-          if (MediaQuery.viewInsetsOf(context).bottom > 0) return const SizedBox.shrink();
+          if (MediaQuery.viewInsetsOf(context).bottom > 0 ||
+              (!widget.showNavigation && widget.currentPath != AppRouter.homeRoute)) {
+            return const SizedBox.shrink();
+          }
           final d = context.themeData.dimensionsData;
           final routeSelectedIndex = tabs.indexWhere((tab) => tab.routeName == widget.currentPath);
           final safeSelectedIndex = (routeSelectedIndex >= 0 ? routeSelectedIndex : selectedIndex)
               .clamp(0, tabs.length - 1);
-          final navShell = _buildNavShell(context, safeSelectedIndex, tabs);
+          final navShell = widget.showNavigation
+              ? _buildNavShell(context, safeSelectedIndex, tabs)
+              : null;
           return SafeArea(
             bottom: true,
             maintainBottomViewPadding: true,
@@ -173,9 +186,12 @@ class _RootViewState extends State<RootView> {
                   ),
                   child: Row(
                     children: [
-                      Expanded(child: navShell),
+                      if (navShell != null) ...[
+                        Expanded(child: navShell),
+                        Gap(d.spacingSm),
+                      ] else
+                        const Spacer(),
                       ...[
-                        Gap(context.themeData.dimensionsData.spacingSm),
                         widget.actionButton ??
                             IconButton.filled(
                               tooltip: context.l10n.pkScan,

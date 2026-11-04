@@ -76,6 +76,8 @@ void main() {
       expect(find.text('Food'), findsOneWidget);
       expect(find.text('Newest'), findsOneWidget);
       expect(find.byType(TextField), findsNothing);
+      final search = find.byTooltip('Search your products');
+      expect(tester.getSize(search), const Size(48, 48));
       expect(find.text('Chat'), findsNothing);
       expect(find.text('Recently scanned'), findsNothing);
       await tester.tap(find.byTooltip('Search your products'));
@@ -179,8 +181,7 @@ void main() {
       expect(
         find.byWidgetPredicate(
           (widget) =>
-              widget is Image &&
-              widget.image != const AssetImage('assets/images/app_icon.png'),
+              widget is Image && widget.image != const AssetImage('assets/images/app_icon.png'),
         ),
         findsNothing,
         reason: 'Only supplied brand art is allowed; no invented product images',

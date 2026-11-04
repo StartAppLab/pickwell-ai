@@ -46,7 +46,9 @@ class ProductDetailScaffold extends StatelessWidget {
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
             icon: const Icon(CupertinoIcons.chevron_back),
             style: IconButton.styleFrom(
-              minimumSize: Size.square(d.minimumTouchTarget),
+              minimumSize: const Size.square(52),
+              fixedSize: const Size.square(52),
+              padding: EdgeInsets.zero,
               backgroundColor: colors.surfaceContainerLowest,
               foregroundColor: colors.primary,
               side: BorderSide(color: colors.outlineVariant),
