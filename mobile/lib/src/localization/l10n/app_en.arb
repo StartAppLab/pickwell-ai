@@ -465,5 +465,16 @@
   "pkReviewExpiresAt": "Review expires: {time}",
   "pkBarcodeOperatorReviewed": "Barcode association reviewed by an operator; not independently verified.",
   "pkAnalysisReviewExpired": "The review expired. Your photos are saved. You can submit a new analysis.",
-  "@pkReviewExpiresAt": {"placeholders": {"time": {"type": "String"}}}
+  "@pkReviewExpiresAt": {"placeholders": {"time": {"type": "String"}}},
+  "pkPrivateReady": "Analysis ready",
+  "pkPrivateNotice": "This product hasn''t been approved for the shared catalog yet.",
+  "pkPrivateRetention": "Preliminary, owner-only result available for up to 24 hours. Photos stay in your expiring private draft; this is not an independently verified product.",
+  "pkPrivateReviewClosed": "Shared review is closed. Your preliminary result remains available until its expiry.",
+  "pkPrivateExpired": "This private result is unavailable or has expired.",
+  "pkPrivateSignIn": "Sign in with the account that submitted this analysis, then retry.",
+  "pkPrivatePublished": "A shared catalog result is now available.",
+  "pkPrivateViewShared": "View shared product",
+  "pkPrivateCheck": "Check shared publication",
+  "pkPrivateCancel": "Cancel shared review",
+  "pkPrivateView": "View analysis"
 }

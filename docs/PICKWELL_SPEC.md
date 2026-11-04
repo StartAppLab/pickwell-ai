@@ -1,5 +1,7 @@
 # PICKWELL AI V2 — TECHNICAL SPECIFICATION
 
+> **2026-11-04 — T07.1C.3 local implementation, NOT deployed:** Validated new analyses return an owner-only preliminary result immediately, separate from the operator-approved shared catalog. One successful private result consumes one reserved credit exactly once; later publication adds no charge. Rejection/cancellation/review expiry cannot refund that success or erase the private result before its bounded expiry. Private non-image results last up to 24 hours; existing five-draft/24-hour local photo recovery is retained with owner-bound references. Public cache, exact operator approvals, original-photo privacy, billing disabled and 1000/100 testing versus 30/3 standard configuration remain unchanged. This supersedes review-only credit/refund and hidden-result wording **for the new local code only**; cloud behavior remains the T07.1D.1 baseline until authorized coordinated rollout. [Implementation, tests, retention and deployment requirements](PICKWELL_PRIVATE_RESULTS.md).
+
 **File:** `PICKWELL_SPEC.md`  
 **Version:** 1.6 — Product trust gates and post-submission architecture\
 **Date:** 2026-11-04\
@@ -9,7 +11,7 @@
 
 > **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C deployed baseline authority (before local C.3):** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -465,3 +467,25 @@ configured backend endpoint and uses fixed-size loading/error fallbacks. Cleanup
 uses protected operator Storage API commands, never SQL deletion of object metadata.
 A deployed protected scheduled runner is a rollout prerequisite. See Product
 Thumbnails for lifecycle, no-replacement rules and physical cleanup limitations.
+
+## T07.1C.3 — Owner preliminary result contract (local only)
+
+`analyze-product` may return `private_ready` with sanitized `product`, owner
+`job_id`/`request_id`, `private_expires_at`, `publication_status` and optional
+separate `canonical_product`. It is not a public-ready response. Never write this
+product to shared local recents or expose it through `get-product`.
+
+`get-private-analysis` POST accepts exactly `{job_id}`. Server Auth supplies the
+confirmed non-anonymous owner; normal request throttles apply, no model/lookup
+allowance is consumed. A missing/other-owner job is `not_found`; expired payload
+is `private_expired` (or canonical-only if publicly ready). Responses are no-store.
+An explicit owner check can finalize already approved publication through the
+existing protected publisher, with zero additional inference/credit.
+
+Flutter `/analysis/:jobId` reuses Details. Local preview requires matching owner,
+job and draft; missing local evidence uses a placeholder. Draft manifest v3 stores
+only job/owner/expiry references, retaining v1/v2 compatibility. Sign-out/account
+switch hides private data and stale asynchronous responses are ignored. Private
+results stay available during review rejection/cancel/expiry, bounded by TTL.
+The full [implementation report](PICKWELL_PRIVATE_RESULTS.md) records accounting,
+concurrency, validation, tests and undeployed dependencies.

@@ -582,3 +582,13 @@ identity discrepancies require review, not blanket retakes of readable labels.
 Operator review does not establish independent barcode ownership. Follow
 `../docs/PICKWELL_PRODUCT_TRUST.md`; existing general “validate and publish” wording
 is conditional on this gate. No backend rollout or new UI polish is implied.
+
+## T07.1C.3 local private-result separation
+
+Follow `../docs/PICKWELL_PRIVATE_RESULTS.md` for the new local path (not deployed).
+A validated private result must be owner-only and excluded from public recents;
+show preliminary Details immediately. Successful private delivery charges once;
+shared publication remains operator-gated and adds no charge. Do not refund a
+successful private result on review cancellation/expiry, hide it before its TTL,
+or turn a local preview into approved shared media. Preserve bounded expiring
+photo drafts and owner/job references; no permanent private/offline payload cache.

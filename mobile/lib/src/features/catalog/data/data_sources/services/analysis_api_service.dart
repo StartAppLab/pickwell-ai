@@ -8,6 +8,7 @@ import '../../../domain/entities/analysis_entity.dart';
 import '../../../domain/entities/label_photo.dart';
 
 abstract class AnalysisApiService {
+  Future<Map<String, dynamic>> privateResult(String jobId);
   Future<Map<String, dynamic>> submit(AnalysisRequest request);
   Future<Map<String, dynamic>> cancelReview(String requestId);
 }
@@ -52,7 +53,14 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> cancelReview(String requestId) async {
+  Future<Map<String, dynamic>> privateResult(String jobId) =>
+      _ownerAction('get-private-analysis', {'job_id': jobId});
+
+  @override
+  Future<Map<String, dynamic>> cancelReview(String requestId) =>
+      _ownerAction('cancel-analysis-review', {'request_id': requestId});
+
+  Future<Map<String, dynamic>> _ownerAction(String function, Map<String, String> body) async {
     if (!config.features.backendEnabled || !config.features.authEnabled) {
       return {'status': 'auth_required'};
     }
@@ -71,8 +79,8 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
     try {
       final response = await client.functions
           .invoke(
-            'cancel-analysis-review',
-            body: {'request_id': requestId},
+            function,
+            body: body,
             headers: {'apikey': config.apiKey, 'Authorization': 'Bearer ${session.accessToken}'},
           )
           .timeout(const Duration(seconds: 10));
@@ -110,6 +118,7 @@ class SupabaseAnalysisApiService implements AnalysisApiService {
       if (session == null) return {'status': 'auth_required'};
     }
     final owner = session.user.id;
+    if (request.expectedOwnerId != null && request.expectedOwnerId != owner) return {'status': 'auth_required'};
     Uint8List front, nutrition, ingredients;
     try {
       front = await _bytes(request.front).timeout(const Duration(seconds: 10));

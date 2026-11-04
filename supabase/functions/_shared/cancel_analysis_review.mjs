@@ -1,3 +1,4 @@
+import { privateResultFields } from './private_analysis.mjs';
 import { requireVerifiedEmail, IdentityError } from './analysis_authorization.mjs';
 import { readBoundedJson, sanitizePublishedProduct } from './catalog_boundary.mjs';
 import { createQuotaService, networkBucket } from './quota_boundary.mjs';
@@ -20,8 +21,9 @@ export function createCancelAnalysisReviewHandler(env,fetcher=fetch){
     body:JSON.stringify({p_user:user,p_key:body.request_id}),redirect:'error',signal:AbortSignal.timeout(5000)});
    if(!result.ok)return reply({status:'error',error:result.status===406?'not_found':'service_unavailable'},result.status===406?404:503);
    const raw=await readBoundedJson(result.body,131072);
-   if(!['review_cancelled','ready','already_exists','analysis_failed','processing'].includes(raw.status))throw Error();
+   if(!['review_cancelled','ready','already_exists','analysis_failed','processing','private_ready','private_expired'].includes(raw.status))throw Error();
    const safe={status:raw.status,barcode:raw.barcode};
+   if(raw.status==='private_ready')Object.assign(safe,privateResultFields(raw));
    if(['ready','already_exists'].includes(raw.status))safe.product=sanitizePublishedProduct(raw.product);
    if(raw.status==='analysis_failed')safe.error=['review_rejected','review_expired','review_cancelled'].includes(raw.error)?raw.error:'analysis_failed';
    return attachAnalysisQuota(reply(safe),user,env,fetcher);

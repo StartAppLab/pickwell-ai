@@ -1089,4 +1089,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkAnalysisReviewExpired => '审核已到期。照片已保存，可以提交新的分析。';
+
+  @override
+  String get pkPrivateReady => 'Analysis ready';
+
+  @override
+  String get pkPrivateNotice => 'This product hasn\'t been approved for the shared catalog yet.';
+
+  @override
+  String get pkPrivateRetention =>
+      'Preliminary, owner-only result available for up to 24 hours. Photos stay in your expiring private draft; this is not an independently verified product.';
+
+  @override
+  String get pkPrivateReviewClosed =>
+      'Shared review is closed. Your preliminary result remains available until its expiry.';
+
+  @override
+  String get pkPrivateExpired => 'This private result is unavailable or has expired.';
+
+  @override
+  String get pkPrivateSignIn =>
+      'Sign in with the account that submitted this analysis, then retry.';
+
+  @override
+  String get pkPrivatePublished => 'A shared catalog result is now available.';
+
+  @override
+  String get pkPrivateViewShared => 'View shared product';
+
+  @override
+  String get pkPrivateCheck => 'Check shared publication';
+
+  @override
+  String get pkPrivateCancel => 'Cancel shared review';
+
+  @override
+  String get pkPrivateView => 'View analysis';
 }

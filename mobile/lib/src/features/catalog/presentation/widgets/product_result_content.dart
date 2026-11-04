@@ -12,12 +12,13 @@ import 'interpretation_explanation.dart';
 class ProductResultContent extends StatelessWidget {
   final ProductRecord product;
   final bool recentSaved;
-  final Widget? statusNotice;
+  final Widget? statusNotice, privateThumbnail;
   const ProductResultContent({
     super.key,
     required this.product,
     this.recentSaved = true,
     this.statusNotice,
+    this.privateThumbnail,
   });
   @override
   Widget build(BuildContext context) {
@@ -41,12 +42,13 @@ class ProductResultContent extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProductCardThumbnail(
-                  thumbnail: p.thumbnail,
-                  placeholderLabel: l.pkNoProductPhoto,
-                  width: 80,
-                  height: 96,
-                ),
+                privateThumbnail ??
+                    ProductCardThumbnail(
+                      thumbnail: p.thumbnail,
+                      placeholderLabel: l.pkNoProductPhoto,
+                      width: 80,
+                      height: 96,
+                    ),
                 Gap(d.spacingMd),
                 Expanded(
                   child: Column(

@@ -361,3 +361,14 @@ Files touched by this follow-up (separate from the earlier feature manifest):
 - `mobile/test/catalog/product_results_test.dart`
 - `docs/PICKWELL_DESIGN.md`
 - `docs/PICKWELL_PRODUCT_THUMBNAILS.md`
+
+## T07.1C.3 local follow-up (not deployed)
+
+[Immediate private results](PICKWELL_PRIVATE_RESULTS.md) now separate successful
+owner analysis from shared publication. A private-ready result consumes one
+credit; cancellation/rejection/review expiry does not refund it, and publication
+never double charges. Private payload survives review closure up to 24h, with
+owner-bound local draft references/preview. This supersedes earlier hidden-result
+and refund wording for the new local path only. Shared thumbnail eligibility,
+exact processed evidence, review bindings and immutable canonical data remain
+unchanged. No extra public image source, automatic approval or hosted rollout.

@@ -17,7 +17,10 @@ export async function publishAnalysis(rpc,identity,settle) {
    Object.fromEntries(Object.keys(v).sort().map(k=>[k,stable(v[k])])):v;
   if(JSON.stringify(stable(validated))!==JSON.stringify(stable(validation)))throw Error();
  } catch { return settle('failed','invalid_model_output'); }
+ // Successful private delivery settles the allowance exactly once. Publication remains gated.
+ const delivered=await rpc('pickwell_deliver_private_analysis',{...identity,p_validated:validated});
+ if(delivered.status!=='private_ready')return delivered;
  const review=await publicationReview(rpc,identity);
- if(review.status!=='approved')return review;
+ if(review.status!=='approved')return delivered;
  return rpc('pickwell_publish_analysis',{...identity,p_validated:validated});
 }

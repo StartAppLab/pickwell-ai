@@ -9,6 +9,40 @@ class AnalysisModel {
   static AnalysisResult parse(Map<String, dynamic> json, String barcode) {
     final quota = QuotaModel.parse(json, QuotaMetric.aiAnalysis);
     final status = json['status'];
+    if (status == 'private_ready') {
+      final job = json['job_id'], owner = json['_quota_subject'];
+      final expires = DateTime.tryParse(json['private_expires_at'] as String? ?? '');
+      final uuid = RegExp(r'^[a-f0-9-]{36}$');
+      if (job is! String ||
+          owner is! String ||
+          !uuid.hasMatch(job) ||
+          !uuid.hasMatch(owner) ||
+          expires == null ||
+          json['barcode'] != barcode) {
+        throw const FormatException();
+      }
+      final product = CatalogModel.parse({...json, 'status': 'ready'}, barcode).product!;
+      final canonical = json['canonical_product'] == null
+          ? null
+          : CatalogModel.parse({
+              'status': 'ready',
+              'barcode': barcode,
+              'product': json['canonical_product'],
+            }, barcode).product;
+      return AnalysisResult(
+        AnalysisPhase.privateReady,
+        product: product,
+        quota: quota,
+        jobId: job,
+        ownerId: owner,
+        privateExpiresAt: expires,
+        publicationStatus: json['publication_status'] as String?,
+        canonicalProduct: canonical,
+      );
+    }
+    if (status == 'private_expired' || status == 'not_found') {
+      return AnalysisResult(AnalysisPhase.blocked, error: 'private_expired', quota: quota);
+    }
     if (['ready', 'already_exists'].contains(status)) {
       final product = CatalogModel.parse({...json, 'status': 'ready'}, barcode).product!;
       return AnalysisResult(AnalysisPhase.ready, product: product, quota: quota);

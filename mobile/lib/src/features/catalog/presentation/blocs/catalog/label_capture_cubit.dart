@@ -33,6 +33,8 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
   final CaptureLabelUseCase captureLabel;
   final PendingCaptureRepository? drafts;
   String? _requestId;
+  String? _privateJobId, _privateOwnerId;
+  DateTime? _privateExpiresAt;
   DateTime? _expiresAt;
   int _attempts = 0;
   Future<void>? _restoring;
@@ -64,6 +66,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
 
   void _activate(PendingCapture item) {
     _requestId = item.requestId;
+    _privateJobId = item.privateJobId;
+    _privateOwnerId = item.privateOwnerId;
+    _privateExpiresAt = item.privateExpiresAt;
     _expiresAt = item.expiresAt;
     _attempts = item.attempts;
     _show(
@@ -123,6 +128,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       nutrition: state.nutrition,
       ingredients: state.ingredients,
       attempts: _attempts,
+      privateJobId: _privateJobId,
+      privateOwnerId: _privateOwnerId,
+      privateExpiresAt: _privateExpiresAt,
     );
     try {
       await drafts?.save(item);
@@ -148,6 +156,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
         nutrition: state.nutrition,
         ingredients: state.ingredients,
         attempts: _attempts,
+        privateJobId: _privateJobId,
+        privateOwnerId: _privateOwnerId,
+        privateExpiresAt: _privateExpiresAt,
         saved: false,
       );
       if (!isClosed) {
@@ -165,7 +176,51 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     }
   }
 
+  Future<bool> rememberPrivate(AnalysisResult result, String requestId) async {
+    final original = _pending[result.product?.barcode];
+    if (result.phase != AnalysisPhase.privateReady ||
+        original == null ||
+        original.requestId != requestId) {
+      return false;
+    }
+    final item = PendingCapture(
+      barcode: original.barcode,
+      requestId: original.requestId,
+      expiresAt: original.expiresAt,
+      front: original.front,
+      nutrition: original.nutrition,
+      ingredients: original.ingredients,
+      attempts: original.attempts,
+      privateJobId: result.jobId,
+      privateOwnerId: result.ownerId,
+      privateExpiresAt: result.privateExpiresAt,
+    );
+    _pending[item.barcode] = item;
+    if (state.barcode == item.barcode) {
+      _privateJobId = item.privateJobId;
+      _privateOwnerId = item.privateOwnerId;
+      _privateExpiresAt = item.privateExpiresAt;
+    }
+    _show(
+      LabelCaptureState(
+        barcode: state.barcode,
+        front: state.front,
+        nutrition: state.nutrition,
+        ingredients: state.ingredients,
+      ),
+    );
+    try {
+      await drafts?.save(item);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<bool> renewRequest() async {
+    _privateJobId = null;
+    _privateOwnerId = null;
+    _privateExpiresAt = null;
     _requestId = createCatalogRequestId();
     _attempts = 0;
     return _persist();
@@ -201,6 +256,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       _activate(saved);
       return;
     }
+    _privateJobId = null;
+    _privateOwnerId = null;
+    _privateExpiresAt = null;
     _requestId = createCatalogRequestId();
     _attempts = 0;
     _expiresAt = DateTime.now().toUtc().add(draftLifetime);
@@ -288,6 +346,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
       return;
     }
     if (photo != null) {
+      _privateJobId = null;
+      _privateOwnerId = null;
+      _privateExpiresAt = null;
       _requestId = createCatalogRequestId();
       _attempts = 0;
     }
@@ -354,6 +415,9 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     _expiries.remove(code)?.cancel();
     if (active) {
       _requestId = null;
+      _privateJobId = null;
+      _privateOwnerId = null;
+      _privateExpiresAt = null;
       _attempts = 0;
       _expiresAt = null;
       _generation++;

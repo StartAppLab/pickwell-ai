@@ -15,23 +15,24 @@ function chunk(name,data){const all=Buffer.concat([Buffer.from(name),data]);let 
 function png(color){const h=Buffer.alloc(13);h.writeUInt32BE(32,0);h.writeUInt32BE(32,4);h[8]=8;h[9]=6;const pixels=Buffer.alloc(32*129,color);for(let n=0;n<32;n++)pixels[n*129]=0;return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',h),chunk('IDAT',deflateSync(pixels)),chunk('IEND',Buffer.alloc(0))]);}
 function submission(extra=false){const f=new FormData();f.set('barcode','036000291452');f.set('idempotency_key',key);for(const [i,p] of ['front','nutrition','ingredients'].entries())f.set(p+'_image',new Blob([png(10+i)]),p+'.png');if(extra)f.set('approved','true');return new Request('https://test.invalid',{method:'POST',body:f,headers:{Authorization:'Bearer e30.e30.fixture'}});}
 test('A barcode/B evidence stays pending; replay cannot rerun Muse or publish until operator approval',async()=>{
- let approved=false,published=false,modelCalls=0,candidate;const writes=[];
+ let approved=false,published=false,modelCalls=0,candidate,delivered=false;const writes=[];
  const h=createAnalyzeProductHandler(env,async(url,options={})=>{
   if(url.endsWith('/auth/v1/user'))return Response.json({id:uid,is_anonymous:false,email:'fixture@example.invalid',email_confirmed_at:'2026-11-04T00:00:00Z'});
   if(url===env.META_API_URL){modelCalls++;const c=frontLabelFixture();for(const p of ['front','nutrition','ingredients'])c.identity[p].product_name='Product B';c.identity.consistency='consistent';return Response.json({model:env.META_MODEL,choices:[{finish_reason:'stop',message:{content:JSON.stringify(c)}}]});}
   const name=url.split('/').at(-1),body=JSON.parse(options.body);writes.push({name,body});
   if(name==='pickwell_lookup_throttle')return Response.json({allowed:true});
-  if(name==='pickwell_quota_snapshot')return Response.json({limit:3,used:published?1:0,reserved:published?0:1,remaining:2});
+  if(name==='pickwell_quota_snapshot')return Response.json({limit:3,used:delivered?1:0,reserved:delivered?0:1,remaining:2});
   if(name==='pickwell_admit_analysis')return Response.json(published?{status:'already_exists',product:published}:candidate?{status:'review_required'}:{status:'reserved',reservation_id:key,job_id:uid});
   if(name==='pickwell_begin_provider')return Response.json({call_allowed:true,attempt_id:key,model:env.META_MODEL});
   if(name==='pickwell_record_provider_metrics')return Response.json({status:'succeeded'});
   if(name==='pickwell_stage_analysis'){candidate={candidate:body.p_candidate,model_version:body.p_model,prompt_version:body.p_prompt};return Response.json({status:'processing'});}
   if(name==='pickwell_read_analysis_candidate')return Response.json(candidate);
+  if(name==='pickwell_deliver_private_analysis'){delivered=true;return Response.json({status:'private_ready',job_id:uid,request_id:key,barcode:'00036000291452',private_expires_at:new Date(Date.now()+86400000).toISOString(),publication_status:'pending',product:{...body.p_validated,id:uid,barcode:'00036000291452'}});}
   if(name==='pickwell_publication_gate')return Response.json(approved?{status:'approved',review_id:key,barcode:'00036000291452',input_digest:'a'.repeat(64),candidate_digest:'b'.repeat(64),policy_version:'trust-publication-v1'}:{status:'review_required',job_id:uid,review_expires_at:'2026-12-01T00:00:00Z'});
   if(name==='pickwell_publish_analysis'){assert.ok(approved);published={...body.p_validated,id:key,barcode:'00036000291452'};return Response.json({status:'ready',product:published});}
   throw Error('Unexpected RPC '+name);
  });
- for(let n=0;n<3;n++){const r=await h(submission());assert.equal(r.status,202);const body=await r.json();assert.equal(body.status,'review_required');assert.equal(body.product,undefined);assert.equal(body.quota.used,0);}
+ for(let n=0;n<3;n++){const r=await h(submission());assert.equal(r.status,200);const body=await r.json();assert.equal(body.status,'private_ready');assert.equal(body.product.barcode,'00036000291452');assert.equal(body.quota.used,1);}
  assert.equal(modelCalls,1);assert.ok(!writes.some(w=>w.name==='pickwell_publish_analysis'||w.name==='pickwell_decide_product_review'));
  assert.equal((await h(submission(true))).status,400);assert.equal(modelCalls,1);
  approved=true;assert.equal((await (await h(submission())).json()).status,'ready');assert.equal(modelCalls,1);

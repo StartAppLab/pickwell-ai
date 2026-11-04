@@ -24,6 +24,12 @@ class CaptureEntryView extends StatelessWidget {
     body: SafeArea(
       child: BlocConsumer<AnalysisSubmissionCubit, AnalysisSubmissionState>(
         listener: (context, submission) {
+          if (submission.phase == AnalysisPhase.privateReady &&
+              submission.barcode == barcode &&
+              submission.result?.jobId != null) {
+            context.replace('/analysis/${submission.result!.jobId}', extra: barcode);
+            return;
+          }
           if (submission.phase == AnalysisPhase.ready &&
               submission.barcode == barcode &&
               context.mounted) {

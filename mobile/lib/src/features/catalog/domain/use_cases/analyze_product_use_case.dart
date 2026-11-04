@@ -10,6 +10,8 @@ class AnalyzeProductUseCase implements FutureEitherUseCase<AnalysisRequest, Anal
   AnalyzeProductUseCase(this.repository);
   Future<Either<Failure, AnalysisResult>> cancelReview(String requestId, String barcode) =>
       repository.cancelReview(requestId, barcode);
+  Future<Either<Failure, AnalysisResult>> privateResult(String jobId, String barcode) =>
+      repository.privateResult(jobId, barcode);
   @override
   Future<Either<Failure, AnalysisResult>> call(AnalysisRequest input) => repository.submit(input);
 }

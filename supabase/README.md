@@ -377,3 +377,12 @@ Operator/test tooling needs Python >=3.11 plus pinned `scripts/thumbnail-require
 no Flutter or Edge image-processing dependency was added. Configure protected
 scheduled `attach-product-thumbnail.mjs --cleanup --apply` before enabling uploads.
 No automatic production deployment; no image role/client flag grants publication.
+
+## Private analysis / shared publication separation
+
+T07.1C.3 is implemented locally, not deployed. Read
+[PICKWELL_PRIVATE_RESULTS.md](../docs/PICKWELL_PRIVATE_RESULTS.md) before applying
+migration `20261104000400` or deploying the private-read/analysis/cancel handlers.
+It changes successful-credit timing while preserving bound operator publication.
+Use the documented coordinated rollout; do not mix old handlers and settlement
+semantics, reset hosted data or silently change testing quotas.

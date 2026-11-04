@@ -2047,6 +2047,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The review expired. Your photos are saved. You can submit a new analysis.'**
   String get pkAnalysisReviewExpired;
+
+  /// No description provided for @pkPrivateReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis ready'**
+  String get pkPrivateReady;
+
+  /// No description provided for @pkPrivateNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'This product hasn\'\'t been approved for the shared catalog yet.'**
+  String get pkPrivateNotice;
+
+  /// No description provided for @pkPrivateRetention.
+  ///
+  /// In en, this message translates to:
+  /// **'Preliminary, owner-only result available for up to 24 hours. Photos stay in your expiring private draft; this is not an independently verified product.'**
+  String get pkPrivateRetention;
+
+  /// No description provided for @pkPrivateReviewClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared review is closed. Your preliminary result remains available until its expiry.'**
+  String get pkPrivateReviewClosed;
+
+  /// No description provided for @pkPrivateExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This private result is unavailable or has expired.'**
+  String get pkPrivateExpired;
+
+  /// No description provided for @pkPrivateSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with the account that submitted this analysis, then retry.'**
+  String get pkPrivateSignIn;
+
+  /// No description provided for @pkPrivatePublished.
+  ///
+  /// In en, this message translates to:
+  /// **'A shared catalog result is now available.'**
+  String get pkPrivatePublished;
+
+  /// No description provided for @pkPrivateViewShared.
+  ///
+  /// In en, this message translates to:
+  /// **'View shared product'**
+  String get pkPrivateViewShared;
+
+  /// No description provided for @pkPrivateCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check shared publication'**
+  String get pkPrivateCheck;
+
+  /// No description provided for @pkPrivateCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel shared review'**
+  String get pkPrivateCancel;
+
+  /// No description provided for @pkPrivateView.
+  ///
+  /// In en, this message translates to:
+  /// **'View analysis'**
+  String get pkPrivateView;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -90,6 +90,7 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
       AnalysisRequest(
         barcode: snapshot.barcode!,
         requestId: _key!,
+        expectedOwnerId: snapshot.pending.where((d) => d.barcode == snapshot.barcode).firstOrNull?.privateOwnerId,
         front: snapshot.front!,
         nutrition: snapshot.nutrition!,
         ingredients: snapshot.ingredients!,
@@ -100,6 +101,15 @@ class AnalysisSubmissionCubit extends Cubit<AnalysisSubmissionState> {
           const AnalysisResult(AnalysisPhase.error, error: 'transport_uncertain', retryable: true),
       (value) => value,
     );
+    if (result.phase == AnalysisPhase.privateReady) {
+      await draft.rememberPrivate(result, _key!);
+      if (!isClosed) {
+        emit(
+          AnalysisSubmissionState(phase: result.phase, barcode: snapshot.barcode, result: result),
+        );
+      }
+      return;
+    }
     if (result.phase == AnalysisPhase.ready) {
       final clean = await draft.discardSubmitted(snapshot);
       if (clean) {

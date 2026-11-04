@@ -19,6 +19,15 @@ class FakeAnalysis extends AnalysisRepository {
   }
 
   @override
+  Future<Either<Failure, AnalysisResult>> privateResult(String jobId, String barcode) async =>
+      transportError
+      ? Left(
+          ServerFailure(
+            error: const DataError(stackTrace: 'fixture', statusCode: 'unavailable'),
+          ),
+        )
+      : Right(result);
+  @override
   Future<Either<Failure, AnalysisResult>> submit(AnalysisRequest request) async {
     requests.add(request);
     if (pending != null) return pending!.future;

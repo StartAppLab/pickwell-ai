@@ -1,12 +1,14 @@
 # PICKWELL AI V2 — AGENT PROMPTS
 
+> **2026-11-04 — T07.1C.3 local implementation, NOT deployed:** Validated new analyses return an owner-only preliminary result immediately, separate from the operator-approved shared catalog. One successful private result consumes one reserved credit exactly once; later publication adds no charge. Rejection/cancellation/review expiry cannot refund that success or erase the private result before its bounded expiry. Private non-image results last up to 24 hours; existing five-draft/24-hour local photo recovery is retained with owner-bound references. Public cache, exact operator approvals, original-photo privacy, billing disabled and 1000/100 testing versus 30/3 standard configuration remain unchanged. This supersedes review-only credit/refund and hidden-result wording **for the new local code only**; cloud behavior remains the T07.1D.1 baseline until authorized coordinated rollout. [Implementation, tests, retention and deployment requirements](PICKWELL_PRIVATE_RESULTS.md).
+
 **Version:** 1.5 — Trust gates and post-submission roadmap\
 **Date:** 2026-11-04\
 **Sources:** PRD v1.8, DESIGN v1.6, SPEC v1.6, DATABASE v1.4, TASKS v1.5 and actual applicable repository `AGENTS.md`.
 
 > **2026-11-04 — T07.1A.1 approved media exception (implemented locally, not deployed):** Only a bounded **front-package derivative** may be intentionally retained as reusable media after exact-evidence operator approval and publication. Original evidence, nutrition and ingredient photographs remain temporary/nonpublic. The post-publication operator command does not alter three-photo submission or approval/quota authority. Private upload → immutable ready association → controlled public image endpoint; no public Storage bucket. Legacy products without an eligible published review retain placeholders. See [architecture, privacy, tests, operator cleanup and rollout](PICKWELL_PRODUCT_THUMBNAILS.md). T07.1A UI polish is not started by this task.
 
-> **2026-11-04 — T07.1C current implementation authority:** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
+> **2026-11-04 — T07.1C deployed baseline authority (before local C.3):** New analyses require an **evidence-bound operator decision before shared publication**; schema validity, three coherent photos and Muse certainty do not authorize publication. **Deployed and hosted-security verified in T07.1D.1**; genuine three-photo/Muse/operator/device validation deferred by owner. [Rollout evidence](PICKWELL_HOSTED_TRUST_ROLLOUT.md). `review_required` keeps a private candidate/reserved slot for at most 30 minutes; rejection, cancellation or expiry releases the slot without a successful-analysis charge. Operator review is distinct from independent barcode verification. Cross-image discrepancies are review conditions, superseding C.1's automatic identity-conflict retakes; unreadable/wrong photos still use relevant-photo retakes. Existing guest cache reads remain available. See [safeguards, tests, rollout and operator procedure](PICKWELL_PRODUCT_TRUST.md). T07.1D.1 resolves the missing hosted gate; testing deployment PASS WITH LIMITATIONS ([rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md)); real-product sign-off remains deferred; billing remains disabled and existing testing allowances unchanged.
 
 > **2026-11-04 — T07.1C.1 approved flow update:** Unknown barcode → **Front packaging → Nutrition → Ingredients** (three required photos) → contextual Email OTP → one server-side Muse analysis. Barcode is already captured, outside the three photo steps. This supersedes earlier two-photo/Barcode-as-Step-1 wording for new submissions; historical completed-task evidence remains unchanged. Front identity is a model observation, **not independent barcode ownership verification**. T07.1C's approval gate and T07.1D remain pending. [Implementation, verification and rollout](PICKWELL_FRONT_PACKAGING.md).
 
@@ -1147,3 +1149,16 @@ Report status, exact files changed, observed commands/test results, security/pri
 ```
 
 **v1.2 (2026-11-04):** Added audit/critical protection/release and post-submission prompts, synchronized their contracts with TASKS, retained historical prompts/completed-work evidence and updated read-first document versions. No implementation or new QA claimed.
+
+## T07.1C.3 follow-up — Deployment and real private-result validation
+
+Read `PICKWELL_PRIVATE_RESULTS.md` and the actual diff/revision first. Preserve the
+existing private-result implementation, owner-only projection, exact operator
+gate, one-successful-private-credit semantics and zero publication double charge.
+Do not rebuild it. Coordinated hosted rollout requires explicit authorization;
+apply outstanding forward migrations in order without a reset, deploy matching
+analysis/cancel/private-read handlers, verify owner/guest/RLS negatives and pruning,
+then test one legitimate three-photo private result and exact-evidence operator
+approval/canonical reuse. Keep 1000/100 testing limits, spend controls and billing
+disabled. Do not approve substituted evidence, enable AI-authorized publication,
+start UI polish/dashboard/T07.2 or invent hosted/live/device evidence.

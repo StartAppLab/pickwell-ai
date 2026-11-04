@@ -64,6 +64,7 @@ test('publication revalidation accepts new observations and legacy results remai
   const validation=validateAnalysis(candidate,{model:'muse-spark-1.3',now:'2026-11-04T00:00:00Z'});let publishes=0;
   const result=await publishAnalysis(async(name,args)=>{
    if(name==='pickwell_read_analysis_candidate')return {candidate:{...candidate,validation},prompt_version:version,model_version:'muse-spark-1.3'};
+   if(name==='pickwell_deliver_private_analysis')return {status:'private_ready'};
    if(name==='pickwell_publication_gate')return {status:'approved',review_id:'11111111-1111-4111-8111-111111111111',barcode:'00036000291452',input_digest:'a'.repeat(64),candidate_digest:'b'.repeat(64),policy_version:'trust-publication-v1'};
    assert.equal(name,'pickwell_publish_analysis');publishes++;assert.deepEqual(args.p_validated,validation);return {status:'ready'};
   },{},()=>{throw Error('unexpected settlement');});assert.equal(result.status,'ready');assert.equal(publishes,1);
@@ -94,6 +95,7 @@ test('authenticated handler keeps all image bytes request-local and cached retry
   if(name==='pickwell_record_provider_metrics')return Response.json({status:'succeeded'});
   if(name==='pickwell_stage_analysis'){candidate={candidate:body.p_candidate,model_version:body.p_model,prompt_version:body.p_prompt};return Response.json({status:'processing'});}
   if(name==='pickwell_read_analysis_candidate')return Response.json(candidate);
+  if(name==='pickwell_deliver_private_analysis')return Response.json({status:'private_ready'});
   if(name==='pickwell_publication_gate')return Response.json({status:'approved',review_id:'11111111-1111-4111-8111-111111111111',barcode:'00036000291452',input_digest:'a'.repeat(64),candidate_digest:'b'.repeat(64),policy_version:'trust-publication-v1'});
   if(name==='pickwell_publish_analysis'){
    const v=body.p_validated;published={id:'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',barcode:'00036000291452',nutrition:v.nutrition,ingredients:v.ingredients,provenance:v.provenance,findings:v.findings,missing_information:v.missing_information};candidate=null;return Response.json({status:'ready',product:published});

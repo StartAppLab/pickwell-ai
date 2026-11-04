@@ -144,7 +144,10 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
     }
 
     final value = {
-      'v': 2,
+      'v': 3,
+      'private_job_id': draft.privateJobId,
+      'private_owner_id': draft.privateOwnerId,
+      'private_expires_at': draft.privateExpiresAt?.toUtc().toIso8601String(),
       'barcode': draft.barcode,
       'request_id': draft.requestId,
       'expires_at': draft.expiresAt.toUtc().toIso8601String(),
@@ -199,7 +202,7 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
       if (await manifest.length() > 4096) throw FormatException();
       final j = jsonDecode(await manifest.readAsString()) as Map;
       final expires = DateTime.parse(j['expires_at'] as String).toUtc();
-      if (![1, 2].contains(j['v']) ||
+      if (![1, 2, 3].contains(j['v']) ||
           !expires.isAfter(DateTime.now().toUtc()) ||
           expires.difference(DateTime.now().toUtc()) > const Duration(hours: 24)) {
         throw FormatException();
@@ -234,6 +237,18 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
         return result;
       }
 
+      final job = j['private_job_id'], owner = j['private_owner_id'];
+      final privateExpires = j['private_expires_at'] == null
+          ? null
+          : DateTime.parse(j['private_expires_at'] as String).toUtc();
+      if (job != null &&
+          (job is! String ||
+              owner is! String ||
+              !RegExp(r'^[a-f0-9-]{36}$').hasMatch(job) ||
+              !RegExp(r'^[a-f0-9-]{36}$').hasMatch(owner) ||
+              privateExpires == null)) {
+        throw const FormatException();
+      }
       final f = await photo(j['front']),
           n = await photo(j['nutrition']),
           i = await photo(j['ingredients']);
@@ -245,6 +260,9 @@ class PendingCaptureRepositoryImpl implements PendingCaptureRepository {
         nutrition: n,
         ingredients: i,
         attempts: j['attempts'],
+        privateJobId: job,
+        privateOwnerId: owner,
+        privateExpiresAt: privateExpires,
       );
     } catch (error) {
       for (final p in restored) {

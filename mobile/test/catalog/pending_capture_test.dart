@@ -114,9 +114,14 @@ void main() {
             nutrition: label,
             ingredients: label,
             attempts: 2,
+            privateJobId: '20000000-0000-4000-8000-000000000002',
+            privateOwnerId: '10000000-0000-4000-8000-000000000001',
+            privateExpiresAt: DateTime.now().toUtc().add(const Duration(hours: 23)),
           ),
         );
-        final restored = await repository.load();
+        final restored = await PendingCaptureRepositoryImpl.testing(media, root).load();
+        expect(restored?.privateJobId, '20000000-0000-4000-8000-000000000002');
+        expect(restored?.privateOwnerId, '10000000-0000-4000-8000-000000000001');
         expect(restored?.attempts, 2);
         expect(restored?.nutrition?.byteLength, label.byteLength);
         expect(await File(restored!.ingredients!.path).exists(), true);
@@ -124,6 +129,9 @@ void main() {
           '${root.path}/pickwell_pending_analysis_v1/00000096385074/manifest.json',
         );
         final json = jsonDecode(await manifest.readAsString()) as Map<String, dynamic>;
+        expect(json.containsKey('product'), false);
+        expect(json.containsKey('payload'), false);
+        expect(json['v'], 3);
         json['nutrition'] = {
           'file': '../../fixture-16.png',
           'captured_at': DateTime.now().toIso8601String(),

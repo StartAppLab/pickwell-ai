@@ -21,6 +21,8 @@ class ApiFixture extends AnalysisApiService {
     'status': 'review_cancelled',
   };
   @override
+  Future<Map<String, dynamic>> privateResult(String jobId) async => value;
+  @override
   Future<Map<String, dynamic>> submit(AnalysisRequest request) async => value;
 }
 

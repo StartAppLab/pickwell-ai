@@ -16,12 +16,15 @@ enum AnalysisPhase {
   blocked,
   cleanupFailed,
   ready,
+  privateReady,
 }
 
 class AnalysisRequest {
   final String barcode, requestId;
+  final String? expectedOwnerId;
   final LabelPhoto front, nutrition, ingredients;
   const AnalysisRequest({
+    this.expectedOwnerId,
     required this.barcode,
     required this.requestId,
     required this.front,
@@ -41,10 +44,17 @@ class AnalysisResult {
   final bool restartAllowed;
   final bool canReanalyzeSaved;
   final int retryAfterSeconds;
-  final DateTime? retryAt, reviewExpiresAt;
+  final DateTime? retryAt, reviewExpiresAt, privateExpiresAt;
+  final String? jobId, ownerId, publicationStatus;
+  final ProductRecord? canonicalProduct;
   const AnalysisResult(
     this.phase, {
     this.product,
+    this.jobId,
+    this.ownerId,
+    this.publicationStatus,
+    this.privateExpiresAt,
+    this.canonicalProduct,
     this.quota,
     this.retake = const {},
     this.retakeDetails = const [],

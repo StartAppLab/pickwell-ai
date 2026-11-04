@@ -1,3 +1,4 @@
+import { privateResultFields } from './private_analysis.mjs';
 import { normalizeIngredientEvidence } from './ingredient_evidence.mjs';
 import { sanitizeRetakeDetails, retakePhotos, retakeTarget } from './retake_details.mjs';
 import { attachAnalysisQuota } from './analysis_quota_response.mjs';
@@ -56,8 +57,9 @@ function createAnalysisExecution(env,fetcher){
    // A previous denial before provider admission stays retryable after restart.
    if(result.status==='analysis_failed'&&['service_budget_exceeded','provider_attempt_limit','concurrency_limited','inference_disabled'].includes(result.error))
     return failure(result.error,result.error==='inference_disabled'?503:429);
-   if(!['ready','already_exists','processing','analysis_failed','needs_retake','review_required','review_cancelled'].includes(result.status))throw Error();
+   if(!['ready','already_exists','processing','analysis_failed','needs_retake','review_required','review_cancelled','private_ready','private_expired'].includes(result.status))throw Error();
    const body={status:result.status,barcode:input.barcode,request_id:input.key};
+   if(result.status==='private_ready')Object.assign(body,privateResultFields(result));
    if(result.job_id)body.job_id=result.job_id; // Only owner IDs are returned by RPC.
    if(['ready','already_exists'].includes(result.status))body.product=sanitizePublishedProduct(result.product);
    if(result.status==='needs_retake'){
@@ -88,7 +90,7 @@ function createAnalysisExecution(env,fetcher){
    }
    if(admitted.status==='inference_disabled')return failure('inference_disabled');
    if(admitted.status!=='reserved'){
-    if(admitted.status==='review_required'||admitted.status==='processing'&&admitted.stage==='validation_pending')return await complete();
+    if(admitted.status==='private_ready'||admitted.status==='review_required'||admitted.status==='processing'&&admitted.stage==='validation_pending')return await complete();
     return safe(admitted);
    }
    // Missing/mismatched credentials cannot spend a provider-attempt claim.
