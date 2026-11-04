@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:fpdart/fpdart.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -82,6 +83,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Original · 500 g'), findsOneWidget);
     await tester.scrollUntilVisible(
+      find.text('About this analysis'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text('About this analysis'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
       find.text(
         'Barcode ownership has not been independently verified. Identity is read from the submitted packaging.',
       ),
@@ -147,7 +155,9 @@ void main() {
       scrollable: find.byType(Scrollable).first,
     );
     expect(find.text('Soy Lecithin'), findsOneWidget);
-    await tester.tap(find.text('Soy Lecithin'));
+    await tester.ensureVisible(find.text('Soy Lecithin'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Soy Lecithin').hitTestable());
     await tester.pumpAndSettle();
     expect(
       find.text('Commonly used to keep ingredients mixed and reduce separation.'),
@@ -258,7 +268,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byType(BackButton), findsOneWidget);
+      expect(find.byIcon(CupertinoIcons.chevron_back), findsOneWidget);
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
       expect(find.byType(BottomNavigationBar), findsNothing);
       expect(find.textContaining('92/100'), findsNothing);
@@ -304,11 +314,19 @@ void main() {
         scrollable: find.byType(Scrollable).first,
       );
       await tester.scrollUntilVisible(
-        find.text('Analysis and provenance'),
+        find.text('About this analysis'),
         200,
         scrollable: find
             .descendant(of: find.byType(ListView).first, matching: find.byType(Scrollable))
             .first,
+      );
+      expect(find.textContaining('fixture:no-provider'), findsNothing);
+      await tester.tap(find.text('About this analysis'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.textContaining('fixture:no-provider'),
+        100,
+        scrollable: find.byType(Scrollable).first,
       );
       expect(find.textContaining('fixture:no-provider'), findsOneWidget);
       expect(tester.takeException(), isNull);

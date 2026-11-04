@@ -2113,6 +2113,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View analysis'**
   String get pkPrivateView;
+
+  /// No description provided for @pkAllNutrition.
+  ///
+  /// In en, this message translates to:
+  /// **'All nutrition facts'**
+  String get pkAllNutrition;
+
+  /// No description provided for @pkAnalysisDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'About this analysis'**
+  String get pkAnalysisDetails;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

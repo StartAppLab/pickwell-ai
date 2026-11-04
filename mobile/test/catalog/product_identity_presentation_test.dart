@@ -115,7 +115,22 @@ void main() {
             name = tester.widget<Text>(find.text('Pancit Canton'));
         expect(brand.style!.fontSize!, lessThan(name.style!.fontSize!));
         expect(find.byType(ProductCardThumbnail), findsOneWidget);
-        expect(find.text(p.barcode), details ? findsOneWidget : findsNothing);
+        expect(find.text(p.barcode), findsNothing);
+        if (details) {
+          await tester.scrollUntilVisible(
+            find.text('About this analysis'),
+            200,
+            scrollable: find.byType(Scrollable).first,
+          );
+          await tester.ensureVisible(find.text('About this analysis'));
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('About this analysis').hitTestable());
+          await tester.pumpAndSettle();
+          expect(
+            find.byWidgetPredicate((w) => w is SelectableText && w.data == p.barcode),
+            findsOneWidget,
+          );
+        }
         expect(tester.takeException(), isNull);
       },
     );

@@ -1125,4 +1125,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get pkPrivateView => 'View analysis';
+
+  @override
+  String get pkAllNutrition => 'All nutrition facts';
+
+  @override
+  String get pkAnalysisDetails => 'About this analysis';
 }

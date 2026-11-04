@@ -10,6 +10,11 @@ class ProductSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final d = context.themeData.dimensionsData;
     return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(d.cardCornerRadius),
+        side: BorderSide(color: context.colorScheme.outlineVariant.withValues(alpha: .7)),
+      ),
       margin: EdgeInsets.only(bottom: d.spacingSm),
       color: context.colorScheme.surfaceContainerLowest,
       child: Padding(
@@ -17,7 +22,7 @@ class ProductSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(title, style: context.textTheme.titleLarge),
+            Text(title, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
             Gap(d.spacingMd),
             for (var index = 0; index < children.length; index++) ...[
               if (index > 0) Gap(d.spacingSm),

@@ -1,12 +1,11 @@
-import 'product_identity_header.dart';
-import 'product_card_thumbnail.dart';
+import 'product_result_header.dart';
+import 'product_nutrition_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../../core/_core.dart';
 import '../../domain/entities/catalog_entity.dart';
 import 'product_section.dart';
 import 'product_finding_card.dart';
-import 'nutrition_fact_row.dart';
 import 'interpretation_explanation.dart';
 
 class ProductResultContent extends StatelessWidget {
@@ -23,13 +22,6 @@ class ProductResultContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = product, l = context.l10n, d = context.themeData.dimensionsData;
-    final basis = switch (p.nutrition['basis']) {
-      'per_100g' => l.pkPer100g,
-      'per_100ml' => l.pkPer100ml,
-      'per_serving' => l.pkPerServing,
-      _ => l.pkUnknownValue,
-    };
-    final nutrients = p.nutrition['nutrients'] as List? ?? [];
     final ingredients = p.ingredients['items'] as List? ?? [];
     final hasInterpretation = p.provenance['interpretation_version'] is String;
     final date = p.analyzedAt?.toLocal();
@@ -39,30 +31,7 @@ class ProductResultContent extends StatelessWidget {
         child: ListView(
           padding: context.themeData.edgeInsetsData.pagePadding,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                privateThumbnail ??
-                    ProductCardThumbnail(
-                      thumbnail: p.thumbnail,
-                      placeholderLabel: l.pkNoProductPhoto,
-                      width: 80,
-                      height: 96,
-                    ),
-                Gap(d.spacingMd),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ProductIdentityHeader(product: p),
-                      Gap(d.spacingXxs),
-                      SelectableText(p.barcode, style: context.textTheme.bodySmall),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Gap(d.spacingMd),
+            ProductResultHeader(product: p, privateThumbnail: privateThumbnail),
             if (p.isDemo) Text(l.pkDemo, style: context.textTheme.labelLarge),
             if (!recentSaved) Text(l.pkRecentNotSaved),
             Gap(d.spacingSm),
@@ -71,88 +40,86 @@ class ProductResultContent extends StatelessWidget {
               title: l.pkOverview,
               children: [
                 Text(p.summary),
-                if (p.provenance['barcode_association'] case final Map association)
-                  if (association['status'] == 'operator_reviewed')
-                    Text(l.pkBarcodeOperatorReviewed, style: context.textTheme.bodySmall),
-                if (p.provenance['identity'] is Map)
-                  Text(l.pkIdentityUnverified, style: context.textTheme.bodySmall),
-                Text(l.pkCaveat, style: context.textTheme.bodySmall),
-                if (hasInterpretation)
-                  Text(l.pkTranscriptionCaveat, style: context.textTheme.bodySmall),
-                if (!hasInterpretation)
-                  Text(l.pkLegacyInterpretation, style: context.textTheme.bodySmall),
+                if (p.findings.isEmpty)
+                  Text(
+                    l.pkNoFindings,
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                Text(
+                  l.pkCaveat,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ],
             ),
-            ProductSection(
-              title: l.pkFindings,
-              children: [
-                if (p.findings.isEmpty) Text(l.pkNoFindings),
-                for (final finding in p.findings) ProductFindingCard(finding: finding),
-              ],
-            ),
+            if (p.findings.isNotEmpty)
+              ProductSection(
+                title: l.pkFindings,
+                children: [for (final finding in p.findings) ProductFindingCard(finding: finding)],
+              ),
             ProductSection(
               title: l.pkIngredients,
               children: [
+                if (ingredients.isNotEmpty)
+                  Text(ingredients.join(', '), maxLines: 3, overflow: TextOverflow.ellipsis),
                 for (final explanation in p.explanations.where(
                   (e) => e['photo'] == 'ingredients' && e['kind'] != null,
                 ))
                   InterpretationExplanation(explanation: explanation),
-                if (hasInterpretation)
-                  ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(l.pkRawLabel),
-                    children: [
-                      for (var index = 0; index < ingredients.length; index++)
-                        Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: Text('${index + 1}. ${ingredients[index]}'),
-                        ),
-                      Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
-                    ],
-                  ),
-                if (!hasInterpretation)
-                  for (var index = 0; index < ingredients.length; index++)
-                    Text('${index + 1}. ${ingredients[index]}'),
-                if (ingredients.isEmpty) Text(l.pkUnknownValue),
-                if (!hasInterpretation) ...[
-                  Text(l.pkRawLabel, style: context.textTheme.titleSmall),
-                  Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
-                ],
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(l.pkRawLabel),
+                  children: [
+                    for (var index = 0; index < ingredients.length; index++)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text('${index + 1}. ${ingredients[index]}'),
+                      ),
+                    Text(p.ingredients['raw']?.toString() ?? l.pkUnknownValue),
+                    for (final explanation in p.explanations.where(
+                      (e) => e['photo'] == 'ingredients' && e['kind'] == null,
+                    ))
+                      Text(explanation['text']?.toString() ?? l.pkUnknownValue),
+                  ],
+                ),
                 Text(l.pkDeclaredAllergens, style: context.textTheme.titleMedium),
                 Text(p.ingredients['declared_allergens']?.toString() ?? l.pkUnknownAllergens),
-                for (final explanation in p.explanations.where(
-                  (e) => e['photo'] == 'ingredients' && e['kind'] == null,
-                ))
-                  Text(explanation['text']?.toString() ?? l.pkUnknownValue),
               ],
             ),
-            ProductSection(
-              title: l.pkNutrition,
-              children: [
-                Text('${l.pkBasis}: $basis', style: context.textTheme.titleMedium),
-                if (p.nutrition['serving_size'] is String)
-                  Text('${l.pkServingSize}: ${p.nutrition['serving_size']}'),
-                if (nutrients.isEmpty) Text(l.pkUnknownValue),
-                for (final nutrient in nutrients)
-                  if (nutrient is Map)
-                    NutritionFactRow(nutrient: Map<String, dynamic>.from(nutrient)),
-                for (final explanation in p.explanations.where((e) => e['photo'] == 'nutrition'))
-                  if (explanation['kind'] != null)
-                    InterpretationExplanation(explanation: explanation)
-                  else
-                    Text(explanation['text']?.toString() ?? l.pkUnknownValue),
-              ],
+            ProductNutritionPanel(
+              nutrition: p.nutrition,
+              explanations: p.explanations.where((e) => e['photo'] == 'nutrition').toList(),
             ),
-            ProductSection(
-              title: l.pkMissingInformation,
+            if (p.missingInformation.isNotEmpty)
+              ProductSection(
+                title: l.pkMissingInformation,
+                children: [for (final information in p.missingInformation) Text(information)],
+              ),
+            ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: Text(
+                l.pkAnalysisDetails,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              subtitle: date == null
+                  ? null
+                  : Text(
+                      '${l.pkAnalysisDate}: ${MaterialLocalizations.of(context).formatMediumDate(date)}',
+                      style: context.textTheme.bodySmall,
+                    ),
+              expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (p.missingInformation.isEmpty) Text(l.pkNoMissingReported),
-                for (final information in p.missingInformation) Text(information),
-              ],
-            ),
-            ProductSection(
-              title: l.pkAnalysisMethod,
-              children: [
+                SelectableText(p.barcode),
+                if (p.provenance['barcode_association'] case final Map association)
+                  if (association['status'] == 'operator_reviewed')
+                    Text(l.pkBarcodeOperatorReviewed),
+                if (p.provenance['identity'] is Map) Text(l.pkIdentityUnverified),
+                Text(hasInterpretation ? l.pkTranscriptionCaveat : l.pkLegacyInterpretation),
                 Text(
                   '${l.pkAnalysisDate}: ${date == null ? l.pkUnknownValue : '${MaterialLocalizations.of(context).formatMediumDate(date)} · ${MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(date))}'}',
                 ),

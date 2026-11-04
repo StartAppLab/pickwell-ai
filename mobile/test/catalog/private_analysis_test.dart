@@ -163,6 +163,7 @@ void main() {
     await tester.pumpAndSettle();
     fake.transportError = true;
     await tester.ensureVisible(find.text('Check shared publication'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Check shared publication'));
     await tester.pumpAndSettle();
     await tester.drag(find.byType(ListView), const Offset(0, 1200));

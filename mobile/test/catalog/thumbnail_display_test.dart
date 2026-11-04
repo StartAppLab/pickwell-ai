@@ -110,13 +110,13 @@ void main() {
     expect(tester.getSize(find.byType(ProductCardThumbnail)), before);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('details use the same derivative fallback with the existing portrait slot', (
+  testWidgets('details use the same derivative fallback in an enlarged square hero', (
     tester,
   ) async {
     await tester.pumpWidget(host(Scaffold(body: ProductResultContent(product: parse(metadata())))));
     await tester.pumpAndSettle();
     expect(find.byType(ProductCardThumbnail), findsOneWidget);
-    expect(tester.getSize(find.byType(ProductCardThumbnail)), const Size(80, 96));
+    expect(tester.getSize(find.byType(ProductCardThumbnail)), const Size(184, 184));
     expect(find.byType(ProductThumbnailPlaceholder), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

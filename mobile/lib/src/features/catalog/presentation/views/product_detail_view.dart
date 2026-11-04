@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -18,35 +19,71 @@ class ProductDetailView extends StatelessWidget {
   const ProductDetailView({super.key, this.session, this.drafts});
   @override
   Widget build(BuildContext context) => Scaffold(
+    backgroundColor: Color.lerp(
+      context.colorScheme.surfaceContainerLowest,
+      context.colorScheme.surface,
+      .15,
+    ),
     appBar: AppBar(
-      leading: BackButton(
-        onPressed: () {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            context.go('/home');
-          }
-        },
+      backgroundColor: Color.lerp(
+        context.colorScheme.surfaceContainerLowest,
+        context.colorScheme.surface,
+        .15,
       ),
-      actions: [
-        PopupMenuButton<String>(
-          onSelected: (value) async {
-            try {
-              await Clipboard.setData(ClipboardData(text: value));
-            } catch (_) {
-              if (context.mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(context.l10n.pkError)));
-              }
+      surfaceTintColor: Colors.transparent,
+      leadingWidth:
+          context.themeData.dimensionsData.minimumTouchTarget +
+          context.themeData.dimensionsData.paddingSm * 2,
+      toolbarHeight:
+          context.themeData.dimensionsData.minimumTouchTarget +
+          context.themeData.dimensionsData.paddingSm * 2,
+      leading: Padding(
+        padding: EdgeInsets.all(context.themeData.dimensionsData.paddingSm),
+        child: IconButton(
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          icon: const Icon(CupertinoIcons.chevron_back),
+          style: IconButton.styleFrom(
+            backgroundColor: context.colorScheme.surfaceContainerLowest,
+            foregroundColor: context.colorScheme.primary,
+            side: BorderSide(color: context.colorScheme.outlineVariant),
+          ),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
             }
           },
-          itemBuilder: (_) => [
-            PopupMenuItem(
-              value: context.read<CatalogCubit>().state.barcode ?? '',
-              child: Text(context.l10n.pkCopyBarcode),
+        ),
+      ),
+      actions: [
+        Padding(
+          padding: EdgeInsets.only(right: context.themeData.dimensionsData.paddingSm),
+          child: PopupMenuButton<String>(
+            icon: const Icon(CupertinoIcons.ellipsis),
+            style: IconButton.styleFrom(
+              backgroundColor: context.colorScheme.surfaceContainerLowest,
+              foregroundColor: context.colorScheme.primary,
+              side: BorderSide(color: context.colorScheme.outlineVariant),
             ),
-          ],
+            onSelected: (value) async {
+              try {
+                await Clipboard.setData(ClipboardData(text: value));
+              } catch (_) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(context.l10n.pkError)));
+                }
+              }
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: context.read<CatalogCubit>().state.barcode ?? '',
+                child: Text(context.l10n.pkCopyBarcode),
+              ),
+            ],
+          ),
         ),
       ],
     ),
@@ -87,17 +124,20 @@ class ProductDetailView extends StatelessWidget {
             statusNotice: Column(
               children: [
                 if (drafts != null) PendingCaptureCard(draft: drafts!, barcode: state.barcode),
-                QuotaStatus(
-                  snapshot: state.quota,
-                  session: session,
-                  metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
-                  unavailable: state.status == LookupStatus.error,
-                  rateLimited: state.error == 'rate_limited',
-                  loadedResult:
-                      state.status == LookupStatus.error ||
-                      state.status == LookupStatus.denied ||
-                      state.quota?.remaining == 0,
-                ),
+                if (state.status == LookupStatus.error ||
+                    state.status == LookupStatus.denied ||
+                    state.quota?.remaining == 0)
+                  QuotaStatus(
+                    snapshot: state.quota,
+                    session: session,
+                    metric: state.quota?.metric ?? QuotaMetric.barcodeLookup,
+                    unavailable: state.status == LookupStatus.error,
+                    rateLimited: state.error == 'rate_limited',
+                    loadedResult:
+                        state.status == LookupStatus.error ||
+                        state.status == LookupStatus.denied ||
+                        state.quota?.remaining == 0,
+                  ),
               ],
             ),
           );

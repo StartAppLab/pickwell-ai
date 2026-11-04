@@ -476,5 +476,7 @@
   "pkPrivateViewShared": "View shared product",
   "pkPrivateCheck": "Check shared publication",
   "pkPrivateCancel": "Cancel shared review",
-  "pkPrivateView": "View analysis"
+  "pkPrivateView": "View analysis",
+  "pkAllNutrition": "All nutrition facts",
+  "pkAnalysisDetails": "About this analysis"
 }
