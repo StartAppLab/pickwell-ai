@@ -248,3 +248,48 @@ supabase/tests/private_analysis.test.mjs
 supabase/tests/private_analysis_endpoint.test.mjs
 supabase/tests/trust_services.test.mjs
 ```
+
+## 2026-11-05 — Completed-analysis Home card handoff
+
+A completed private analysis previously stayed in the large draft panel, showing
+“Analysis ready”, barcode, recovery copy, View analysis and Delete saved draft.
+Keeping its expiring private photos/reference was intentional; presenting completed
+work as an unfinished draft was not appropriate.
+
+Flutter now renders completed owner-private contributions with the same product
+card layout, validated brand/name/variant/quantity, an authorized local front
+preview or honest fallback, and a small **Private analysis** label. Tap the card
+to open the owner-only result. Retry/remove actions are in its overflow menu;
+unfinished captures keep their existing recovery panel. Home no longer displays
+its empty-recents prompt while such a card is visible.
+
+The card's product facts live only in an owner-scoped Cubit in memory. Existing
+server result retrieval supplies missing display data after restart; it never
+submits another analysis or puts private payloads into the shared recent index.
+Account switches hide/dispose these cards, late replies are ignored, and private
+expiry clears their display state. Pull-to-refresh and the card retry action refresh
+the owner metadata without a new analysis submission. The existing five-draft/24-hour limits and
+transient photo retention remain unchanged. No new permanent private history.
+
+On confirmation of **this contribution's publication**, or a canonical-only reply
+after private expiry, the client uses the already cached sanitized canonical
+record to save the normal recent barcode reference before retiring the matching
+draft. Another contributor's different canonical result does not silently replace
+an unexpired private analysis. The handoff checks request/job/owner and photo
+version; it cannot delete newer retakes. Failed index writes or photo cleanup keep
+recoverable local state with a retry indication. Ready Product Details lookups
+also refresh Home, and a publication arriving during an older Home refresh waits
+for a fresh index read instead of disappearing from the list until restart.
+
+Validation: **187 catalog Flutter tests passed; analyzer clean**. New tests cover
+card presentation, cross-account hiding, exactly scoped cleanup, cache/index write
+failure, cleanup failure, late retakes, Home refresh races, ready lookup handoff,
+and real repository promotion with zero extra remote lookup calls. No new AI
+submission, server quota/approval change, migration, backend deployment or device
+verification was performed for this follow-up. A hot restart/rebuilt client is
+needed to use the changed Flutter presentation.
+
+Files: new `private_product_card_cubit.dart`, `private_analysis_card.dart` and
+`private_product_card_test.dart`; existing catalog/pending-card widgets,
+`label_capture_cubit.dart`, Product Details/router callbacks, Home view/Cubit,
+English ARB/generated localization files, and this report.

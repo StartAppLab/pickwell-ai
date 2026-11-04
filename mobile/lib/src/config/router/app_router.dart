@@ -154,6 +154,7 @@ class AppRouter {
               entryQuota: state.extra is QuotaSnapshot ? state.extra as QuotaSnapshot : null,
             ),
           child: ProductDetailView(
+            onPublished: () => getIt<HomeCubit>().reloadAfterCurrent(),
             session: getIt<AppSession>(),
             drafts: getIt<LabelCaptureCubit>(),
           ),
@@ -167,7 +168,11 @@ class AppRouter {
             final draft = getIt<LabelCaptureCubit>().state;
             if (draft.barcode != code || !draft.ready) return '/capture/$code';
             final owner = draft.pending.where((d) => d.barcode == code).firstOrNull;
-            if (owner?.privateJobId != null) return owner?.privateOwnerId == getIt<AppSession>().userId ? '/analysis/${owner!.privateJobId}' : '/home';
+            if (owner?.privateJobId != null) {
+              return owner?.privateOwnerId == getIt<AppSession>().userId
+                  ? '/analysis/${owner!.privateJobId}'
+                  : '/home';
+            }
           } catch (_) {
             return '/scan';
           }
@@ -195,7 +200,11 @@ class AppRouter {
             await draft.begin(code);
             if (draft.state.barcode != code) return '/home';
             final owner = draft.state.pending.where((d) => d.barcode == code).firstOrNull;
-            if (owner?.privateJobId != null) return owner?.privateOwnerId == getIt<AppSession>().userId ? '/analysis/${owner!.privateJobId}' : '/home';
+            if (owner?.privateJobId != null) {
+              return owner?.privateOwnerId == getIt<AppSession>().userId
+                  ? '/analysis/${owner!.privateJobId}'
+                  : '/home';
+            }
           } catch (_) {
             return '/scan';
           }

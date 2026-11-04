@@ -15,6 +15,13 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> init() => load();
   Future<void>? _loading;
   Future<void> load() => _loading ??= _load().whenComplete(() => _loading = null);
+  // A publication arriving during an older refresh needs a fresh index read.
+  Future<void> reloadAfterCurrent() async {
+    final active = _loading;
+    if (active != null) await active;
+    if (!isClosed) await load();
+  }
+
   Future<void> _load() async {
     if (isClosed) return;
     if (state == const HomeState.idle()) emit(const HomeState.loading());

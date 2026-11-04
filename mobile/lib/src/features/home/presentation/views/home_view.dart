@@ -23,6 +23,8 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   bool search = false, food = false;
   String query = '';
+  bool _hasPendingItems = false;
+  int _privateRefreshRevision = 0;
   final _searchController = TextEditingController();
   final _searchFocus = FocusNode();
   RecentProductSort sort = RecentProductSort.newest;
@@ -73,7 +75,10 @@ class _HomeViewState extends State<HomeView> {
                     );
                     final loading = state.maybeWhen(loading: () => true, orElse: () => false);
                     return RefreshIndicator(
-                      onRefresh: () => context.read<HomeCubit>().load(),
+                      onRefresh: () async {
+                        setState(() => _privateRefreshRevision++);
+                        await context.read<HomeCubit>().load();
+                      },
                       child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -116,12 +121,26 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                 ],
                                 if (widget.drafts != null)
-                                  PendingCaptureCard(draft: widget.drafts!, query: query),
+                                  PendingCaptureCard(
+                                    draft: widget.drafts!,
+                                    query: query,
+                                    refreshRevision: _privateRefreshRevision,
+                                    onHasItemsChanged: (value) {
+                                      if (mounted && value != _hasPendingItems) {
+                                        setState(() => _hasPendingItems = value);
+                                      }
+                                    },
+                                    onPublished: () async {
+                                      if (mounted) {
+                                        await context.read<HomeCubit>().reloadAfterCurrent();
+                                      }
+                                    },
+                                  ),
                                 if (loading) ...[
                                   const Center(child: CircularProgressIndicator()),
                                   Gap(d.spacingLg),
                                 ],
-                                if (!loading && visible.isEmpty) ...[
+                                if (!loading && visible.isEmpty && !_hasPendingItems) ...[
                                   Gap(d.spacingXxl),
                                   AppIcon(
                                     icon: HugeIcons.strokeRoundedBarcodeScan,

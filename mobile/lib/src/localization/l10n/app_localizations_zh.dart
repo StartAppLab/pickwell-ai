@@ -1131,4 +1131,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get pkAnalysisDetails => 'About this analysis';
+
+  @override
+  String get pkPrivateCardLabel => 'Private analysis';
+
+  @override
+  String get pkRemoveLocalAnalysis => 'Remove from this device';
 }

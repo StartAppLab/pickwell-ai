@@ -2125,6 +2125,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About this analysis'**
   String get pkAnalysisDetails;
+
+  /// No description provided for @pkPrivateCardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Private analysis'**
+  String get pkPrivateCardLabel;
+
+  /// No description provided for @pkRemoveLocalAnalysis.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from this device'**
+  String get pkRemoveLocalAnalysis;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

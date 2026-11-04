@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,8 @@ import '../widgets/product_result_content.dart';
 class ProductDetailView extends StatelessWidget {
   final AppSession? session;
   final LabelCaptureCubit? drafts;
-  const ProductDetailView({super.key, this.session, this.drafts});
+  final Future<void> Function()? onPublished;
+  const ProductDetailView({super.key, this.session, this.drafts, this.onPublished});
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: Color.lerp(
@@ -90,6 +92,12 @@ class ProductDetailView extends StatelessWidget {
     body: SafeArea(
       child: BlocConsumer<CatalogCubit, CatalogState>(
         listener: (context, state) {
+          if (state.status == LookupStatus.found &&
+              state.product != null &&
+              state.recentSaved &&
+              onPublished != null) {
+            unawaited(onPublished!());
+          }
           if (state.status == LookupStatus.miss) {
             context.replace('/capture/${state.barcode}', extra: state.quota);
           }
@@ -105,7 +113,12 @@ class ProductDetailView extends StatelessWidget {
           if (p == null) {
             return Column(
               children: [
-                if (drafts != null) PendingCaptureCard(draft: drafts!, barcode: state.barcode),
+                if (drafts != null)
+                  PendingCaptureCard(
+                    draft: drafts!,
+                    barcode: state.barcode,
+                    onPublished: onPublished,
+                  ),
                 Expanded(
                   child: LookupNotice(
                     status: state.status,
@@ -123,7 +136,12 @@ class ProductDetailView extends StatelessWidget {
             recentSaved: state.recentSaved,
             statusNotice: Column(
               children: [
-                if (drafts != null) PendingCaptureCard(draft: drafts!, barcode: state.barcode),
+                if (drafts != null)
+                  PendingCaptureCard(
+                    draft: drafts!,
+                    barcode: state.barcode,
+                    onPublished: onPublished,
+                  ),
                 if (state.status == LookupStatus.error ||
                     state.status == LookupStatus.denied ||
                     state.quota?.remaining == 0)

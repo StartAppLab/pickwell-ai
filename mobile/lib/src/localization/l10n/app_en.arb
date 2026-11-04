@@ -478,5 +478,7 @@
   "pkPrivateCancel": "Cancel shared review",
   "pkPrivateView": "View analysis",
   "pkAllNutrition": "All nutrition facts",
-  "pkAnalysisDetails": "About this analysis"
+  "pkAnalysisDetails": "About this analysis",
+  "pkPrivateCardLabel": "Private analysis",
+  "pkRemoveLocalAnalysis": "Remove from this device"
 }

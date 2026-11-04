@@ -379,6 +379,25 @@ class LabelCaptureCubit extends Cubit<LabelCaptureState> {
     }
   }
 
+  // A late server confirmation may retire only the exact saved version checked.
+  Future<bool> discardExpected(PendingCapture item) async {
+    final current = _pending[item.barcode];
+    if (current == null ||
+        current.requestId != item.requestId ||
+        current.privateJobId != item.privateJobId ||
+        current.privateOwnerId != item.privateOwnerId) {
+      return false;
+    }
+    return discardSubmitted(
+      LabelCaptureState(
+        barcode: item.barcode,
+        front: item.front,
+        nutrition: item.nutrition,
+        ingredients: item.ingredients,
+      ),
+    );
+  }
+
   Future<void> discard({bool expired = false}) async {
     final code = state.barcode;
     if (code != null) await discardBarcode(code, expired: expired);

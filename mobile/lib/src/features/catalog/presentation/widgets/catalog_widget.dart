@@ -10,7 +10,15 @@ import 'product_card_thumbnail.dart';
 class CatalogWidget extends StatelessWidget {
   final RecentProduct entry;
   final VoidCallback onTap;
-  const CatalogWidget({super.key, required this.entry, required this.onTap});
+  final Widget? image, status, trailing;
+  const CatalogWidget({
+    super.key,
+    required this.entry,
+    required this.onTap,
+    this.image,
+    this.status,
+    this.trailing,
+  });
   @override
   Widget build(BuildContext context) {
     final d = context.themeData.dimensionsData, l = context.l10n;
@@ -30,15 +38,24 @@ class CatalogWidget extends StatelessWidget {
             padding: EdgeInsets.all(d.paddingXs),
             child: Row(
               children: [
-                ProductCardThumbnail(thumbnail: product?.thumbnail),
+                image ?? ProductCardThumbnail(thumbnail: product?.thumbnail),
                 Gap(d.spacingSm),
-                Expanded(child: ProductIdentityHeader(product: product, compact: true)),
-                Gap(d.spacingXs),
-                AppIcon(
-                  icon: CupertinoIcons.chevron_forward,
-                  size: d.iconMedium,
-                  color: context.colorScheme.onSurfaceVariant,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ProductIdentityHeader(product: product, compact: true),
+                      if (status != null) ...[Gap(d.spacingXxs), status!],
+                    ],
+                  ),
                 ),
+                Gap(d.spacingXs),
+                trailing ??
+                    AppIcon(
+                      icon: CupertinoIcons.chevron_forward,
+                      size: d.iconMedium,
+                      color: context.colorScheme.onSurfaceVariant,
+                    ),
               ],
             ),
           ),
