@@ -1,5 +1,9 @@
 # T07.2A — Final hackathon repository readiness
 
+> Historical audit. See [T07.2A.1 remediation](PICKWELL_PUBLIC_REPOSITORY_REMEDIATION.md)
+> for subsequent README/notices, owner attestations and complete available GitHub
+> inventory. The original checks and dated decision below are preserved.
+
 Date: **November 5, 2026 (Philippine time)**.
 **Decision: BLOCKED for an unconditional public-submission recommendation.**
 Deadline supplied by owner: November 5, 2026, 10:00 AM Philippine time. This check

@@ -36,7 +36,7 @@ This section and the dated reconciliation notes below describe current status. E
 | T07.1C.1 | Three-photo capture/identity implemented and backend deployed; live three-photo/device validation deferred. |
 | T07.1C | IMPLEMENTED / deployed; restricted operator publication and hosted security checks verified. Real-product approval/device flow deferred. [Rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md). |
 | T07.1D / T07.1D.1 | Hosted rollout/security verified; PASS WITH LIMITATIONS for testing profile. Missing-gate blocker resolved; genuine three-photo/Muse/operator/device validation deferred explicitly by owner. [Rollout](PICKWELL_HOSTED_TRUST_ROLLOUT.md). |
-| T07.2 | NOT STARTED; follows T07.1D release sign-off and explicit T06.4 implementation/defer decision. |
+| T07.2 | Repository preparation in progress (T07.2A/A.1); demo/submission acceptance remains incomplete. Explicit T06.4 disposition and final evidence remain separate. |
 | T08.1–T08.4 | APPROVED POST-SUBMISSION ROADMAP; NOT IMPLEMENTED. See section 12 for dependencies and acceptance. |
 
 **Evidence boundary:** Device and further real-product/unreadable-label passes are owner-reported in the conversation and recorded in T07.1. Automated/native/hosted checks are separately identified in the QA report. This documentation-only reconciliation performs no new device test, provider call, deployment or full regression.
@@ -504,13 +504,20 @@ Implementation/deployment source `5178ec1`; [full rollout report](PICKWELL_HOSTE
 
 ### T07.2 Hackathon submission handoff
 
+**2026-11-05 — T07.2A.1 repository remediation:** README and starter presentation
+updated; ownership attestation, third-party notices/inventories and available
+GitHub exposure inventory recorded. Owner reports remaining icons as free and
+directs no further source-license research; grants are not independently verified.
+[Scope, findings and exact publication steps](PICKWELL_PUBLIC_REPOSITORY_REMEDIATION.md).
+No push, visibility change, demo recording or submission acceptance claimed.
+
 **2026-11-05 — T07.2A readiness review:** Final-source checks pass; public submission
 recommendation remains BLOCKED by unresolved redistribution/privacy-artifact
 clearance and final genuine-device/demo evidence. See
 [exact checks and remaining actions](PICKWELL_SUBMISSION_READINESS.md). No acceptance
 checkbox is newly completed.
 
-**Status / dependencies:** Pre-submission handoff; NOT STARTED. Depends on T07.1D release sign-off; optional T06.4 must be explicitly implemented or deferred, never silently treated as complete.
+**Status / dependencies:** Repository preparation in progress; final handoff is not signed off. Depends on T07.1D release sign-off; optional T06.4 must be explicitly implemented or deferred, never silently treated as complete.
 
 - [ ] Record a truthful ≤3-minute demo using actual working flows and confirmed Meta model; don't misrepresent mock responses as live.
 - [ ] Capture quick technical explanation: shared barcode cache, three-photo Meta analysis, rule-based findings, safe retries/auth/quotas.

@@ -1,0 +1,27 @@
+[
+  {
+    "path": "website/src/assets/icons/facebook-icon.tsx",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/9.0.0/icons/facebook.svg",
+    "evidence": "all SVG paths match after whitespace/comma normalization"
+  },
+  {
+    "path": "website/src/assets/icons/facebook-icon.tsx",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/4.0.0/icons/facebook.svg",
+    "evidence": "all SVG paths match after whitespace/comma normalization"
+  },
+  {
+    "path": "website/src/assets/icons/facebook-icon.tsx",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/6.0.0/icons/facebook.svg",
+    "evidence": "all SVG paths match after whitespace/comma normalization"
+  },
+  {
+    "path": "website/src/assets/icons/facebook-icon.tsx",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/7.0.0/icons/facebook.svg",
+    "evidence": "all SVG paths match after whitespace/comma normalization"
+  },
+  {
+    "path": "website/src/assets/icons/quote-icon.tsx",
+    "source": "https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.4.0/svgs/solid/quote-left.svg",
+    "evidence": "all SVG paths match after whitespace/comma normalization"
+  }
+]

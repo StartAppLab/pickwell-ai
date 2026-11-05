@@ -1,7 +1,14 @@
-# Consumer Flutter starter
+# Pickwell AI mobile
 
-A configurable starting point for offline utilities, free account-based apps,
-guest-first freemium apps, and authenticated subscription apps.
+The Flutter client for Pickwell AI. Follow the [root setup](../README.md) using
+`config/pickwell.dev.example.json` for the connected barcode/three-photo/OTP flow.
+Current privacy and Product Trust behavior is documented in the Pickwell sections
+below and the [documentation index](../docs/README.md).
+
+The following reusable-framework reference is retained from the owner's StartAppLab
+foundation. Its optional subscription, social-auth and analytics recipes are not
+claims that those integrations are active in the hackathon build.
+See [third-party attribution](../THIRD_PARTY_NOTICES.md).
 
 ## Run without external services
 

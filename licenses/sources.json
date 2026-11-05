@@ -1,0 +1,128 @@
+{
+  "retrieved": "2026-11-05",
+  "licenses": [
+    {
+      "file": "Manrope-OFL.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/manrope/OFL.txt",
+      "sha256": "58172e0c0fac2cda8a37b348164bb55e44b0e69051e557e92b1d3f6910141f7b"
+    },
+    {
+      "file": "flag-icons-MIT.txt",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/LICENSE",
+      "sha256": "8f1195d55a2fd315a07d812328470ca9ba2abb78c8d317ff19619d5125e00cea"
+    },
+    {
+      "file": "shadcn-ui-MIT.txt",
+      "source": "https://raw.githubusercontent.com/shadcn-ui/ui/main/LICENSE.md",
+      "sha256": "1564074e13439397221ffd522e2e504d56561994a23d371aa5e3ad43e4f5423f"
+    }
+  ],
+  "flags": [
+    {
+      "path": "mobile/assets/icons/flags/ic_ae.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/ae.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_cn.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/cn.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_de.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/de.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_es.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/es.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": false
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_fr.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/fr.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": false
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_in.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/in.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_it.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/it.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_jp.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/jp.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_kr.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/kr.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_pt.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/pt.svg",
+      "exact_bytes": false,
+      "whitespace_normalized_match": false
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_ru.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/ru.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    },
+    {
+      "path": "mobile/assets/icons/flags/ic_us.svg",
+      "source": "https://raw.githubusercontent.com/lipis/flag-icons/main/flags/4x3/us.svg",
+      "exact_bytes": true,
+      "whitespace_normalized_match": true
+    }
+  ],
+  "native": [
+    {
+      "package": "posthog-ios",
+      "version": "3.92.0",
+      "revision": "835f624c2618d72d73650d0ed0029325232f5b0a",
+      "source": "https://raw.githubusercontent.com/PostHog/posthog-ios/835f624c2618d72d73650d0ed0029325232f5b0a/LICENSE",
+      "notice": "posthog-ios-LICENSE",
+      "sha256": "113042ff4d3dd178c90515446b18475562e868a6ab6d77a07ffaa62dc798db8b"
+    },
+    {
+      "package": "purchases-hybrid-common",
+      "version": "19.10.0",
+      "revision": "7514157cbe345ca753aafbaf74fbe1f8433bf07f",
+      "source": "https://raw.githubusercontent.com/RevenueCat/purchases-hybrid-common/7514157cbe345ca753aafbaf74fbe1f8433bf07f/LICENSE",
+      "notice": "purchases-hybrid-common-LICENSE",
+      "sha256": "77e57f8a31eb21899940135b8f3acba2b0fc1825cc07db66e7b63b2f936f35ff"
+    },
+    {
+      "package": "purchases-ios-spm",
+      "version": "5.94.0",
+      "revision": "1152c719f7b35f86d16a2d0053aba9d26972a962",
+      "source": "https://raw.githubusercontent.com/RevenueCat/purchases-ios-spm/1152c719f7b35f86d16a2d0053aba9d26972a962/LICENSE",
+      "notice": "purchases-ios-spm-LICENSE",
+      "sha256": "9f0832999aa913fb2d4a94179839573467a2b79b43f6417ebaab93003506f1a2"
+    },
+    {
+      "package": "sentry-cocoa",
+      "version": "9.27.0",
+      "revision": "aaf96c4a417d30208b3c25d90910d6156ddc973d",
+      "source": "https://raw.githubusercontent.com/getsentry/sentry-cocoa/aaf96c4a417d30208b3c25d90910d6156ddc973d/LICENSE.md",
+      "notice": "sentry-cocoa-LICENSE.md",
+      "sha256": "1784335a04bbe8014b9bf0f6a373f7b3804855792545702199dbdd6e2c5b6ad1"
+    }
+  ]
+}
