@@ -1196,6 +1196,24 @@ abstract class AppLocalizations {
   /// **'Continue with Email'**
   String get pkOtpTitle;
 
+  /// No description provided for @pkOtpEmailIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'We’ll send you a one-time code. No password needed.'**
+  String get pkOtpEmailIntro;
+
+  /// No description provided for @pkOtpCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get pkOtpCodeTitle;
+
+  /// No description provided for @pkOtpCodeIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code we sent to your email to continue.'**
+  String get pkOtpCodeIntro;
+
   /// No description provided for @pkOtpDraftSafe.
   ///
   /// In en, this message translates to:

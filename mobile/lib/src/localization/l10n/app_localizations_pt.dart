@@ -601,6 +601,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pkOtpTitle => 'Continue with Email';
 
   @override
+  String get pkOtpEmailIntro => 'We’ll send you a one-time code. No password needed.';
+
+  @override
+  String get pkOtpCodeTitle => 'Check your email';
+
+  @override
+  String get pkOtpCodeIntro => 'Enter the code we sent to your email to continue.';
+
+  @override
   String get pkOtpDraftSafe =>
       'Your captured labels stay on this device while you sign in. Cancel returns to your photos.';
 
