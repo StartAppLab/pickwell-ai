@@ -504,10 +504,16 @@ Implementation/deployment source `5178ec1`; [full rollout report](PICKWELL_HOSTE
 
 ### T07.2 Hackathon submission handoff
 
+**2026-11-05 — T07.2A readiness review:** Final-source checks pass; public submission
+recommendation remains BLOCKED by unresolved redistribution/privacy-artifact
+clearance and final genuine-device/demo evidence. See
+[exact checks and remaining actions](PICKWELL_SUBMISSION_READINESS.md). No acceptance
+checkbox is newly completed.
+
 **Status / dependencies:** Pre-submission handoff; NOT STARTED. Depends on T07.1D release sign-off; optional T06.4 must be explicitly implemented or deferred, never silently treated as complete.
 
 - [ ] Record a truthful ≤3-minute demo using actual working flows and confirmed Meta model; don't misrepresent mock responses as live.
-- [ ] Capture quick technical explanation: shared barcode cache, two-image Meta analysis, rule-based findings, safe retries/auth/quotas.
+- [ ] Capture quick technical explanation: shared barcode cache, three-photo Meta analysis, rule-based findings, safe retries/auth/quotas.
 - [ ] Prepare public GitHub repository/submission materials according to verified organizer instructions while removing secrets and sensitive credentials.
 - [ ] Verify organizer deadline and upload requirements directly before final submission.
 - [ ] Document which functionality was built during the hackathon, which template/pre-existing work was reused, actual limitations and proposed-only roadmap; do not claim medical certification, independent identity verification or unbuilt T08 capabilities.

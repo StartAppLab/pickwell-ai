@@ -518,18 +518,23 @@ remaining full-submission/device acceptance.
 
 ## Pickwell contribution and results flow
 
-After an unknown barcode, capture Nutrition and Ingredients, then choose Analyze.
-The existing Email OTP gate resumes the same draft and submits two binary photos
-to the protected backend. Retakes identify the relevant capture; uncertain outcomes
-reuse the same request key within a bounded manual-check window. Confirmed success
-awaits owned temporary-photo deletion before opening the same result screen used
-by cached lookup. Cleanup failures have a cleanup-only retry.
+After an unknown barcode, capture **Front packaging → Nutrition facts → Ingredients**,
+then choose Analyze. Email OTP resumes the same draft and submits three binary
+photos to the protected Muse backend. Validated success returns an owner-private
+result, with a bounded 24-hour result/draft lifetime and exactly one successful
+analysis credit. Publication requires separate exact-evidence operator approval;
+private success alone does not enter the guest catalog. Shared publication adds no
+second analysis charge. See [private results](../docs/PICKWELL_PRIVATE_RESULTS.md),
+[Product Trust](../docs/PICKWELL_PRODUCT_TRUST.md) and
+[current hosted rollout](../docs/PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md).
+Retakes target the relevant photo; uncertain retries retain the bound request key.
 
 Results expose label evidence, explicit units/basis, unknowns, declared allergens
-and provenance, without an overall score or purchase UI. Only recent barcode/time
-references persist. No new client config or package is needed. Live new analysis
-remains unavailable while the existing server inference flag is off; this task did
-not enable it. See [results/submission evidence](../docs/PICKWELL_RESULTS_FLOW.md)
+and provenance, without an overall score or purchase UI. Shared recents retain
+barcode/time references; private results use owner-bound references separately.
+The latest recorded hosted rollout restored inference; this is historical deployment
+evidence, not a fresh live-provider test. See
+[results/submission evidence](../docs/PICKWELL_RESULTS_FLOW.md)
 for targeted checks and the deferred real-device/provider acceptance.
 
 ## Pickwell remaining usage
@@ -541,9 +546,10 @@ usage requests. See [T06.2 evidence](../docs/PICKWELL_QUOTA_UI.md).
 
 ## Pending analysis drafts
 
-One private photo draft survives Back and normal app restart for up to its 24-hour
-expiry; OS cache cleanup can remove it sooner. Home shows Needs analysis with
-Continue/Delete actions. Successful analysis clears it before result navigation.
+Up to five private photo drafts survive Back and normal app restart for up to their
+24-hour expiry; OS cache cleanup can remove them sooner. Home shows Needs analysis
+with Continue/Delete actions. Private success may retain bounded photos for the
+existing review/thumbnail handoff; it does not permanently retain originals.
 Daily service limits now show the local reset and a manual check action. Rebuild
 the app for these changes. See [pending analysis evidence](../docs/PICKWELL_PENDING_ANALYSES.md).
 

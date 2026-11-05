@@ -1,3 +1,10 @@
+> **Current state (T07.2A):** The November 4 C.4 rollout deployed Product Trust,
+> private results and optional thumbnails from `5178ec1`; earlier deferred/not-deployed
+> sections below are historical. See [current contract and setup](../README.md),
+> [hosted rollout](../docs/PICKWELL_HOSTED_PRIVATE_RESULTS_ROLLOUT.md) and
+> [submission blockers](../docs/PICKWELL_SUBMISSION_READINESS.md). Billing stays disabled;
+> no fresh live inference/device pass is claimed.
+
 # Supabase Project Structure
 
 This backend is optional for the consumer Flutter starter. Run CLI commands from
