@@ -56,7 +56,13 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(
-        find.text(record?.name == 'Fixture oats' ? 'Fixture oats' : 'Food product'),
+        find.text(
+          record == null
+              ? 'Connect to load product details'
+              : record.name == 'Fixture oats'
+              ? 'Fixture oats'
+              : 'Food product',
+        ),
         findsOneWidget,
       );
       expect(find.byType(ProductCardThumbnail), findsOneWidget);

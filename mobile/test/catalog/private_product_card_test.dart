@@ -21,6 +21,8 @@ import '../../lib/src/features/catalog/presentation/blocs/catalog/label_capture_
 import '../../lib/src/features/catalog/presentation/blocs/catalog/private_product_card_cubit.dart';
 import '../../lib/src/features/catalog/presentation/widgets/pending_capture_card.dart';
 import '../../lib/src/features/catalog/presentation/widgets/catalog_widget.dart';
+import '../../lib/src/features/catalog/presentation/widgets/catalog_card_skeleton.dart';
+import '../../lib/src/features/catalog/presentation/widgets/private_analysis_card.dart';
 import '../../lib/src/features/home/presentation/views/home_view.dart';
 import '../../lib/src/features/home/presentation/blocs/home/home_cubit.dart';
 import 'analysis_fixtures.dart';
@@ -84,6 +86,42 @@ void main() {
     authorized: () => authorized,
     onPublished: published,
   );
+  testWidgets('private card uses a skeleton until identity arrives and retains it during refresh', (
+    tester,
+  ) async {
+    api.wait = Completer();
+    final c = make();
+    final load = c.load();
+    await tester.pumpWidget(
+      host(
+        Scaffold(
+          body: BlocProvider.value(
+            value: c,
+            child: PrivateAnalysisCard(item: item),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(CatalogCardSkeleton), findsOneWidget);
+    expect(find.text('Food product'), findsNothing);
+    expect(find.byType(CatalogWidget), findsNothing);
+    api.wait!.complete(Right(privateResult()));
+    await load;
+    await tester.pumpAndSettle();
+    expect(find.byType(CatalogCardSkeleton), findsNothing);
+    expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
+    api.wait = Completer();
+    final refresh = c.load();
+    await tester.pump();
+    expect(find.byType(CatalogCardSkeleton), findsNothing);
+    expect(find.text('SYNTHETIC WIDGET FIXTURE'), findsOneWidget);
+    api.wait!.complete(Right(privateResult()));
+    await refresh;
+    expect(api.requests, isEmpty);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await c.close();
+  });
   test(
     'private card reads validated identity without submitting or entering published recents',
     () async {

@@ -25,7 +25,6 @@ class CatalogWidget extends StatelessWidget {
     final product = entry.product;
     return Semantics(
       button: true,
-      label: product == null ? l.pkCardUnavailable : null,
       child: Card(
         margin: EdgeInsets.zero,
         elevation: 2,
@@ -44,7 +43,10 @@ class CatalogWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ProductIdentityHeader(product: product, compact: true),
+                      if (product == null)
+                        Text(l.pkCardUnavailable, style: context.textTheme.bodyMedium)
+                      else
+                        ProductIdentityHeader(product: product, compact: true),
                       if (status != null) ...[Gap(d.spacingXxs), status!],
                     ],
                   ),

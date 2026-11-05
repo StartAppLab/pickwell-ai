@@ -18,6 +18,8 @@ import '../../lib/src/features/root/presentation/blocs/root/root_cubit.dart';
 import '../../lib/src/features/root/presentation/views/root_view.dart';
 import '../../lib/src/localization/l10n/app_localizations.dart';
 import 'catalog_cubit_test.dart' show FakeCatalog;
+import 'private_product_card_test.dart' show DelayedRecents;
+import '../../lib/src/features/catalog/presentation/widgets/catalog_card_skeleton.dart';
 
 AppConfig config() => const AppConfig(
   baseUrl: '',
@@ -35,6 +37,31 @@ void main() {
   });
   tearDown(() async {
     await getIt.reset();
+  });
+  testWidgets('Home loads card skeletons then truthful empty state without generic products', (
+    tester,
+  ) async {
+    final repo = DelayedRecents();
+    final home = HomeCubit(GetRecentProductsUseCase(repo));
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.lightTheme(AppColorScheme.lightColorScheme),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: BlocProvider.value(value: home, child: const HomeView()),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(CatalogCardSkeleton), findsNWidgets(3));
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Food product'), findsNothing);
+    expect(find.text('Your next food find starts here'), findsNothing);
+    repo.first.complete(const Right([]));
+    await tester.pumpAndSettle();
+    expect(find.byType(CatalogCardSkeleton), findsNothing);
+    expect(find.text('Your next food find starts here'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await home.close();
   });
   testWidgets(
     'guest empty Home has search/chips and separate far-right Scan; nested route hides dock',

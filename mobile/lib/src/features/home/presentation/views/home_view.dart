@@ -137,8 +137,10 @@ class _HomeViewState extends State<HomeView> {
                                     },
                                   ),
                                 if (loading) ...[
-                                  const Center(child: CircularProgressIndicator()),
-                                  Gap(d.spacingLg),
+                                  for (var i = 0; i < 3; i++) ...[
+                                    const CatalogCardSkeleton(),
+                                    Gap(d.spacingSm),
+                                  ],
                                 ],
                                 if (!loading && visible.isEmpty && !_hasPendingItems) ...[
                                   Gap(d.spacingXxl),
