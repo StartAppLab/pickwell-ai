@@ -35,3 +35,7 @@ need release-specific review before binary redistribution. Existing ignored buil
 artifacts and private validation environments are not included in this repository.
 No third-party trademark grant is inferred. Original and historical free-asset
 source gaps are explicitly recorded under the owner's requested review boundary.
+
+Upstream legal texts are preserved byte-for-byte. The local `.gitattributes`
+disables whitespace diagnostics only for copied license-text files; generated
+CSV inventories use LF endings. Source hashes remain independently checked.

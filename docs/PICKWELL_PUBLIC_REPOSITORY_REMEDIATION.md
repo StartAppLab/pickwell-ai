@@ -135,7 +135,10 @@ credential values or raw private API response files are committed.
   claims checked against repository examples, package commands and current reports.
 - License manifests verify content hashes; all current inventoried asset blobs
   still match the unchanged assets. Source attribution is labeled by evidence type.
-- Current/nonignored secret-pattern scan and diff whitespace check pass.
+- Current/nonignored secret-pattern scan and diff whitespace check pass. Generated
+  CSV line endings were normalized to LF; scoped attributes preserve verbatim
+  upstream legal-text whitespace. A follow-up commit records this correction
+  without rewriting the initial remediation commit.
 - No application code, dependency lockfile, migration, Edge Function or deployment
   setting changed, so completed Flutter/backend suites were not repeated. The prior
   analyzer, 223 Flutter, 42 backend, 21 tooling, Android build and APK scan evidence
